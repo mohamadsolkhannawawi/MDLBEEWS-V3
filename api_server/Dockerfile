@@ -2,7 +2,7 @@ FROM node:20-slim
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY api_server/package*.json ./
 RUN npm ci --production
 
 COPY api_server/ .
