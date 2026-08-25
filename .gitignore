@@ -3,3 +3,7 @@ data_archiver/data_archive
 mongo/*
 grafana/*
 rabbitmq/*
+.env
+influxDB/.env
+**/__pycache__/
+*.pyc

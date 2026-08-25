@@ -1,0 +1,87 @@
+# Prometheus Server Configuration
+# Scrapes metrics from all EEWS microservice modules
+# ==============================================================================
+
+global:
+  scrape_interval: 5s          # Scrape targets every 5 seconds
+  evaluation_interval: 5s      # Evaluate rules every 5 seconds
+  scrape_timeout: 4s           # Timeout per scrape
+
+scrape_configs:
+  # --- Prometheus self-monitoring ---
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # --- Node Exporter (host-level metrics: CPU, memory, disk, network) ---
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          instance: 'docker-host'
+
+  # --- EEWS Microservice Modules ---
+  - job_name: 'data_provider'
+    static_configs:
+      - targets: ['data_provider:8101']
+        labels:
+          module: 'data_provider'
+
+  - job_name: 'p_wave_detector'
+    dns_sd_configs:
+      - names: ['p_wave_detector']
+        type: 'A'
+        port: 8102
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+
+  - job_name: 'p_wave_detector_load_balance'
+    dns_sd_configs:
+      - names: ['p_wave_detector_load_balance']
+        type: 'A'
+        port: 8103
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+
+  - job_name: 'load_balancer'
+    dns_sd_configs:
+      - names: ['load_balancer']
+        type: 'A'
+        port: 8104
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+
+  - job_name: 'loc_mag_detector'
+    dns_sd_configs:
+      - names: ['loc_mag_detector']
+        type: 'A'
+        port: 8105
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+
+  - job_name: 'data_archiver'
+    dns_sd_configs:
+      - names: ['data_archiver']
+        type: 'A'
+        port: 8106
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+
+  - job_name: 'api_server'
+    static_configs:
+      - targets: ['api_server:8107']
+        labels:
+          module: 'api_server'
+    metrics_path: '/metrics'
+
+  - job_name: 'fast_api'
+    static_configs:
+      - targets: ['fast_api:8108']
+        labels:
+          module: 'fast_api'
+    metrics_path: '/metrics'
