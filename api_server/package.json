@@ -1,0 +1,20 @@
+{
+  "name": "eews-websocket-server",
+  "version": "2.0.0",
+  "description": "EEWS WebSocket Server (Express.js + Socket.IO) with Prometheus metrics",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mohamad Solkhan Nawawi",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "http": "^0.0.1-security",
+    "kafkajs": "^2.2.4",
+    "prom-client": "^15.1.3",
+    "socket.io": "^4.8.1"
+  }
+}
