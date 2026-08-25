@@ -1,0 +1,9 @@
+.git
+mongo
+influxDB
+node_modules
+grafana_data
+prometheus_data
+data_archiver/data_archive
+*.csv
+.env
