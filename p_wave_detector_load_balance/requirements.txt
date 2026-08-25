@@ -1,0 +1,8 @@
+kafka-python-ng==2.2.3
+obspy==1.4.1
+numpy==1.24.4
+tensorflow==2.10.0
+fastapi==0.115.8
+uvicorn==0.34.0
+cachetools==5.5.2
+prometheus_client==0.21.1
