@@ -10,8 +10,7 @@ ENV PIP_INDEX_URL=${PIP_INDEX_URL} \
     PIP_DEFAULT_TIMEOUT=120
 
 COPY fast_api/requirements.txt requirements.txt
-RUN python -m pip install --upgrade pip setuptools wheel
-RUN python -m pip install --no-cache-dir --index-url https://pypi.org/simple --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
+RUN python -m pip install --no-cache-dir --retries 5 --timeout 60 --index-url https://pypi.org/simple --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
 
 COPY config/ config/
 COPY utils/ utils/

@@ -16,7 +16,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     no_proxy='*'
 
 COPY loc_mag_detector/requirements.txt requirements.txt
-RUN python -m pip install --upgrade pip setuptools wheel
 RUN python -m pip install --no-cache-dir --retries 5 --timeout 60 --index-url https://pypi.org/simple --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
 
 COPY config/ config/
