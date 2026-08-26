@@ -3,8 +3,6 @@
 # Includes full pipeline + Prometheus + Grafana + Node Exporter
 # ==============================================================================
 
-version: '3.8'
-
 services:
   # ============================================================================
   # Infrastructure: Zookeeper + Kafka Cluster
