@@ -3,8 +3,8 @@ import csv
 import time
 import argparse
 import os
-
-PROMETHEUS_URL = "http://localhost:9090/api/v1/query"
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 # Define the PromQL queries we want to run and record
 QUERIES = {
@@ -20,27 +20,63 @@ QUERIES = {
     "active_ws_clients_fastapi": 'fastapi_ws_active_clients'
 }
 
-def fetch_metric(query):
-    try:
-        response = requests.get(PROMETHEUS_URL, params={'query': query})
-        response.raise_for_status()
-        results = response.json()['data']['result']
-        if results:
-            # For simplicity, returning the first result's value
-            return round(float(results[0]['value'][1]), 4)
-        return 0.0
-    except Exception as e:
-        print(f"Error fetching query '{query}': {e}")
-        return 0.0
+def create_session():
+    retry = Retry(
+        total=3,
+        connect=3,
+        read=3,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["GET"]
+    )
+    session = requests.Session()
+    session.mount("http://", HTTPAdapter(max_retries=retry))
+    session.mount("https://", HTTPAdapter(max_retries=retry))
+    return session
 
-def collect_metrics(duration_sec, interval_sec, output_file):
+
+def wait_for_prometheus(session, prometheus_url, timeout_sec=60):
+    ready_url = prometheus_url.rsplit('/api/v1/query', 1)[0] + '/-/ready'
+    deadline = time.time() + timeout_sec
+    while time.time() < deadline:
+        try:
+            response = session.get(ready_url, timeout=10)
+            if response.status_code == 200:
+                return
+        except requests.RequestException:
+            pass
+        time.sleep(2)
+    raise RuntimeError(f"Prometheus is not ready at {ready_url}")
+
+
+def fetch_metric(session, prometheus_url, query):
+    response = session.get(
+        prometheus_url,
+        params={'query': query},
+        timeout=30
+    )
+    response.raise_for_status()
+    payload = response.json()
+    if payload.get('status') != 'success':
+        raise RuntimeError(payload.get('error', 'Prometheus query failed'))
+    results = payload['data']['result']
+    if results:
+        return round(float(results[0]['value'][1]), 4)
+    return ''
+
+def collect_metrics(duration_sec, interval_sec, output_file, prometheus_url):
     print(f"Starting metrics collection for {duration_sec} seconds (interval: {interval_sec}s).")
     print(f"Output will be saved to: {output_file}")
     
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    output_dir = os.path.dirname(output_file)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
     
     headers = ["timestamp"] + list(QUERIES.keys())
     
+    session = create_session()
+    wait_for_prometheus(session, prometheus_url)
+
     with open(output_file, mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(headers)
@@ -51,7 +87,13 @@ def collect_metrics(duration_sec, interval_sec, output_file):
             row = [current_time]
             
             for name, query in QUERIES.items():
-                val = fetch_metric(query)
+                try:
+                    val = fetch_metric(session, prometheus_url, query)
+                except requests.RequestException as error:
+                    raise RuntimeError(f"Prometheus unavailable while querying {name}: {error}") from error
+                except (KeyError, TypeError, ValueError, RuntimeError) as error:
+                    print(f"Metric unavailable for '{name}': {error}")
+                    val = ''
                 row.append(val)
                 
             writer.writerow(row)
@@ -65,6 +107,7 @@ if __name__ == "__main__":
     parser.add_argument("--duration", type=int, default=60, help="Duration to collect metrics in seconds")
     parser.add_argument("--interval", type=int, default=5, help="Interval between scrapes in seconds")
     parser.add_argument("--output", type=str, default="results/metrics_output.csv", help="Output CSV file path")
+    parser.add_argument("--prometheus-url", default="http://localhost:9090/api/v1/query", help="Prometheus query API URL")
     args = parser.parse_args()
 
-    collect_metrics(args.duration, args.interval, args.output)
+    collect_metrics(args.duration, args.interval, args.output, args.prometheus_url)
