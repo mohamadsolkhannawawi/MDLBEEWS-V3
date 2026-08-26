@@ -1,4 +1,4 @@
-FROM python:3.10-slim-buster
+FROM python:3.10.14-slim-bullseye
 WORKDIR /app
 COPY data_provider_generator/requirements.txt requirements.txt
 RUN pip install --no-cache-dir --upgrade pip
