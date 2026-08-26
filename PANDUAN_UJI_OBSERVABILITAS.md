@@ -214,6 +214,25 @@ wc -l tests/results/s2_scalability.csv
 
 CSV harus memiliki header dan banyak timestamp. Metric yang belum memiliki observasi valid dicatat kosong, bukan `0.0` atau `nan`. Kolom kosong dapat normal untuk metric load balancer yang tidak aktif atau histogram sebelum memiliki observasi pada window `[1m]`. Gunakan hanya nilai numerik yang tersedia untuk statistik; jika metric yang seharusnya aktif kosong, periksa `/targets`, endpoint `/metrics`, dan log service.
 
+Setelah CSV S1a dan S1b tersedia, jalankan analisis otomatis:
+
+```powershell
+python tests/analyze_s1.py --s1a tests/results/s1a_no_metrics.csv --s1b tests/results/s1b_with_metrics.csv --output tests/results/s1_comparison.csv
+```
+
+Aturan perbandingan:
+
+- Nilai kosong dan `nan` adalah missing, bukan nol.
+- CPU dan memory dibandingkan menggunakan mean nilai numerik yang valid.
+- Perubahan absolut dihitung sebagai `S1b mean - S1a mean`.
+- Persentase perubahan dihitung sebagai `(perubahan absolut / S1a mean) * 100`.
+- Metric yang hanya tersedia pada S1b berstatus `no_baseline`, sehingga tidak dipakai untuk menghitung overhead.
+- Jika seluruh nilai metric kosong, statusnya tidak dapat dibandingkan.
+- Kolom load balancer boleh kosong jika service load balancer tidak aktif.
+- Histogram boleh kosong sebelum ada observasi dalam window `[1m]`.
+
+File `tests/results/s1_comparison.csv` berisi mean, median, standar deviasi, P95, jumlah valid, jumlah missing, perubahan absolut, persentase perubahan, dan status perbandingan.
+
 ## 8. Skenario Pengujian
 
 Script `tests/run_all_tests.ps1` berjalan di Windows PowerShell. Jalankan:

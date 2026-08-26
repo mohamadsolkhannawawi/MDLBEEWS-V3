@@ -233,6 +233,27 @@ python3 tests/collect_metrics.py --duration 120 --interval 5 --output tests/resu
 
 Metric yang dicatat meliputi CPU host (%), memory host (MB), P-Wave inference latency P95, Loc-Mag inference latency P95, end-to-end delay P95, active WebSocket clients, dan latency load balancer bila tersedia.
 
+### Analisis S1a dan S1b
+
+S1a menghasilkan baseline CPU dan memory host tanpa instrumentation Prometheus. S1b menghasilkan CPU dan memory host dari Prometheus serta metric pipeline lainnya. Jalankan analisis otomatis setelah kedua CSV tersedia:
+
+```powershell
+python tests/analyze_s1.py --s1a tests/results/s1a_no_metrics.csv --s1b tests/results/s1b_with_metrics.csv --output tests/results/s1_comparison.csv
+```
+
+Aturan analisis:
+
+- Kolom kosong dan nilai `nan` dianggap missing, bukan nol.
+- CPU dan memory dibandingkan menggunakan mean nilai valid S1a dan S1b.
+- `absolute_change = S1b mean - S1a mean`.
+- `percent_change = absolute_change / S1a mean * 100`.
+- Metric yang hanya ada di S1b diberi status `no_baseline` dan tidak digunakan untuk menghitung overhead.
+- Metric dengan seluruh nilai kosong diberi status tidak dapat dibandingkan.
+- Kolom load balancer boleh kosong jika service load balancer tidak aktif.
+- Histogram boleh kosong pada awal pengujian sebelum memiliki observasi pada window `[1m]`.
+
+Output analisis disimpan pada `tests/results/s1_comparison.csv` dan memuat mean, median, standar deviasi, P95, jumlah nilai valid, jumlah missing, perubahan absolut, serta persentase perubahan.
+
 Periksa output:
 
 ```bash
@@ -264,6 +285,12 @@ S1a tidak mengaktifkan Prometheus metrics. CPU dan memory host direkam otomatis 
 
 ```powershell
 ./tests/collect_host_metrics.ps1 -DurationSec 120 -IntervalSec 5 -OutputFile tests/results/s1a_no_metrics.csv
+```
+
+Setelah S1a dan S1b selesai, hitung perbandingan:
+
+```powershell
+python tests/analyze_s1.py --s1a tests/results/s1a_no_metrics.csv --s1b tests/results/s1b_with_metrics.csv --output tests/results/s1_comparison.csv
 ```
 
 ### S2: Skalabilitas Multi-Container
