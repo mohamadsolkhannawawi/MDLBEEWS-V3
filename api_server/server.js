@@ -1,10 +1,6 @@
-"""
-WebSocket Server (Express.js / Socket.IO) — Kafka Consumer → WebSocket
-Consumes trace data and location-magnitude results from Kafka,
-broadcasts to connected WebSocket clients.
-
-Instrumented with Prometheus metrics via prom-client.
-"""
+// WebSocket Server (Express.js / Socket.IO) - Kafka Consumer -> WebSocket
+// Consumes trace data and location-magnitude results from Kafka and broadcasts
+// them to connected WebSocket clients.
 
 const { Kafka } = require('kafkajs');
 const express = require("express");

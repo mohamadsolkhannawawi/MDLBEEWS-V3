@@ -17,18 +17,30 @@ from utils.logger import get_logger
 logger = get_logger("DataProvider")
 
 if ENABLE_METRICS:
-    from prometheus_client import start_http_server, Counter, Gauge
-    TRACES_SENT = Counter(
-        'data_provider_traces_sent_total',
+    from prometheus_client import REGISTRY, start_http_server, Counter, Gauge
+
+    def get_metric(metric_type, name, documentation, label_names=None):
+        registry_name = name.removesuffix('_total')
+        existing_metric = REGISTRY._names_to_collectors.get(registry_name)
+        if existing_metric is not None:
+            return existing_metric
+        metric_kwargs = {'labelnames': label_names} if label_names else {}
+        return metric_type(name, documentation, **metric_kwargs)
+
+    TRACES_SENT = get_metric(
+        Counter,
+        'TRACES_SENT',
         'Total number of trace messages sent to Kafka',
         ['topic']
     )
-    PUBLISH_ERRORS = Counter(
-        'data_provider_publish_errors_total',
+    PUBLISH_ERRORS = get_metric(
+        Counter,
+        'PUBLISH_ERRORS',
         'Total number of Kafka publish errors'
     )
-    ACTIVE_STREAMS = Gauge(
-        'data_provider_active_streams',
+    ACTIVE_STREAMS = get_metric(
+        Gauge,
+        'ACTIVE_STREAMS',
         'Number of active SeedLink streams'
     )
 else:
