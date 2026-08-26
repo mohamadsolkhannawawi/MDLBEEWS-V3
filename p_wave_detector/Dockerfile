@@ -3,7 +3,7 @@ FROM python:3.10-slim-bullseye
 WORKDIR /app
 
 COPY p_wave_detector/requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 COPY config/ config/
 COPY utils/ utils/
