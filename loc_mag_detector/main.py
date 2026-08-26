@@ -66,7 +66,7 @@ class TraceConsumer:
     def __init__(self):
         self.consumer = None
         self.producer = None
-        self.model = tf.keras.models.load_model('./loc_mag_detector/model_loc_mag.h5', compile=False)
+        self.model = tf.keras.models.load_model('./model_loc_mag.h5', compile=False)
 
     def preprocessingPWave(self, data: np.ndarray) -> np.ndarray:
         return data / np.max(np.abs(data), axis=0)

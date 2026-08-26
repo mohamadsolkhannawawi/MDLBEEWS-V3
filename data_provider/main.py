@@ -79,4 +79,4 @@ if __name__ == '__main__':
     num_stations = int(os.getenv("DATA_PROVIDER_NUM_STATIONS", "6000"))
 
     logger.info(f"Launching multi_process with {num_processes} processes and {num_stations} stations")
-    main(station_path='./data_provider/data/stations.json', num_processes=num_processes, num_station_configs=num_stations)
+    main(station_path='./data/stations.json', num_processes=num_processes, num_station_configs=num_stations)

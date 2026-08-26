@@ -78,7 +78,7 @@ class TraceConsumer:
     def __init__(self):
         self.consumer = None
         self.producer = None
-        self.model = tf.keras.models.load_model('./p_wave_detector/model_p_wave.h5', compile=False)
+        self.model = tf.keras.models.load_model('./model_p_wave.h5', compile=False)
         self.last_waveform: Dict[str, list] = {}
         self.cache_lock = threading.Lock()
 
