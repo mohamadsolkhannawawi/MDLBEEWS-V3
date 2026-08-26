@@ -50,6 +50,7 @@ if (ENABLE_METRICS) {
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+const metricsApp = express();
 
 const KAFKA_BROKERS = (process.env.KAFKA_BROKERS_ALL || 'kafka1:9092,kafka2:9093,kafka3:9094').split(',');
 const KAFKA_TOPIC_TRACE = process.env.KAFKA_TOPIC_TRACE || 'trace_topic';
@@ -160,9 +161,9 @@ const initializeWebSocket2 = (consumer2) => {
 const main = async () => {
   app.use(cors());
 
-  // --- Prometheus /metrics endpoint ---
+  // --- Prometheus metrics server ---
   if (ENABLE_METRICS) {
-    app.get('/metrics', async (req, res) => {
+    metricsApp.get('/metrics', async (req, res) => {
       try {
         res.set('Content-Type', promClient.register.contentType);
         res.end(await promClient.register.metrics());
@@ -170,7 +171,9 @@ const main = async () => {
         res.status(500).end(err.message);
       }
     });
-    console.log(`[ApiServer] Prometheus /metrics endpoint enabled`);
+    metricsApp.listen(METRICS_PORT, () => {
+      console.log(`[ApiServer] Prometheus metrics server listening on port ${METRICS_PORT}`);
+    });
   }
 
   // Health check
