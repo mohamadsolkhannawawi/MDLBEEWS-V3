@@ -83,6 +83,21 @@ docker compose ps
 
 Container utama harus `Up (healthy)`: `api_server`, `fast_api`, `data_provider`, `p_wave_detector`, `loc_mag_detector`, dan `data_archiver`. Kafka dan Zookeeper harus `Up`, bukan `Restarting` atau `Exited`.
 
+Urutan wajib sebelum mengumpulkan angka:
+
+1. Pastikan Docker Engine berjalan.
+2. Pastikan `.env` dan `influxDB/.env` tersedia.
+3. Jalankan `docker compose config`.
+4. Jalankan `docker compose up -d` atau `docker compose up -d --build`.
+5. Tunggu 30 sampai 60 detik agar Kafka selesai startup dan memilih leader.
+6. Jalankan `docker compose ps` dan tunggu service utama berstatus `Up (healthy)`.
+7. Jalankan `curl.exe http://localhost:9090/-/ready` pada Windows atau `curl http://localhost:9090/-/ready` pada Ubuntu.
+8. Jalankan query Prometheus `up` dan pastikan target utama bernilai `1`.
+9. Periksa log service utama dan pastikan tidak ada restart, model hilang, atau file data hilang.
+10. Baru jalankan `tests/collect_metrics.py`.
+
+Jangan menjalankan pengumpulan metric setelah script skenario selesai tanpa menyalakan Compose lagi, karena script akan membersihkan container di akhir eksekusi.
+
 Untuk rebuild satu service:
 
 ```bash
@@ -104,6 +119,7 @@ Gunakan URL ini pada host Docker. Untuk komputer lain, ganti `localhost` dengan 
 | Express metrics | `http://localhost:8107/metrics` |
 | FastAPI WebSocket | `http://localhost:3334` |
 | FastAPI health | `http://localhost:3334/health` |
+| FastAPI metrics | `http://localhost:8108/metrics` |
 | Grafana | `http://localhost:4000` |
 | Prometheus targets | `http://localhost:9090/targets` |
 | Prometheus graph | `http://localhost:9090/graph` |
@@ -196,7 +212,7 @@ head -5 tests/results/s2_scalability.csv
 wc -l tests/results/s2_scalability.csv
 ```
 
-CSV harus memiliki header dan banyak timestamp. Nilai 0 dapat normal untuk metric tanpa traffic.
+CSV harus memiliki header dan banyak timestamp. Metric yang belum memiliki observasi valid dicatat kosong, bukan `0.0` atau `nan`. Nilai 0 hanya boleh diinterpretasikan sebagai nilai metric yang memang benar-benar nol.
 
 ## 8. Skenario Pengujian
 

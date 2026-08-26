@@ -327,7 +327,7 @@ services:
       dockerfile: fast_api/Dockerfile
     ports:
       - "3334:3333"
-      - "8108:8108"
+      - "8108:3333"
     tty: true
     env_file:
       - .env

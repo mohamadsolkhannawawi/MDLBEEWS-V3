@@ -154,6 +154,21 @@ docker compose ps
 
 Service utama harus berstatus `Up (healthy)`: `api_server`, `fast_api`, `data_provider`, `p_wave_detector`, `loc_mag_detector`, dan `data_archiver`. Kafka, Zookeeper, MongoDB, InfluxDB, Prometheus, dan Grafana minimal harus `Up`.
 
+Urutan wajib sebelum mengambil angka pengujian:
+
+1. Pastikan Docker Engine berjalan.
+2. Pastikan `.env` dan `influxDB/.env` tersedia.
+3. Jalankan `docker compose config`.
+4. Jalankan `docker compose up -d` atau `docker compose up -d --build`.
+5. Tunggu 30 sampai 60 detik agar Kafka selesai startup.
+6. Jalankan `docker compose ps` dan tunggu service utama `Up (healthy)`.
+7. Periksa kesiapan Prometheus dengan `curl.exe http://localhost:9090/-/ready` pada Windows atau `curl http://localhost:9090/-/ready` pada Ubuntu.
+8. Jalankan query Prometheus `up` dan pastikan target utama bernilai `1`.
+9. Periksa log service utama.
+10. Baru jalankan `tests/collect_metrics.py`.
+
+Jangan menjalankan pengumpulan metric setelah script skenario selesai tanpa menjalankan Compose lagi, karena script skenario membersihkan container pada akhir eksekusi.
+
 ## 6. URL Aplikasi dan Credential
 
 | Layanan | URL | Input |
@@ -162,6 +177,7 @@ Service utama harus berstatus `Up (healthy)`: `api_server`, `fast_api`, `data_pr
 | Express metrics | `http://localhost:8107/metrics` | Tidak ada |
 | FastAPI WebSocket | `http://localhost:3334` | Tidak ada |
 | FastAPI health | `http://localhost:3334/health` | Tidak ada |
+| FastAPI metrics | `http://localhost:8108/metrics` | Tidak ada |
 | Grafana | `http://localhost:4000` | `admin` / `12345678` |
 | Prometheus | `http://localhost:9090` | Tidak ada |
 | Prometheus targets | `http://localhost:9090/targets` | Tidak ada |
@@ -224,7 +240,7 @@ head -5 tests/results/s2_scalability.csv
 wc -l tests/results/s2_scalability.csv
 ```
 
-Dengan durasi 120 detik dan interval 5 detik, file biasanya memiliki sekitar 25 baris data selain header. Nilai `0.0` dapat berarti metric belum memiliki traffic atau belum tersedia.
+Dengan durasi 120 detik dan interval 5 detik, file biasanya memiliki sekitar 25 baris data selain header. Metric yang belum memiliki observasi valid ditulis kosong, bukan `0.0` atau `nan`. Nilai `0.0` hanya boleh dianggap sebagai nol yang valid jika query memang mengembalikan nol.
 
 ## 9. Empat Skenario Pengujian Skripsi
 

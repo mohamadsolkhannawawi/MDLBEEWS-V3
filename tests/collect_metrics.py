@@ -3,6 +3,7 @@ import csv
 import time
 import argparse
 import os
+import math
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
@@ -61,7 +62,8 @@ def fetch_metric(session, prometheus_url, query):
         raise RuntimeError(payload.get('error', 'Prometheus query failed'))
     results = payload['data']['result']
     if results:
-        return round(float(results[0]['value'][1]), 4)
+        value = float(results[0]['value'][1])
+        return round(value, 4) if math.isfinite(value) else ''
     return ''
 
 def collect_metrics(duration_sec, interval_sec, output_file, prometheus_url):
