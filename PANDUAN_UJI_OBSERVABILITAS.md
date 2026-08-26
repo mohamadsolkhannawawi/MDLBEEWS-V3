@@ -92,9 +92,9 @@ Urutan wajib sebelum mengumpulkan angka:
 5. Tunggu 30 sampai 60 detik agar Kafka selesai startup dan memilih leader.
 6. Jalankan `docker compose ps` dan tunggu service utama berstatus `Up (healthy)`.
 7. Jalankan `curl.exe http://localhost:9090/-/ready` pada Windows atau `curl http://localhost:9090/-/ready` pada Ubuntu.
-8. Jalankan query Prometheus `up` dan pastikan target utama bernilai `1`.
+8. Jalankan query Prometheus `up`: `curl.exe "http://localhost:9090/api/v1/query?query=up"` dan pastikan target utama bernilai `1`.
 9. Periksa log service utama dan pastikan tidak ada restart, model hilang, atau file data hilang.
-10. Baru jalankan `tests/collect_metrics.py`.
+10. Untuk S1a jalankan `tests/collect_host_metrics.ps1`; untuk S1b-S4 jalankan `tests/collect_metrics.py`.
 
 Jangan menjalankan pengumpulan metric setelah script skenario selesai tanpa menyalakan Compose lagi, karena script akan membersihkan container di akhir eksekusi.
 
@@ -212,7 +212,7 @@ head -5 tests/results/s2_scalability.csv
 wc -l tests/results/s2_scalability.csv
 ```
 
-CSV harus memiliki header dan banyak timestamp. Metric yang belum memiliki observasi valid dicatat kosong, bukan `0.0` atau `nan`. Nilai 0 hanya boleh diinterpretasikan sebagai nilai metric yang memang benar-benar nol.
+CSV harus memiliki header dan banyak timestamp. Metric yang belum memiliki observasi valid dicatat kosong, bukan `0.0` atau `nan`. Kolom kosong dapat normal untuk metric load balancer yang tidak aktif atau histogram sebelum memiliki observasi pada window `[1m]`. Gunakan hanya nilai numerik yang tersedia untuk statistik; jika metric yang seharusnya aktif kosong, periksa `/targets`, endpoint `/metrics`, dan log service.
 
 ## 8. Skenario Pengujian
 

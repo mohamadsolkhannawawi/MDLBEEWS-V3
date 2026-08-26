@@ -38,8 +38,8 @@ function Run-Scenario {
     Start-Sleep -Seconds 60
 
     if ($Name -eq "S1a (Tanpa Metrics)") {
-        Write-Host "4. Scenario S1a tidak memiliki endpoint Prometheus aktif. Melewati collect_metrics.py."
-        Write-Host "Pengujian manual diperlukan dari sisi resource monitor host."
+        Write-Host "4. Collecting host CPU and memory metrics for S1a..."
+        & $PSScriptRoot/collect_host_metrics.ps1 -DurationSec $DurationSec -IntervalSec 5 -OutputFile $OutputFile
     } else {
         Write-Host "4. Collecting metrics for $DurationSec seconds..."
         & $PythonExecutable tests/collect_metrics.py --duration $DurationSec --interval 5 --output $OutputFile

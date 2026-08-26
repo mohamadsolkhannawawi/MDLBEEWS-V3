@@ -165,7 +165,7 @@ Urutan wajib sebelum mengambil angka pengujian:
 7. Periksa kesiapan Prometheus dengan `curl.exe http://localhost:9090/-/ready` pada Windows atau `curl http://localhost:9090/-/ready` pada Ubuntu.
 8. Jalankan query Prometheus `up` dan pastikan target utama bernilai `1`.
 9. Periksa log service utama.
-10. Baru jalankan `tests/collect_metrics.py`.
+10. Untuk S1a jalankan `tests/collect_host_metrics.ps1`; untuk S1b-S4 jalankan `tests/collect_metrics.py`.
 
 Jangan menjalankan pengumpulan metric setelah script skenario selesai tanpa menjalankan Compose lagi, karena script skenario membersihkan container pada akhir eksekusi.
 
@@ -240,7 +240,7 @@ head -5 tests/results/s2_scalability.csv
 wc -l tests/results/s2_scalability.csv
 ```
 
-Dengan durasi 120 detik dan interval 5 detik, file biasanya memiliki sekitar 25 baris data selain header. Metric yang belum memiliki observasi valid ditulis kosong, bukan `0.0` atau `nan`. Nilai `0.0` hanya boleh dianggap sebagai nol yang valid jika query memang mengembalikan nol.
+Dengan durasi 120 detik dan interval 5 detik, file biasanya memiliki sekitar 25 baris data selain header. Metric yang belum memiliki observasi valid ditulis kosong, bukan `0.0` atau `nan`. Kolom kosong dapat normal untuk metric load balancer yang tidak aktif atau histogram sebelum memiliki observasi pada window `[1m]`. Gunakan hanya nilai numerik yang tersedia untuk statistik; jika metric yang seharusnya aktif kosong, periksa `/targets`, endpoint `/metrics`, dan log service.
 
 ## 9. Empat Skenario Pengujian Skripsi
 
@@ -260,7 +260,11 @@ Mengukur pengaruh instrumentation terhadap CPU, memory, dan latency.
 ./tests/run_all_tests.ps1 -Scenario s1b
 ```
 
-S1a tidak mengumpulkan Prometheus metrics; catat resource host secara manual.
+S1a tidak mengaktifkan Prometheus metrics. CPU dan memory host direkam otomatis tanpa Task Manager:
+
+```powershell
+./tests/collect_host_metrics.ps1 -DurationSec 120 -IntervalSec 5 -OutputFile tests/results/s1a_no_metrics.csv
+```
 
 ### S2: Skalabilitas Multi-Container
 
