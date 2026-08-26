@@ -11,6 +11,19 @@ param (
 
 $PythonExecutable = "python" # Atau "python3" tergantung env
 
+function Test-OutputWritable {
+    param ([string]$OutputFile)
+
+    if (Test-Path $OutputFile) {
+        try {
+            $stream = [System.IO.File]::Open($OutputFile, 'Open', 'ReadWrite', 'None')
+            $stream.Close()
+        } catch {
+            throw "Output file is locked or inaccessible: $OutputFile. Close Excel or another editor, then run the scenario again."
+        }
+    }
+}
+
 function Run-Scenario {
     param (
         [string]$Name,
@@ -42,7 +55,12 @@ function Run-Scenario {
         & $PSScriptRoot/collect_host_metrics.ps1 -DurationSec $DurationSec -IntervalSec 5 -OutputFile $OutputFile
     } else {
         Write-Host "4. Collecting metrics for $DurationSec seconds..."
+        Test-OutputWritable -OutputFile $OutputFile
         & $PythonExecutable tests/collect_metrics.py --duration $DurationSec --interval 5 --output $OutputFile
+    }
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Scenario $Name failed while collecting metrics. Exit code: $LASTEXITCODE"
     }
 
     Write-Host "5. Scenario $Name completed." -ForegroundColor Green

@@ -262,6 +262,10 @@ docker compose logs --tail=100 api_server
 docker compose logs --tail=100 fast_api
 ```
 
+### CSV permission denied
+
+Jika collector menampilkan `PermissionError`, tutup file CSV di Excel, VS Code, atau editor lain. Script skenario memeriksa file output sebelum pengujian dan menghentikan skenario dengan status gagal, bukan menampilkan pesan sukses palsu.
+
 Error `ModuleNotFoundError: tensorflow` berarti detector perlu dibuild ulang. Error model `model_*.h5` berarti file model belum tersedia di image. Error `stations.json` berarti path data provider salah atau file tidak ikut image. Error `ECONNREFUSED` Kafka dapat terjadi selama startup; tunggu 30 sampai 60 detik dan cek broker.
 
 Untuk masalah build:

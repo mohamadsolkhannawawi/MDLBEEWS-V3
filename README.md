@@ -447,6 +447,10 @@ docker compose ps
 docker compose logs --tail=100 <service>
 ```
 
+### CSV permission denied
+
+Jika `collect_metrics.py` menampilkan `PermissionError`, tutup file CSV di Excel, VS Code, atau editor lain. Script skenario memeriksa file output sebelum pengujian dan akan berhenti dengan status gagal, bukan melaporkan skenario berhasil secara palsu.
+
 ### Model tidak ditemukan
 
 Pastikan file berikut ada dan ikut build context:

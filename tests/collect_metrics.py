@@ -79,7 +79,14 @@ def collect_metrics(duration_sec, interval_sec, output_file, prometheus_url):
     session = create_session()
     wait_for_prometheus(session, prometheus_url)
 
-    with open(output_file, mode='w', newline='') as file:
+    try:
+        output_file_handle = open(output_file, mode='w', newline='')
+    except PermissionError as error:
+        raise PermissionError(
+            f"Cannot write '{output_file}'. Close Excel or another program using the file, then retry."
+        ) from error
+
+    with output_file_handle as file:
         writer = csv.writer(file)
         writer.writerow(headers)
         
