@@ -1,72 +1,72 @@
 # MDLBEEWS: Modular Deep Learning Based Earthquake Early Warning System
 
-## Deskripsi Sistem
+## Overview
+MDLBEEWS is a high-performance, event-driven microservices architecture designed for real-time Earthquake Early Warning. By leveraging deep learning alongside robust data streaming technologies, the system is capable of analyzing continuous seismic waveforms, detecting P-Waves, computing earthquake location and magnitude, and disseminating real-time alerts with minimal latency.
 
-MDLBEEWS (*Modular Deep Learning Based Earthquake Early Warning System*) adalah sebuah sistem peringatan dini gempa bumi berbasis *deep learning* yang dirancang dengan arsitektur *microservices* modern. Sistem ini bertujuan untuk memproses data seismik secara *real-time* dan memprediksi potensi gempa dengan latensi seminimal mungkin, guna mendukung respons cepat mitigasi bencana. 
+The platform is fully containerized, horizontally scalable, and features a comprehensive observability stack to monitor system health, throughput, and end-to-end latency across all distributed components.
 
-Fokus utama dari repositori ini adalah pada **pengembangan arsitektur backend yang scalable dan observable**. Sistem ini mengimplementasikan konsep *Event-Driven Architecture* (EDA) untuk memastikan aliran data berkecepatan tinggi antar layanan tidak terhambat (*bottleneck*).
+## Architecture & Microservices
+The system follows an **Event-Driven Microservices** paradigm, decoupling data ingestion from processing and archival via Apache Kafka. 
 
-## Arsitektur & Teknologi Utama
+### Core Components
+1. **Data Provider**
+   Connects to seismic sensors (via SeedLink protocol), parses multiplexed MiniSEED data into standardized JSON formats, and publishes raw waveform streams to the `eews-data` Kafka topic.
+2. **P-Wave Detector**
+   Consumes raw seismic data, preprocesses it, and utilizes a Deep Learning model to detect the arrival of Primary Waves (P-Waves). It publishes detection events to the `p-wave-picks` Kafka topic.
+3. **Location & Magnitude (Loc-Mag) Detector**
+   Listens to P-Wave detection events and estimates the hypocenter (location) and magnitude of the potential earthquake, issuing the final early warning alerts.
+4. **Data Archiver**
+   Acts as the system's sink, consuming all processed data and metadata. It archives continuous waveforms into standard MiniSEED files and stores event metadata into a MongoDB database for post-event analysis.
+5. **Real-time API Servers (WebSockets)**
+   Both Express.js and FastAPI implementations exist to broadcast real-time alerts to frontend dashboards and mobile clients via low-latency WebSockets.
 
-Pengembangan aplikasi ini bertumpu pada teknologi-teknologi standar industri untuk *streaming* dan *monitoring*:
+### Infrastructure & Observability
+- **Message Broker:** Apache Kafka & Zookeeper (handles high-throughput asynchronous communication).
+- **Database:** MongoDB (for JSON metadata and processing logs).
+- **Observability Stack:** Prometheus and Grafana are integrated to scrape and visualize metrics (CPU/Memory usage, Kafka lag, end-to-end processing delays, and system throughput).
 
-- **Containerization (Docker & Docker Compose):** Seluruh modul diisolasi ke dalam container masing-masing untuk memudahkan deployment dan skalabilitas horizontal.
-- **Message Broker (Apache Kafka):** Berfungsi sebagai tulang punggung (backbone) sistem untuk mendistribusikan data *waveform* seismik antar layanan (*decoupled services*) secara *real-time* dengan toleransi kesalahan (*fault-tolerant*).
-- **WebSockets (FastAPI & Express.js):** Menangani pengiriman peringatan dan *update* data ke *client/frontend* secara dua arah (bidirectional) dengan latensi rendah.
-- **Observability Stack (Prometheus & Grafana):** Sistem pemantauan komprehensif terintegrasi untuk melacak metrik krusial seperti penggunaan CPU, memori, latensi komunikasi antar-layanan (*inter-service latency*), dan *end-to-end data delay*.
-- **Machine Learning (TensorFlow):** Model *deep learning* ditempatkan pada modul khusus untuk memproses inferensi P-Wave secara efisien tanpa membebani layanan pengumpul data.
+## Prerequisites
+- Docker Engine and Docker Compose (v2)
+- At least 8GB of RAM allocated to Docker (16GB recommended for running the full observability and deep learning stack).
 
-## Struktur Microservices
+## Getting Started
 
-Sistem ini terbagi ke dalam beberapa *service* terpisah yang memiliki tanggung jawab tunggal (*Single Responsibility Principle*):
-
-1. **Data Provider:** Mengambil data seismik mentah (contoh: via SeedLink) dan mempublikasikannya ke topik Kafka.
-2. **P-Wave Detector:** Mengkonsumsi data dari Kafka, melakukan *preprocessing*, menjalankan inferensi *deep learning*, dan mempublikasikan peringatan dini jika anomali terdeteksi.
-3. **Loc-Mag Detector:** Memperkirakan lokasi episentrum dan magnitudo gempa lanjutan berdasarkan data peringatan.
-4. **Data Archiver:** Menyimpan *log* metadata ke dalam MongoDB dan arsip data seismik (MiniSEED) ke sistem penyimpanan lokal.
-5. **WebSocket Servers:** Bertugas sebagai *Gateway* antara sistem Kafka internal dengan klien eksternal.
-
-## Panduan Instalasi & Pengembangan
-
-### Prasyarat
-- Docker dan Docker Compose.
-- Environment yang memadai (RAM minimal 8GB direkomendasikan untuk menjalankan seluruh *stack* ML dan Observability).
-
-### Instalasi
-1. Clone repositori pengembangan ini:
+1. **Clone the Repository**
    ```bash
-   git clone https://github.com/developer/MDLBEEWS.git
+   git clone https://github.com/your-org/MDLBEEWS.git
    cd MDLBEEWS
    ```
-2. Salin *environment variables* (opsional jika ingin kustomisasi):
+
+2. **Environment Configuration**
+   Copy the example environment variables file and modify it if necessary:
    ```bash
    cp .env.example .env
    ```
-3. Bangun dan jalankan seluruh container:
+
+3. **Build and Run the System**
+   Launch the entire microservices ecosystem, including Kafka, MongoDB, processing nodes, and the observability stack:
    ```bash
    docker compose up -d --build
    ```
 
-## Akses Layanan & Monitoring
+## Monitoring & Observability
+Once the system is operational, you can access the monitoring interfaces to observe the real-time performance of the deep learning pipeline:
 
-Setelah sistem berjalan, Anda dapat memonitor kinerjanya melalui:
-- **Grafana Dashboard:** `http://localhost:4000` (Login: `admin` / `12345678`)
-- **Prometheus UI:** `http://localhost:9090`
-- **Node Exporter:** `http://localhost:9100`
+- **Grafana Dashboard:** http://localhost:4000 (Default Login: `admin` / `12345678`)
+- **Prometheus UI:** http://localhost:9090
+- **Node Exporter:** http://localhost:9100
 
-Untuk menghentikan *environment* pengembangan:
+To gracefully shut down the environment and remove the created containers and networks:
 ```bash
 docker compose down -v
 ```
 
-## Pengujian Observabilitas
-
-Sebagai bagian dari pengembangan sistem, terdapat skrip otomatis untuk menguji beban kerja aplikasi (overhead observabilitas, *load balancing*, dan perbandingan latensi):
-
-```powershell
-# Menjalankan seluruh tes performa secara berurutan
-./tests/run_all_tests.ps1 -Scenario all
+## System Scalability
+The architecture is designed to scale horizontally. If the volume of seismic stations increases, you can easily scale the consumer services. For example, to run multiple instances of the P-Wave Detector:
+```bash
+docker compose up -d --scale p_wave_detector=3
 ```
+*(Note: Kafka partitions must be configured to match or exceed the number of consumer replicas for effective load distribution).*
 
-## Lisensi
-Proyek ini dilisensikan di bawah lisensi MIT.
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
