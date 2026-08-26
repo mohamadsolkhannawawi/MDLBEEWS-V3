@@ -1,9 +1,8 @@
-FROM python:3.10.14-slim-bullseye
+FROM python:3.10.14-bullseye
 
 WORKDIR /app
 
 COPY p_wave_detector/requirements.txt requirements.txt
-RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY config/ config/
