@@ -1,11 +1,10 @@
-FROM python:3.10.14-bullseye
+FROM python:3.10-slim-bookworm
 
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_INDEX_URL=https://pypi.org/simple \
-    PIP_EXTRA_INDEX_URL='' \
+    PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_DEFAULT_TIMEOUT=120 \
     HTTP_PROXY='' \
@@ -16,7 +15,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     no_proxy='*'
 
 COPY p_wave_detector/requirements.txt requirements.txt
-RUN python -m pip install --no-cache-dir --retries 5 --timeout 60 --index-url https://pypi.org/simple --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
+RUN python -m pip install --retries 5 --timeout 60 --index-url https://pypi.org/simple --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
 
 COPY config/ config/
 COPY utils/ utils/
