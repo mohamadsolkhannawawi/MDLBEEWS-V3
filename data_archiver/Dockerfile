@@ -15,6 +15,16 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     no_proxy='*'
 
 COPY data_archiver/requirements.txt requirements.txt
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    gfortran \
+    libblas-dev \
+    liblapack-dev \
+    libatlas-base-dev \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 RUN python -m pip install --retries 5 --timeout 60 --index-url https://pypi.org/simple --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
 
 COPY config/ config/
