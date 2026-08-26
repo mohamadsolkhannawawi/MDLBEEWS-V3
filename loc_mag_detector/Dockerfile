@@ -3,6 +3,7 @@ FROM python:3.10.14-bullseye
 WORKDIR /app
 
 COPY loc_mag_detector/requirements.txt requirements.txt
+RUN pip install --no-cache-dir pip==24.0
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY config/ config/

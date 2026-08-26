@@ -1,9 +1,9 @@
-FROM python:3.10.14-slim-bullseye
+FROM python:3.10.14-bullseye
 
 WORKDIR /app
 
 COPY fast_api/requirements.txt requirements.txt
-RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir pip==24.0
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY config/ config/
