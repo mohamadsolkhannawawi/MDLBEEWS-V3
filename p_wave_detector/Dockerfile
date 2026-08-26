@@ -2,16 +2,22 @@ FROM python:3.10.14-bullseye
 
 WORKDIR /app
 
-ARG PIP_INDEX_URL=https://pypi.org/simple
-ARG PIP_EXTRA_INDEX_URL=
-ENV PIP_INDEX_URL=${PIP_INDEX_URL} \
-    PIP_EXTRA_INDEX_URL=${PIP_EXTRA_INDEX_URL} \
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_INDEX_URL=https://pypi.org/simple \
+    PIP_EXTRA_INDEX_URL='' \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_DEFAULT_TIMEOUT=120
+    PIP_DEFAULT_TIMEOUT=120 \
+    HTTP_PROXY='' \
+    HTTPS_PROXY='' \
+    http_proxy='' \
+    https_proxy='' \
+    NO_PROXY='*' \
+    no_proxy='*'
 
 COPY p_wave_detector/requirements.txt requirements.txt
 RUN python -m pip install --upgrade pip setuptools wheel
-RUN python -m pip install --no-cache-dir --index-url https://pypi.org/simple --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
+RUN python -m pip install --no-cache-dir --retries 5 --timeout 60 --index-url https://pypi.org/simple --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
 
 COPY config/ config/
 COPY utils/ utils/

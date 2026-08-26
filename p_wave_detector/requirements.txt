@@ -1,6 +1,5 @@
 kafka-python-ng==2.2.3
 obspy==1.4.1
 numpy==1.24.4
-tensorflow==2.10.0
 influxdb_client==1.44.0
 prometheus_client==0.21.1
