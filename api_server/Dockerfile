@@ -3,7 +3,7 @@ FROM node:20-slim
 WORKDIR /app
 
 COPY api_server/package*.json ./
-RUN npm ci --production
+RUN npm install --omit=dev
 
 COPY api_server/ .
 
