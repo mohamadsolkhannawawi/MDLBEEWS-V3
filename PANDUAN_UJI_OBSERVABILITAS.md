@@ -1,297 +1,591 @@
-# Panduan Validasi dan Pengujian Sistem EEWS
+# Panduan Pengujian Observabilitas EEWS — Skenario S1 hingga S4
 
-Dokumen ini memandu pengoperasian, validasi, pengambilan screenshot, dan pengumpulan data untuk sistem EEWS berbasis Docker, Kafka, microservices, Prometheus, Grafana, MongoDB, dan InfluxDB.
-
----
-
-## 1. Prasyarat
-
-Windows membutuhkan Docker Desktop, Git, Python 3.10+, PowerShell, RAM minimal 8 GB, dan ruang kosong minimal 30 GB. VM Ubuntu membutuhkan Docker Engine, Docker Compose Plugin, Git, akses internet, minimal 4 vCPU, RAM 8 GB, dan ruang kosong 30 GB.
-
-Periksa versi:
-
-```bash
-docker --version
-docker compose version
-git --version
-python --version
-```
-
-Install library pengumpul metric pada host:
-
-```bash
-python -m pip install requests
-```
+Dokumen ini adalah panduan langkah-demi-langkah untuk melaksanakan seluruh pengujian BAB IV, mulai dari persiapan awal hingga semua file CSV output berhasil dikumpulkan. Skenario S1–S4 sesuai dengan Tabel 3.3 pada BAB III.
 
 ---
 
-## 2. Mengambil Source Code dan Environment
+## Daftar Isi
 
-Clone pertama kali:
+1. [Prasyarat dan Persiapan Awal](#1-prasyarat-dan-persiapan-awal)
+2. [Mengambil Source Code](#2-mengambil-source-code)
+3. [Pemasangan Dependensi Python](#3-pemasangan-dependensi-python)
+4. [Validasi Sistem Sebelum Pengujian](#4-validasi-sistem-sebelum-pengujian)
+5. [Panduan Pengambilan Screenshot](#5-panduan-pengambilan-screenshot)
+6. [S1 — Overhead Instrumentasi Prometheus](#6-s1--overhead-instrumentasi-prometheus)
+7. [S2 — Skalabilitas Multi-Container](#7-s2--skalabilitas-multi-container)
+8. [S3 — Perbandingan WebSocket Server](#8-s3--perbandingan-websocket-server)
+9. [S4 — Kafka vs Kafka+NGINX Load Balancer](#9-s4--kafka-vs-kafkanginx-load-balancer)
+10. [Menjalankan Semua Skenario Sekaligus](#10-menjalankan-semua-skenario-sekaligus)
+11. [Checklist Output yang Harus Dikumpulkan](#11-checklist-output-yang-harus-dikumpulkan)
+12. [Troubleshooting](#12-troubleshooting)
 
-```bash
+---
+
+## 1. Prasyarat dan Persiapan Awal
+
+### Software yang Wajib Terinstal
+
+| Software | Versi Minimum | Cara Cek |
+|---|---|---|
+| Docker Desktop (Windows) | 4.x | `docker --version` |
+| Docker Compose Plugin | 2.x | `docker compose version` |
+| Python | 3.10+ | `python --version` |
+| Git | 2.x | `git --version` |
+| PowerShell | 5.1+ | `$PSVersionTable.PSVersion` |
+
+### Spesifikasi Mesin yang Direkomendasikan
+
+- RAM: minimum **16 GB** (seluruh stack berjalan bersamaan bisa menggunakan 8–12 GB)
+- Penyimpanan kosong: minimum **30 GB**
+- CPU: minimum 4 core (8 core untuk skenario multi-container)
+
+### Izin PowerShell (lakukan sekali saja)
+
+```powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+---
+
+## 2. Mengambil Source Code
+
+### Clone pertama kali
+
+```powershell
 git clone https://github.com/mohamadsolkhannawawi/MDLBEEWS-V3.git
-cd ~/MDLBEEWS-V3
+cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS"
 ```
 
-Update berikutnya:
+### Update jika sudah pernah clone
 
-```bash
-cd ~/MDLBEEWS-V3
+```powershell
+cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS"
 git pull origin main
 ```
 
-Windows PowerShell:
+### Siapkan file environment
 
 ```powershell
 Copy-Item .env.example .env
 Copy-Item influxDB\.env.example influxDB\.env
 ```
 
-Ubuntu VM:
+> **Catatan:** Jangan pernah meng-commit file `.env`. File ini berisi credential yang bersifat rahasia.
 
-```bash
-cp .env.example .env
-cp influxDB/.env.example influxDB/.env
-```
+### Validasi konfigurasi
 
-Validasi:
-
-```bash
-ls -la .env influxDB/.env
+```powershell
 docker compose config
 ```
 
-Jangan commit `.env`. Jika muncul permission denied:
+Perintah ini harus selesai tanpa error. Jika ada error, periksa apakah file `.env` dan `influxDB/.env` sudah tersedia.
 
-```bash
-sudo chown -R $USER:$USER ~/MDLBEEWS-V3/influxDB
-chmod 755 ~/MDLBEEWS-V3/influxDB
-chmod 600 ~/MDLBEEWS-V3/influxDB/.env
+---
+
+## 3. Pemasangan Dependensi Python
+
+Semua skrip pengumpul metrik membutuhkan library berikut. Pasang sekali saja:
+
+```powershell
+pip install requests websockets
+```
+
+### Verifikasi
+
+```powershell
+python -c "import requests, websockets; print('OK')"
 ```
 
 ---
 
-## 3. Build dan Startup
+## 4. Validasi Sistem Sebelum Pengujian
 
-Build dan start:
+Sebelum menjalankan skenario apapun, pastikan sistem berjalan dengan benar menggunakan langkah berikut.
 
-```bash
+### Langkah 4.1 — Jalankan docker compose utama
+
+```powershell
+cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS"
 docker compose up -d --build
+```
+
+Tunggu **60 detik** agar Kafka selesai startup dan memilih leader.
+
+### Langkah 4.2 — Periksa status container
+
+```powershell
 docker compose ps
 ```
 
-Container utama harus `Up (healthy)`: `api_server`, `fast_api`, `data_provider`, `p_wave_detector`, `loc_mag_detector`, dan `data_archiver`. Kafka dan Zookeeper harus `Up`, bukan `Restarting` atau `Exited`.
+Container berikut **wajib** berstatus `Up (healthy)` atau `Up`:
 
-Urutan wajib sebelum mengumpulkan angka:
-
-1. Pastikan Docker Engine berjalan.
-2. Pastikan `.env` dan `influxDB/.env` tersedia.
-3. Jalankan `docker compose config`.
-4. Jalankan `docker compose up -d` atau `docker compose up -d --build`.
-5. Tunggu 30 sampai 60 detik agar Kafka selesai startup dan memilih leader.
-6. Jalankan `docker compose ps` dan tunggu service utama berstatus `Up (healthy)`.
-7. Jalankan `curl.exe http://localhost:9090/-/ready` pada Windows atau `curl http://localhost:9090/-/ready` pada Ubuntu.
-8. Jalankan query Prometheus `up`: `curl.exe "http://localhost:9090/api/v1/query?query=up"` dan pastikan target utama bernilai `1`.
-9. Periksa log service utama dan pastikan tidak ada restart, model hilang, atau file data hilang.
-10. Untuk S1a jalankan `tests/collect_host_metrics.ps1`; untuk S1b-S4 jalankan `tests/collect_metrics.py`.
-
-Jangan menjalankan pengumpulan metric setelah script skenario selesai tanpa menyalakan Compose lagi, karena script akan membersihkan container di akhir eksekusi.
-
-Untuk rebuild satu service:
-
-```bash
-docker compose build --no-cache --progress=plain data_archiver
-docker compose build --no-cache --progress=plain data_provider
-docker compose build --no-cache --progress=plain p_wave_detector
-docker compose build --no-cache --progress=plain loc_mag_detector
-```
-
----
-
-## 4. URL dan Login
-
-Gunakan URL ini pada host Docker. Untuk komputer lain, ganti `localhost` dengan IP host atau VM.
-
-| Komponen | URL |
+| Container | Status Wajib |
 |---|---|
-| Express data table | `http://localhost:3333` |
-| Express metrics | `http://localhost:8107/metrics` |
-| FastAPI WebSocket | `http://localhost:3334` |
-| FastAPI health | `http://localhost:3334/health` |
-| FastAPI metrics | `http://localhost:8108/metrics` |
-| Grafana | `http://localhost:4000` |
-| Prometheus targets | `http://localhost:9090/targets` |
-| Prometheus graph | `http://localhost:9090/graph` |
-| InfluxDB | `http://localhost:8086` |
-| Mongo Express | `http://localhost:8081` |
+| `zookeeper` | Up |
+| `kafka1`, `kafka2`, `kafka3` | Up |
+| `data_provider` | Up |
+| `p_wave_detector` (instance-1) | Up |
+| `loc_mag_detector` | Up |
+| `data_archiver` (instance-1) | Up |
+| `api_server` | Up |
+| `fast_api` | Up |
+| `prometheus` | Up |
+| `grafana` | Up |
 
-Port `3333` adalah Express API. Port `3334` pada host diteruskan ke port internal FastAPI `3333`.
+### Langkah 4.3 — Periksa Prometheus
 
-Grafana login: `admin` / `12345678`.
+```powershell
+# Prometheus harus menjawab "Prometheus Server is Ready."
+curl.exe http://localhost:9090/-/ready
 
-InfluxDB login: username `admin`, password `12345678`, organization `owner`, bucket `eews`.
-
-Mongo Express login: username `admin`, password `password`.
-
-Tes endpoint:
-
-```bash
-curl http://localhost:3333
-curl http://localhost:3334/health
-curl http://localhost:8107/metrics
+# Semua target utama harus bernilai 1
+curl.exe "http://localhost:9090/api/v1/query?query=up"
 ```
 
-## 5. Validasi Prometheus dan Grafana
+Buka `http://localhost:9090/targets` di browser. Semua service EEWS harus berstatus **UP** (hijau).
 
-Di `http://localhost:9090/targets`, target aktif seperti `data_provider`, `p_wave_detector`, `loc_mag_detector`, `data_archiver`, `api_server`, dan `fast_api` harus UP. Target load balancer boleh gagal jika servicenya dikomentari di Compose.
+### Langkah 4.4 — Periksa Grafana
 
-Di Prometheus Graph, jalankan query berikut satu per satu:
+Buka `http://localhost:4000`. Login dengan `admin` / `12345678`. Pastikan dashboard **EEWS Observability** muncul dan panelnya menampilkan data.
 
-```promql
-up
+### Langkah 4.5 — Periksa endpoint WebSocket dan metrik
+
+```powershell
+curl.exe http://localhost:3333
+curl.exe http://localhost:3334/health
+curl.exe http://localhost:8107/metrics
 ```
 
-```promql
-100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)
-```
+### URL Lengkap untuk Validasi
 
-```promql
-(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / 1024 / 1024
-```
-
-```promql
-rate(data_provider_traces_sent_total[1m])
-```
-
-```promql
-histogram_quantile(0.95, rate(pwave_inference_latency_seconds_bucket[1m]))
-```
-
-```promql
-histogram_quantile(0.95, rate(locmag_inference_latency_seconds_bucket[1m]))
-```
-
-Screenshot harus menampilkan URL, query, rentang waktu, dan hasil tabel/grafik.
-
-Di Grafana, login lalu buka dashboard EEWS, pilih **Last 15 minutes**, tunggu 1 sampai 5 menit, dan pastikan panel CPU, memory, request, latency, atau delay berisi data.
+| Komponen | URL | Login |
+|---|---|---|
+| Express WebSocket UI | `http://localhost:3333` | — |
+| FastAPI WebSocket UI | `http://localhost:3334` | — |
+| Express Metrics | `http://localhost:8107/metrics` | — |
+| FastAPI Metrics | `http://localhost:8108/metrics` | — |
+| Prometheus Targets | `http://localhost:9090/targets` | — |
+| Prometheus Graph | `http://localhost:9090/graph` | — |
+| Grafana | `http://localhost:4000` | `admin` / `12345678` |
+| InfluxDB | `http://localhost:8086` | `admin` / `12345678` |
+| Mongo Express | `http://localhost:8081` | `admin` / `password` |
 
 ---
 
-## 6. Screenshot yang Wajib Diambil
+## 5. Panduan Pengambilan Screenshot
 
-Ambil screenshot berikut:
+Screenshot berikut wajib diambil **satu kali** setelah validasi sistem berhasil (Langkah 4), dan dapat dipakai untuk semua skenario.
 
-1. `docker compose ps` dengan container aktif.
-2. `http://localhost:3333` dengan record trace.
-3. `http://localhost:3334` dengan WebSocket Client.
-4. `http://localhost:8107/metrics` dengan metric mentah.
-5. `http://localhost:9090/targets` dengan target UP.
-6. Prometheus Graph query `up`.
-7. Prometheus Graph CPU atau memory.
-8. Grafana dashboard dengan grafik terisi.
-9. InfluxDB Data Explorer.
-10. Mongo Express bila bukti database diperlukan.
+| No | Yang Difoto | Cara Mengambil |
+|---|---|---|
+| 1 | Hasil `docker compose ps` | Buka PowerShell, jalankan perintah, screenshot terminal |
+| 2 | Halaman `http://localhost:3333` | Browser, tampilkan data trace |
+| 3 | Halaman `http://localhost:3334` | Browser, tampilkan koneksi WebSocket |
+| 4 | Halaman `http://localhost:8107/metrics` | Browser, tampilkan teks metrik mentah Prometheus |
+| 5 | Halaman `http://localhost:9090/targets` | Browser, semua target harus UP (hijau) |
+| 6 | Prometheus Graph dengan query `up` | Ketik `up` di kotak query, klik Execute |
+| 7 | Prometheus Graph CPU | Query: `100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)` |
+| 8 | Grafana dashboard EEWS | Pilih time range **Last 15 minutes** |
+| 9 | InfluxDB Data Explorer | Buka bucket `eews` |
+| 10 | Mongo Express | Buka collection data |
 
-Jangan tampilkan password, token, isi `.env`, atau secret pada screenshot.
+> **Penting:** Jangan tampilkan password, token, atau isi file `.env` pada screenshot manapun.
 
 ---
 
-## 7. Mengumpulkan Data CSV
+## 6. S1 — Overhead Instrumentasi Prometheus
 
-Jalankan dari root repository setelah Compose stabil:
+**Tujuan:** Mengukur selisih CPU (%), memori (MB), dan latensi (ms) antara sistem *tanpa* instrumentasi Prometheus (S1a) dan sistem *dengan* instrumentasi Prometheus (S1b).
 
-```bash
-python tests/collect_metrics.py --duration 120 --interval 5 --output tests/results/s2_scalability.csv
-```
+**Compose file yang digunakan:** `docker-compose-5-1.yml` (S1a, tanpa metrik) dan `docker-compose-5-2.yml` (S1b, dengan metrik)
 
-Ubuntu dapat memakai `python3` dan perlu `python3 -m pip install requests`. Periksa hasil:
+**Output yang dihasilkan:**
+- `tests/results/s1_overhead_no_metrics_stats.csv` (S1a)
+- `tests/results/s1_overhead_with_metrics_stats.csv` (S1b)
 
-```bash
-head -5 tests/results/s2_scalability.csv
-wc -l tests/results/s2_scalability.csv
-```
-
-CSV harus memiliki header dan banyak timestamp. Metric yang belum memiliki observasi valid dicatat kosong, bukan `0.0` atau `nan`. Kolom kosong dapat normal untuk metric load balancer yang tidak aktif atau histogram sebelum memiliki observasi pada window `[1m]`. Gunakan hanya nilai numerik yang tersedia untuk statistik; jika metric yang seharusnya aktif kosong, periksa `/targets`, endpoint `/metrics`, dan log service.
-
-Setelah CSV S1a dan S1b tersedia, jalankan analisis otomatis:
+### Cara Menjalankan S1 (Otomatis)
 
 ```powershell
-python tests/analyze_s1.py --s1a tests/results/s1a_no_metrics.csv --s1b tests/results/s1b_with_metrics.csv --output tests/results/s1_comparison.csv
+cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
+.\run_s1_overhead.ps1
 ```
 
-Aturan perbandingan:
+Script ini akan otomatis:
+1. Menurunkan compose yang berjalan sebelumnya
+2. Menjalankan `docker-compose-5-1.yml` (S1a tanpa metrik)
+3. Menunggu 60 detik stabilisasi
+4. Mengumpulkan metrik selama 120 detik ke CSV S1a
+5. Menurunkan S1a, menjalankan `docker-compose-5-2.yml` (S1b dengan metrik)
+6. Menunggu 60 detik stabilisasi
+7. Mengumpulkan metrik selama 120 detik ke CSV S1b
+8. Menurunkan S1b
 
-- Nilai kosong dan `nan` adalah missing, bukan nol.
-- CPU dan memory dibandingkan menggunakan mean nilai numerik yang valid.
-- Perubahan absolut dihitung sebagai `S1b mean - S1a mean`.
-- Persentase perubahan dihitung sebagai `(perubahan absolut / S1a mean) * 100`.
-- Metric yang hanya tersedia pada S1b berstatus `no_baseline`, sehingga tidak dipakai untuk menghitung overhead.
-- Jika seluruh nilai metric kosong, statusnya tidak dapat dibandingkan.
-- Kolom load balancer boleh kosong jika service load balancer tidak aktif.
-- Histogram boleh kosong sebelum ada observasi dalam window `[1m]`.
+### Cara Menjalankan S1 (Manual, jika script gagal)
 
-File `tests/results/s1_comparison.csv` berisi mean, median, standar deviasi, P95, jumlah valid, jumlah missing, perubahan absolut, persentase perubahan, dan status perbandingan.
-
-## 8. Skenario Pengujian
-
-Script `tests/run_all_tests.ps1` berjalan di Windows PowerShell. Jalankan:
+**Langkah S1a — Sistem Tanpa Prometheus:**
 
 ```powershell
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-./tests/run_all_tests.ps1 -Scenario s1a
-./tests/run_all_tests.ps1 -Scenario s1b
-./tests/run_all_tests.ps1 -Scenario s2
-./tests/run_all_tests.ps1 -Scenario s3
-./tests/run_all_tests.ps1 -Scenario s4a
-./tests/run_all_tests.ps1 -Scenario s4b
+cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS"
+docker compose down -v
+docker compose -f docker-compose-5-1.yml up -d --build
+# Tunggu 60 detik
+Start-Sleep -Seconds 60
+# Kumpulkan metrik
+python tests/collect_docker_stats.py --duration 120 --output tests/results/s1_overhead_no_metrics_stats.csv --target-substring ""
+docker compose -f docker-compose-5-1.yml down -v
 ```
 
-Untuk semua skenario: `./tests/run_all_tests.ps1 -Scenario all`.
+**Langkah S1b — Sistem Dengan Prometheus:**
 
-Di Ubuntu, file `.ps1` tidak berjalan langsung di Bash. Jalankan Compose file secara manual, kumpulkan CSV dengan `tests/collect_metrics.py`, dan lakukan `docker compose down` sebelum berganti skenario.
-
-## 9. Pemeriksaan Log dan Troubleshooting
-
-```bash
-docker compose logs --tail=100 data_provider
-docker compose logs --tail=100 p_wave_detector
-docker compose logs --tail=100 loc_mag_detector
-docker compose logs --tail=100 data_archiver
-docker compose logs --tail=100 api_server
-docker compose logs --tail=100 fast_api
+```powershell
+docker compose -f docker-compose-5-2.yml up -d --build
+Start-Sleep -Seconds 60
+python tests/collect_docker_stats.py --duration 120 --output tests/results/s1_overhead_with_metrics_stats.csv --target-substring ""
+docker compose -f docker-compose-5-2.yml down -v
 ```
 
-### CSV permission denied
+### Analisis Perbandingan S1a vs S1b
 
-Jika collector menampilkan `PermissionError`, tutup file CSV di Excel, VS Code, atau editor lain. Script skenario memeriksa file output sebelum pengujian dan menghentikan skenario dengan status gagal, bukan menampilkan pesan sukses palsu.
+Setelah kedua CSV tersedia:
 
-Error `ModuleNotFoundError: tensorflow` berarti detector perlu dibuild ulang. Error model `model_*.h5` berarti file model belum tersedia di image. Error `stations.json` berarti path data provider salah atau file tidak ikut image. Error `ECONNREFUSED` Kafka dapat terjadi selama startup; tunggu 30 sampai 60 detik dan cek broker.
+```powershell
+python tests/analyze_s1.py --s1a tests/results/s1_overhead_no_metrics_stats.csv --s1b tests/results/s1_overhead_with_metrics_stats.csv --output tests/results/s1_comparison.csv
+```
 
-Untuk masalah build:
+### Verifikasi Hasil
 
-```bash
+```powershell
+Get-Content tests/results/s1_overhead_no_metrics_stats.csv | Select-Object -First 5
+Get-Content tests/results/s1_overhead_with_metrics_stats.csv | Select-Object -First 5
+```
+
+CSV harus memiliki kolom `timestamp`, `aggregate_cpu_percent`, `aggregate_mem_mb` dan minimal 20 baris data.
+
+---
+
+## 7. S2 — Skalabilitas Multi-Container
+
+**Tujuan:** Mengukur pengaruh jumlah *instance* (1 hingga 5 container) terhadap *data delay end-to-end*, CPU agregat, dan memori agregat pada modul **Data Archiver** dan **P-Wave Detector**.
+
+**Compose file yang digunakan:**
+- Data Archiver (1–5 container): `docker-compose-3-1.yml` hingga `docker-compose-3-5.yml`
+- P-Wave Detector Kafka native (2–5 container): `docker-compose-3-6.yml` hingga `docker-compose-3-9.yml`
+- P-Wave Detector FastAPI (2–5 container): `docker-compose-3-10.yml` hingga `docker-compose-3-13.yml`
+
+**Output yang dihasilkan (per variasi):**
+- `tests/results/table4_1_container_stats.csv` hingga `table4_5_container_stats.csv`
+- `tests/results/table5_kafka_2c_stats.csv` hingga `table5_fastapi_5c_stats.csv`
+
+### Cara Menjalankan S2 — Data Archiver (Otomatis)
+
+```powershell
+cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
+.\run_table4_archiver.ps1
+```
+
+### Cara Menjalankan S2 — P-Wave Detector (Otomatis)
+
+```powershell
+.\run_table5_pwavedetector.ps1
+```
+
+### Cara Menjalankan S2 (Manual, satu konfigurasi)
+
+Contoh untuk Data Archiver 3 container:
+
+```powershell
+cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS"
+docker compose down -v
+docker compose -f docker-compose-3-3.yml up -d --build
+Start-Sleep -Seconds 60
+
+# Jalankan kedua kolektor secara bersamaan
+Start-Process python -ArgumentList "tests/collect_docker_stats.py --duration 120 --output tests/results/table4_3_container_stats.csv --target-substring data_archiver" -NoNewWindow
+python tests/collect_metrics.py --duration 120 --output tests/results/table4_3_container_metrics.csv
+
+docker compose -f docker-compose-3-3.yml down -v
+```
+
+### Verifikasi Hasil
+
+```powershell
+Get-ChildItem tests/results/table4_*.csv
+Get-ChildItem tests/results/table5_*.csv
+```
+
+---
+
+## 8. S3 — Perbandingan WebSocket Server
+
+**Tujuan:** Membandingkan performa Express.js/Socket.IO versus FastAPI dalam menangani koneksi WebSocket pada 1 client dan 5 client konkuren, mengukur *data delay*, CPU (%), dan memori (MB).
+
+**Compose file yang digunakan:**
+- Express.js: `docker-compose-4-1.yml` (port `3333`)
+- FastAPI: `docker-compose-4-2.yml` (port `3334`)
+
+**Output yang dihasilkan:**
+- `tests/results/table6_express_1c_stats.csv`
+- `tests/results/table6_express_5c_stats.csv`
+- `tests/results/table6_fastapi_1c_stats.csv`
+- `tests/results/table6_fastapi_5c_stats.csv`
+
+### Cara Menjalankan S3 (Otomatis)
+
+```powershell
+cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
+.\run_table6_websocket.ps1
+```
+
+Script ini secara otomatis akan menjalankan `ws_load_generator.py` untuk mensimulasikan 1 atau 5 client WebSocket yang terkoneksi selama durasi pengujian.
+
+### Cara Menjalankan S3 (Manual)
+
+Contoh untuk Express.js dengan 5 client:
+
+```powershell
+cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS"
+docker compose down -v
+docker compose -f docker-compose-4-1.yml up -d --build
+Start-Sleep -Seconds 60
+
+# Jalankan load generator di background
+Start-Process python -ArgumentList "tests/ws_load_generator.py --uri ws://localhost:3333 --clients 5 --duration 60" -NoNewWindow
+
+# Kumpulkan metrik selama durasi yang sama
+Start-Process python -ArgumentList "tests/collect_docker_stats.py --duration 60 --output tests/results/table6_express_5c_stats.csv --target-substring api" -NoNewWindow
+python tests/collect_metrics.py --duration 60 --output tests/results/table6_express_5c_metrics.csv
+
+docker compose -f docker-compose-4-1.yml down -v
+```
+
+### Verifikasi Hasil
+
+```powershell
+Get-ChildItem tests/results/table6_*.csv
+```
+
+---
+
+## 9. S4 — Kafka vs Kafka+NGINX Load Balancer
+
+**Tujuan:** Membandingkan konfigurasi *message broker* Kafka native (3 broker) versus Kafka+NGINX sebagai *load balancer* eksternal, mengukur *data delay*, CPU (%), dan memori (MB) pada kondisi beban normal.
+
+**Compose file yang digunakan:**
+- Kafka 3 Container: `docker-compose-2-1.yml`
+- Kafka 3 Container + NGINX: `docker-compose-2-2.yml`
+
+**Output yang dihasilkan:**
+- `tests/results/table2_kafka_stats.csv`
+- `tests/results/table2_kafka_metrics.csv`
+- `tests/results/table2_nginx_stats.csv`
+- `tests/results/table2_nginx_metrics.csv`
+
+### Cara Menjalankan S4 (Otomatis)
+
+```powershell
+cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
+.\run_table2_broker.ps1
+```
+
+### Cara Menjalankan S4 (Manual)
+
+Contoh untuk Kafka saja:
+
+```powershell
+cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS"
+docker compose down -v
+docker compose -f docker-compose-2-1.yml up -d --build
+Start-Sleep -Seconds 60
+
+Start-Process python -ArgumentList "tests/collect_docker_stats.py --duration 120 --output tests/results/table2_kafka_stats.csv --target-substring kafka" -NoNewWindow
+python tests/collect_metrics.py --duration 120 --output tests/results/table2_kafka_metrics.csv
+
+docker compose -f docker-compose-2-1.yml down -v
+```
+
+Contoh untuk Kafka + NGINX:
+
+```powershell
+docker compose -f docker-compose-2-2.yml up -d --build
+Start-Sleep -Seconds 60
+
+Start-Process python -ArgumentList "tests/collect_docker_stats.py --duration 120 --output tests/results/table2_nginx_stats.csv --target-substring kafka" -NoNewWindow
+python tests/collect_metrics.py --duration 120 --output tests/results/table2_nginx_metrics.csv
+
+docker compose -f docker-compose-2-2.yml down -v
+```
+
+### Verifikasi Hasil
+
+```powershell
+Get-ChildItem tests/results/table2_*.csv
+```
+
+---
+
+## 10. Menjalankan Semua Skenario Sekaligus
+
+Jika Anda ingin menjalankan S1 hingga S4 secara berurutan tanpa intervensi manual, gunakan master runner:
+
+```powershell
+cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
+.\run_all_tests.ps1
+```
+
+> **Perhatian:** Proses ini membutuhkan estimasi **1,5 hingga 3 jam** tergantung spesifikasi mesin. Pastikan komputer tidak masuk mode tidur (*sleep*) selama eksekusi.
+
+Untuk mencegah komputer tidur saat tes berjalan panjang:
+
+```powershell
+# Jalankan ini di terminal terpisah selama pengujian berlangsung
+while ($true) { [System.Console]::Write("."); Start-Sleep -Seconds 60 }
+```
+
+---
+
+## 11. Checklist Output yang Harus Dikumpulkan
+
+Tandai setiap item setelah berhasil dikumpulkan.
+
+### Screenshot (satu kali, dari sistem yang sudah tervalidasi)
+
+- [ ] `docker compose ps` — semua container Up
+- [ ] `http://localhost:3333` — data trace muncul
+- [ ] `http://localhost:3334` — koneksi WebSocket aktif
+- [ ] `http://localhost:8107/metrics` — teks metrik Prometheus muncul
+- [ ] `http://localhost:9090/targets` — semua target UP (hijau)
+- [ ] Prometheus Graph — query `up`
+- [ ] Prometheus Graph — query CPU
+- [ ] Grafana dashboard — panel berisi grafik terisi data
+- [ ] InfluxDB Data Explorer — bucket `eews` berisi data
+- [ ] Mongo Express — koleksi berisi dokumen
+
+### File CSV per Skenario
+
+**S1 — Overhead Instrumentasi:**
+- [ ] `tests/results/s1_overhead_no_metrics_stats.csv`
+- [ ] `tests/results/s1_overhead_with_metrics_stats.csv`
+- [ ] `tests/results/s1_comparison.csv` (hasil analisis)
+
+**S2 — Data Archiver (1–5 container):**
+- [ ] `tests/results/table4_1_container_stats.csv`
+- [ ] `tests/results/table4_2_container_stats.csv`
+- [ ] `tests/results/table4_3_container_stats.csv`
+- [ ] `tests/results/table4_4_container_stats.csv`
+- [ ] `tests/results/table4_5_container_stats.csv`
+
+**S2 — P-Wave Detector Kafka (2–5 container):**
+- [ ] `tests/results/table5_kafka_2c_stats.csv`
+- [ ] `tests/results/table5_kafka_3c_stats.csv`
+- [ ] `tests/results/table5_kafka_4c_stats.csv`
+- [ ] `tests/results/table5_kafka_5c_stats.csv`
+
+**S2 — P-Wave Detector FastAPI (2–5 container):**
+- [ ] `tests/results/table5_fastapi_2c_stats.csv`
+- [ ] `tests/results/table5_fastapi_3c_stats.csv`
+- [ ] `tests/results/table5_fastapi_4c_stats.csv`
+- [ ] `tests/results/table5_fastapi_5c_stats.csv`
+
+**S3 — WebSocket:**
+- [ ] `tests/results/table6_express_1c_stats.csv`
+- [ ] `tests/results/table6_express_5c_stats.csv`
+- [ ] `tests/results/table6_fastapi_1c_stats.csv`
+- [ ] `tests/results/table6_fastapi_5c_stats.csv`
+
+**S4 — Broker:**
+- [ ] `tests/results/table2_kafka_stats.csv`
+- [ ] `tests/results/table2_kafka_metrics.csv`
+- [ ] `tests/results/table2_nginx_stats.csv`
+- [ ] `tests/results/table2_nginx_metrics.csv`
+
+### Verifikasi Cepat Semua CSV
+
+```powershell
+Get-ChildItem "tests/results/*.csv" | ForEach-Object {
+    $lines = (Get-Content $_.FullName).Count
+    Write-Host "$($_.Name): $lines baris"
+}
+```
+
+Setiap CSV harus memiliki **lebih dari 5 baris** (header + data). Jika kurang, pengujian mungkin terlalu singkat atau container belum stabil saat pengumpulan dimulai.
+
+---
+
+## 12. Troubleshooting
+
+### Container langsung Exiting atau Restarting
+
+```powershell
+docker compose logs --tail=50 data_provider
+docker compose logs --tail=50 p_wave_detector
+docker compose logs --tail=50 kafka1
+```
+
+Cari pesan `Error`, `Exception`, atau `ECONNREFUSED`. Untuk Kafka, tunggu minimal 60 detik karena Kafka membutuhkan waktu startup yang relatif lama.
+
+### Error `model_p_wave.h5` atau `model_loc_mag.h5` tidak ditemukan
+
+File model H5 harus tersedia di dalam folder masing-masing modul sebelum build:
+- `p_wave_detector/model_p_wave.h5`
+- `loc_mag_detector/model_p_wave.h5`
+
+### Python: `ModuleNotFoundError: No module named 'requests'`
+
+```powershell
+pip install requests websockets
+```
+
+### CSV kosong atau hanya berisi header
+
+Pastikan:
+1. Container sudah berjalan selama minimal 60 detik sebelum kolektor dijalankan
+2. Argumen `--target-substring` sesuai nama container (cek `docker compose ps`)
+3. Tidak ada error di terminal saat kolektor berjalan
+
+### Permission Denied saat menulis CSV
+
+Pastikan file CSV tidak sedang dibuka di Excel atau editor lain. Tutup semua aplikasi yang membuka file tersebut.
+
+### Rebuild paksa setelah perubahan kode
+
+```powershell
 docker builder prune -af
-docker compose build --no-cache --progress=plain <service>
+docker compose -f docker-compose-5-2.yml build --no-cache --progress=plain
 ```
 
-Gunakan `docker compose down -v` hanya jika memang ingin menghapus seluruh volume data.
+### Hapus semua data volume (reset total)
 
-## 10. Checklist Kelulusan
+```powershell
+docker compose down -v
+docker volume prune -f
+```
 
-- [ ] `.env` dan `influxDB/.env` tersedia.
-- [ ] `docker compose config` berhasil.
-- [ ] Semua image berhasil dibangun.
-- [ ] Container utama berstatus `Up (healthy)`.
-- [ ] Kafka dan Zookeeper berstatus `Up`.
-- [ ] Data Table menampilkan trace.
-- [ ] WebSocket Client terbuka.
-- [ ] Endpoint metrics menampilkan teks Prometheus.
-- [ ] Target Prometheus utama berstatus UP.
-- [ ] Grafana login dan dashboard berisi grafik.
-- [ ] InfluxDB bucket `eews` tersedia.
-- [ ] Tidak ada error model atau file data pada log.
-- [ ] CSV memiliki header dan baris data.
-- [ ] Screenshot tidak berisi credential atau token.
+> **Perhatian:** Perintah di atas menghapus seluruh data MongoDB, InfluxDB, dan Grafana. Gunakan hanya jika memang ingin reset penuh.
 
-Catat untuk setiap skenario: nama skenario, waktu, mesin/VM, CPU/RAM, versi Docker, Compose file, durasi, jumlah replica, nama CSV, nama screenshot, status container, status target Prometheus, dan error yang ditemukan.
+---
+
+## Referensi Mapping Skenario ke Compose File
+
+| Kode Skenario (BAB III) | Compose File | Script Otomatis |
+|---|---|---|
+| S1a — Tanpa Prometheus | `docker-compose-5-1.yml` | `run_s1_overhead.ps1` |
+| S1b — Dengan Prometheus | `docker-compose-5-2.yml` | `run_s1_overhead.ps1` |
+| S2 — Archiver 1 Container | `docker-compose-3-1.yml` | `run_table4_archiver.ps1` |
+| S2 — Archiver 2 Container | `docker-compose-3-2.yml` | `run_table4_archiver.ps1` |
+| S2 — Archiver 3 Container | `docker-compose-3-3.yml` | `run_table4_archiver.ps1` |
+| S2 — Archiver 4 Container | `docker-compose-3-4.yml` | `run_table4_archiver.ps1` |
+| S2 — Archiver 5 Container | `docker-compose-3-5.yml` | `run_table4_archiver.ps1` |
+| S2 — P-Wave Kafka 2C | `docker-compose-3-6.yml` | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave Kafka 3C | `docker-compose-3-7.yml` | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave Kafka 4C | `docker-compose-3-8.yml` | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave Kafka 5C | `docker-compose-3-9.yml` | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave FastAPI 2C | `docker-compose-3-10.yml` | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave FastAPI 3C | `docker-compose-3-11.yml` | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave FastAPI 4C | `docker-compose-3-12.yml` | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave FastAPI 5C | `docker-compose-3-13.yml` | `run_table5_pwavedetector.ps1` |
+| S3 — Express 1 Client | `docker-compose-4-1.yml` | `run_table6_websocket.ps1` |
+| S3 — Express 5 Client | `docker-compose-4-1.yml` | `run_table6_websocket.ps1` |
+| S3 — FastAPI 1 Client | `docker-compose-4-2.yml` | `run_table6_websocket.ps1` |
+| S3 — FastAPI 5 Client | `docker-compose-4-2.yml` | `run_table6_websocket.ps1` |
+| S4 — Kafka 3 Broker | `docker-compose-2-1.yml` | `run_table2_broker.ps1` |
+| S4 — Kafka 3 Broker + NGINX | `docker-compose-2-2.yml` | `run_table2_broker.ps1` |

@@ -1,92 +1,37 @@
-<#
-.SYNOPSIS
-Otomatisasi pengujian skenario EEWS Observability.
-Skrip ini akan merestart container, menjalankan docker compose sesuai skenario, menunggu inisialisasi,
-dan mengumpulkan metrik menggunakan collect_metrics.py.
-#>
+# Master test runner untuk menguji semua skenario (Table 1, 2, 4, 5, 6, dan S1) secara berurutan.
+# Setiap skrip akan otomatis mem-build Docker, menahan (wait) stabilisasi 60 detik, mengukur metrik 120 detik,
+# dan menulis hasilnya ke dalam folder tests/results/
 
-param (
-    [string]$Scenario = "all" # Options: all, s1a, s1b, s2, s3, s4a, s4b
-)
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+Set-Location $ScriptDir
 
-$PythonExecutable = "python" # Atau "python3" tergantung env
+Write-Host "============================================================" -ForegroundColor Green
+Write-Host " MEMULAI SELURUH PENGUJIAN OTOMATIS (ESTIMASI WAKTU: ~2 JAM)" -ForegroundColor Green
+Write-Host "============================================================" -ForegroundColor Green
 
-function Test-OutputWritable {
-    param ([string]$OutputFile)
-
-    if (Test-Path $OutputFile) {
-        try {
-            $stream = [System.IO.File]::Open($OutputFile, 'Open', 'ReadWrite', 'None')
-            $stream.Close()
-        } catch {
-            throw "Output file is locked or inaccessible: $OutputFile. Close Excel or another editor, then run the scenario again."
-        }
-    }
+# Buat folder results jika belum ada
+if (-not (Test-Path "results")) {
+    New-Item -ItemType Directory -Force -Path "results" | Out-Null
 }
 
-function Run-Scenario {
-    param (
-        [string]$Name,
-        [string]$ComposeFile,
-        [int]$DurationSec,
-        [string]$OutputFile
-    )
-    
-    Write-Host "============================================================" -ForegroundColor Cyan
-    Write-Host "Running Scenario: $Name" -ForegroundColor Cyan
-    Write-Host "Compose File: $ComposeFile"
-    Write-Host "============================================================" -ForegroundColor Cyan
+Write-Host "`n[1/6] Menjalankan Table 1 (Data Provider)..." -ForegroundColor Yellow
+& .\run_table1_dataprovider.ps1
 
-    Write-Host "1. Tearing down existing containers..."
-    docker compose -f docker-compose.yml down -v
-    docker compose -f docker-compose-5-1.yml down -v
-    docker compose -f docker-compose-5-2.yml down -v
-    docker compose -f docker-compose-2-1.yml down -v
-    docker compose -f docker-compose-2-2.yml down -v
+Write-Host "`n[2/6] Menjalankan Table 2 (Message Broker - Kafka vs NGINX)..." -ForegroundColor Yellow
+& .\run_table2_broker.ps1
 
-    Write-Host "2. Starting containers for $Name..."
-    docker compose -f $ComposeFile up -d --build
+Write-Host "`n[3/6] Menjalankan Table 4 (Data Archiver Scalability)..." -ForegroundColor Yellow
+& .\run_table4_archiver.ps1
 
-    Write-Host "3. Waiting for systems to stabilize (60 seconds)..."
-    Start-Sleep -Seconds 60
+Write-Host "`n[4/6] Menjalankan Table 5 (P-Wave Detector Scalability)..." -ForegroundColor Yellow
+& .\run_table5_pwavedetector.ps1
 
-    if ($Name -eq "S1a (Tanpa Metrics)") {
-        Write-Host "4. Collecting host CPU and memory metrics for S1a..."
-        & $PSScriptRoot/collect_host_metrics.ps1 -DurationSec $DurationSec -IntervalSec 5 -OutputFile $OutputFile
-    } else {
-        Write-Host "4. Collecting metrics for $DurationSec seconds..."
-        Test-OutputWritable -OutputFile $OutputFile
-        & $PythonExecutable tests/collect_metrics.py --duration $DurationSec --interval 5 --output $OutputFile
-    }
+Write-Host "`n[5/6] Menjalankan Table 6 (WebSocket Express vs FastAPI)..." -ForegroundColor Yellow
+& .\run_table6_websocket.ps1
 
-    if ($LASTEXITCODE -ne 0) {
-        throw "Scenario $Name failed while collecting metrics. Exit code: $LASTEXITCODE"
-    }
+Write-Host "`n[6/6] Menjalankan Skripsi S1 (Instrumentasi Overhead)..." -ForegroundColor Yellow
+& .\run_s1_overhead.ps1
 
-    Write-Host "5. Scenario $Name completed." -ForegroundColor Green
-    Write-Host ""
-}
-
-$Scenarios = @{
-    "s1a" = @{ Name="S1a (Tanpa Metrics)"; File="docker-compose-5-1.yml"; Duration=120; Out="tests/results/s1a_no_metrics.csv" }
-    "s1b" = @{ Name="S1b (Dengan Metrics)"; File="docker-compose-5-2.yml"; Duration=120; Out="tests/results/s1b_with_metrics.csv" }
-    "s2"  = @{ Name="S2 (Skalabilitas Default)"; File="docker-compose.yml"; Duration=120; Out="tests/results/s2_scalability.csv" }
-    "s3"  = @{ Name="S3 (Perbandingan WS)"; File="docker-compose.yml"; Duration=120; Out="tests/results/s3_websocket.csv" }
-    "s4a" = @{ Name="S4a (Kafka LB)"; File="docker-compose-2-1.yml"; Duration=120; Out="tests/results/s4a_kafka_lb.csv" }
-    "s4b" = @{ Name="S4b (Kafka + NGINX)"; File="docker-compose-2-2.yml"; Duration=120; Out="tests/results/s4b_nginx_lb.csv" }
-}
-
-if ($Scenario -eq "all") {
-    foreach ($key in @("s1a", "s1b", "s2", "s3", "s4a", "s4b")) {
-        $s = $Scenarios[$key]
-        Run-Scenario -Name $s.Name -ComposeFile $s.File -DurationSec $s.Duration -OutputFile $s.Out
-    }
-} elseif ($Scenarios.ContainsKey($Scenario.ToLower())) {
-    $s = $Scenarios[$Scenario.ToLower()]
-    Run-Scenario -Name $s.Name -ComposeFile $s.File -DurationSec $s.Duration -OutputFile $s.Out
-} else {
-    Write-Host "Invalid scenario specified. Available options: all, s1a, s1b, s2, s3, s4a, s4b" -ForegroundColor Red
-}
-
-Write-Host "Semua pengujian selesai! Membersihkan container terakhir..."
-docker compose -f docker-compose.yml down
+Write-Host "============================================================" -ForegroundColor Green
+Write-Host " SEMUA PENGUJIAN SELESAI! Hasil tersedia di tests/results/" -ForegroundColor Green
+Write-Host "============================================================" -ForegroundColor Green
