@@ -25,13 +25,13 @@ Dokumen ini adalah panduan langkah-demi-langkah untuk melaksanakan seluruh pengu
 
 ### Software yang Wajib Terinstal
 
-| Software | Versi Minimum | Cara Cek |
-|---|---|---|
-| Docker Desktop (Windows) | 4.x | `docker --version` |
-| Docker Compose Plugin | 2.x | `docker compose version` |
-| Python | 3.10+ | `python --version` |
-| Git | 2.x | `git --version` |
-| PowerShell | 5.1+ | `$PSVersionTable.PSVersion` |
+| Software                 | Versi Minimum | Cara Cek                    |
+| ------------------------ | ------------- | --------------------------- |
+| Docker Desktop (Windows) | 4.x           | `docker --version`          |
+| Docker Compose Plugin    | 2.x           | `docker compose version`    |
+| Python                   | 3.10+         | `python --version`          |
+| Git                      | 2.x           | `git --version`             |
+| PowerShell               | 5.1+          | `$PSVersionTable.PSVersion` |
 
 ### Spesifikasi Mesin yang Direkomendasikan
 
@@ -119,18 +119,18 @@ docker compose ps
 
 Container berikut **wajib** berstatus `Up (healthy)` atau `Up`:
 
-| Container | Status Wajib |
-|---|---|
-| `zookeeper` | Up |
-| `kafka1`, `kafka2`, `kafka3` | Up |
-| `data_provider` | Up |
-| `p_wave_detector` (instance-1) | Up |
-| `loc_mag_detector` | Up |
-| `data_archiver` (instance-1) | Up |
-| `api_server` | Up |
-| `fast_api` | Up |
-| `prometheus` | Up |
-| `grafana` | Up |
+| Container                      | Status Wajib |
+| ------------------------------ | ------------ |
+| `zookeeper`                    | Up           |
+| `kafka1`, `kafka2`, `kafka3`   | Up           |
+| `data_provider`                | Up           |
+| `p_wave_detector` (instance-1) | Up           |
+| `loc_mag_detector`             | Up           |
+| `data_archiver` (instance-1)   | Up           |
+| `api_server`                   | Up           |
+| `fast_api`                     | Up           |
+| `prometheus`                   | Up           |
+| `grafana`                      | Up           |
 
 ### Langkah 4.3 — Periksa Prometheus
 
@@ -139,7 +139,9 @@ Container berikut **wajib** berstatus `Up (healthy)` atau `Up`:
 curl.exe http://localhost:9090/-/ready
 
 # Semua target utama harus bernilai 1
-curl.exe "http://localhost:9090/api/v1/query?query=up"
+curl.exe "http://localhost:9090/api/v1/query?query=up" |
+    ConvertFrom-Json |
+    ConvertTo-Json -Depth 100
 ```
 
 Buka `http://localhost:9090/targets` di browser. Semua service EEWS harus berstatus **UP** (hijau).
@@ -158,17 +160,17 @@ curl.exe http://localhost:8107/metrics
 
 ### URL Lengkap untuk Validasi
 
-| Komponen | URL | Login |
-|---|---|---|
-| Express WebSocket UI | `http://localhost:3333` | — |
-| FastAPI WebSocket UI | `http://localhost:3334` | — |
-| Express Metrics | `http://localhost:8107/metrics` | — |
-| FastAPI Metrics | `http://localhost:8108/metrics` | — |
-| Prometheus Targets | `http://localhost:9090/targets` | — |
-| Prometheus Graph | `http://localhost:9090/graph` | — |
-| Grafana | `http://localhost:4000` | `admin` / `12345678` |
-| InfluxDB | `http://localhost:8086` | `admin` / `12345678` |
-| Mongo Express | `http://localhost:8081` | `admin` / `password` |
+| Komponen             | URL                             | Login                |
+| -------------------- | ------------------------------- | -------------------- |
+| Express WebSocket UI | `http://localhost:3333`         | —                    |
+| FastAPI WebSocket UI | `http://localhost:3334`         | —                    |
+| Express Metrics      | `http://localhost:8107/metrics` | —                    |
+| FastAPI Metrics      | `http://localhost:8108/metrics` | —                    |
+| Prometheus Targets   | `http://localhost:9090/targets` | —                    |
+| Prometheus Graph     | `http://localhost:9090/graph`   | —                    |
+| Grafana              | `http://localhost:4000`         | `admin` / `12345678` |
+| InfluxDB             | `http://localhost:8086`         | `admin` / `12345678` |
+| Mongo Express        | `http://localhost:8081`         | `admin` / `password` |
 
 ---
 
@@ -176,18 +178,18 @@ curl.exe http://localhost:8107/metrics
 
 Screenshot berikut wajib diambil **satu kali** setelah validasi sistem berhasil (Langkah 4), dan dapat dipakai untuk semua skenario.
 
-| No | Yang Difoto | Cara Mengambil |
-|---|---|---|
-| 1 | Hasil `docker compose ps` | Buka PowerShell, jalankan perintah, screenshot terminal |
-| 2 | Halaman `http://localhost:3333` | Browser, tampilkan data trace |
-| 3 | Halaman `http://localhost:3334` | Browser, tampilkan koneksi WebSocket |
-| 4 | Halaman `http://localhost:8107/metrics` | Browser, tampilkan teks metrik mentah Prometheus |
-| 5 | Halaman `http://localhost:9090/targets` | Browser, semua target harus UP (hijau) |
-| 6 | Prometheus Graph dengan query `up` | Ketik `up` di kotak query, klik Execute |
-| 7 | Prometheus Graph CPU | Query: `100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)` |
-| 8 | Grafana dashboard EEWS | Pilih time range **Last 15 minutes** |
-| 9 | InfluxDB Data Explorer | Buka bucket `eews` |
-| 10 | Mongo Express | Buka collection data |
+| No  | Yang Difoto                             | Cara Mengambil                                                            |
+| --- | --------------------------------------- | ------------------------------------------------------------------------- |
+| 1   | Hasil `docker compose ps`               | Buka PowerShell, jalankan perintah, screenshot terminal                   |
+| 2   | Halaman `http://localhost:3333`         | Browser, tampilkan data trace                                             |
+| 3   | Halaman `http://localhost:3334`         | Browser, tampilkan koneksi WebSocket                                      |
+| 4   | Halaman `http://localhost:8107/metrics` | Browser, tampilkan teks metrik mentah Prometheus                          |
+| 5   | Halaman `http://localhost:9090/targets` | Browser, semua target harus UP (hijau)                                    |
+| 6   | Prometheus Graph dengan query `up`      | Ketik `up` di kotak query, klik Execute                                   |
+| 7   | Prometheus Graph CPU                    | Query: `100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)` |
+| 8   | Grafana dashboard EEWS                  | Pilih time range **Last 15 minutes**                                      |
+| 9   | InfluxDB Data Explorer                  | Buka bucket `eews`                                                        |
+| 10  | Mongo Express                           | Buka collection data                                                      |
 
 > **Penting:** Jangan tampilkan password, token, atau isi file `.env` pada screenshot manapun.
 
@@ -195,11 +197,12 @@ Screenshot berikut wajib diambil **satu kali** setelah validasi sistem berhasil 
 
 ## 6. S1 — Overhead Instrumentasi Prometheus
 
-**Tujuan:** Mengukur selisih CPU (%), memori (MB), dan latensi (ms) antara sistem *tanpa* instrumentasi Prometheus (S1a) dan sistem *dengan* instrumentasi Prometheus (S1b).
+**Tujuan:** Mengukur selisih CPU (%), memori (MB), dan latensi (ms) antara sistem _tanpa_ instrumentasi Prometheus (S1a) dan sistem _dengan_ instrumentasi Prometheus (S1b).
 
 **Compose file yang digunakan:** `docker-compose-5-1.yml` (S1a, tanpa metrik) dan `docker-compose-5-2.yml` (S1b, dengan metrik)
 
 **Output yang dihasilkan:**
+
 - `tests/results/s1_overhead_no_metrics_stats.csv` (S1a)
 - `tests/results/s1_overhead_with_metrics_stats.csv` (S1b)
 
@@ -211,6 +214,7 @@ cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
 ```
 
 Script ini akan otomatis:
+
 1. Menurunkan compose yang berjalan sebelumnya
 2. Menjalankan `docker-compose-5-1.yml` (S1a tanpa metrik)
 3. Menunggu 60 detik stabilisasi
@@ -265,14 +269,16 @@ CSV harus memiliki kolom `timestamp`, `aggregate_cpu_percent`, `aggregate_mem_mb
 
 ## 7. S2 — Skalabilitas Multi-Container
 
-**Tujuan:** Mengukur pengaruh jumlah *instance* (1 hingga 5 container) terhadap *data delay end-to-end*, CPU agregat, dan memori agregat pada modul **Data Archiver** dan **P-Wave Detector**.
+**Tujuan:** Mengukur pengaruh jumlah _instance_ (1 hingga 5 container) terhadap _data delay end-to-end_, CPU agregat, dan memori agregat pada modul **Data Archiver** dan **P-Wave Detector**.
 
 **Compose file yang digunakan:**
+
 - Data Archiver (1–5 container): `docker-compose-3-1.yml` hingga `docker-compose-3-5.yml`
 - P-Wave Detector Kafka native (2–5 container): `docker-compose-3-6.yml` hingga `docker-compose-3-9.yml`
 - P-Wave Detector FastAPI (2–5 container): `docker-compose-3-10.yml` hingga `docker-compose-3-13.yml`
 
 **Output yang dihasilkan (per variasi):**
+
 - `tests/results/table4_1_container_stats.csv` hingga `table4_5_container_stats.csv`
 - `tests/results/table5_kafka_2c_stats.csv` hingga `table5_fastapi_5c_stats.csv`
 
@@ -317,13 +323,15 @@ Get-ChildItem tests/results/table5_*.csv
 
 ## 8. S3 — Perbandingan WebSocket Server
 
-**Tujuan:** Membandingkan performa Express.js/Socket.IO versus FastAPI dalam menangani koneksi WebSocket pada 1 client dan 5 client konkuren, mengukur *data delay*, CPU (%), dan memori (MB).
+**Tujuan:** Membandingkan performa Express.js/Socket.IO versus FastAPI dalam menangani koneksi WebSocket pada 1 client dan 5 client konkuren, mengukur _data delay_, CPU (%), dan memori (MB).
 
 **Compose file yang digunakan:**
+
 - Express.js: `docker-compose-4-1.yml` (port `3333`)
 - FastAPI: `docker-compose-4-2.yml` (port `3334`)
 
 **Output yang dihasilkan:**
+
 - `tests/results/table6_express_1c_stats.csv`
 - `tests/results/table6_express_5c_stats.csv`
 - `tests/results/table6_fastapi_1c_stats.csv`
@@ -368,13 +376,15 @@ Get-ChildItem tests/results/table6_*.csv
 
 ## 9. S4 — Kafka vs Kafka+NGINX Load Balancer
 
-**Tujuan:** Membandingkan konfigurasi *message broker* Kafka native (3 broker) versus Kafka+NGINX sebagai *load balancer* eksternal, mengukur *data delay*, CPU (%), dan memori (MB) pada kondisi beban normal.
+**Tujuan:** Membandingkan konfigurasi _message broker_ Kafka native (3 broker) versus Kafka+NGINX sebagai _load balancer_ eksternal, mengukur _data delay_, CPU (%), dan memori (MB) pada kondisi beban normal.
 
 **Compose file yang digunakan:**
+
 - Kafka 3 Container: `docker-compose-2-1.yml`
 - Kafka 3 Container + NGINX: `docker-compose-2-2.yml`
 
 **Output yang dihasilkan:**
+
 - `tests/results/table2_kafka_stats.csv`
 - `tests/results/table2_kafka_metrics.csv`
 - `tests/results/table2_nginx_stats.csv`
@@ -432,7 +442,7 @@ cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
 .\run_all_tests.ps1
 ```
 
-> **Perhatian:** Proses ini membutuhkan estimasi **1,5 hingga 3 jam** tergantung spesifikasi mesin. Pastikan komputer tidak masuk mode tidur (*sleep*) selama eksekusi.
+> **Perhatian:** Proses ini membutuhkan estimasi **1,5 hingga 3 jam** tergantung spesifikasi mesin. Pastikan komputer tidak masuk mode tidur (_sleep_) selama eksekusi.
 
 Untuk mencegah komputer tidur saat tes berjalan panjang:
 
@@ -463,11 +473,13 @@ Tandai setiap item setelah berhasil dikumpulkan.
 ### File CSV per Skenario
 
 **S1 — Overhead Instrumentasi:**
+
 - [ ] `tests/results/s1_overhead_no_metrics_stats.csv`
 - [ ] `tests/results/s1_overhead_with_metrics_stats.csv`
 - [ ] `tests/results/s1_comparison.csv` (hasil analisis)
 
 **S2 — Data Archiver (1–5 container):**
+
 - [ ] `tests/results/table4_1_container_stats.csv`
 - [ ] `tests/results/table4_2_container_stats.csv`
 - [ ] `tests/results/table4_3_container_stats.csv`
@@ -475,24 +487,28 @@ Tandai setiap item setelah berhasil dikumpulkan.
 - [ ] `tests/results/table4_5_container_stats.csv`
 
 **S2 — P-Wave Detector Kafka (2–5 container):**
+
 - [ ] `tests/results/table5_kafka_2c_stats.csv`
 - [ ] `tests/results/table5_kafka_3c_stats.csv`
 - [ ] `tests/results/table5_kafka_4c_stats.csv`
 - [ ] `tests/results/table5_kafka_5c_stats.csv`
 
 **S2 — P-Wave Detector FastAPI (2–5 container):**
+
 - [ ] `tests/results/table5_fastapi_2c_stats.csv`
 - [ ] `tests/results/table5_fastapi_3c_stats.csv`
 - [ ] `tests/results/table5_fastapi_4c_stats.csv`
 - [ ] `tests/results/table5_fastapi_5c_stats.csv`
 
 **S3 — WebSocket:**
+
 - [ ] `tests/results/table6_express_1c_stats.csv`
 - [ ] `tests/results/table6_express_5c_stats.csv`
 - [ ] `tests/results/table6_fastapi_1c_stats.csv`
 - [ ] `tests/results/table6_fastapi_5c_stats.csv`
 
 **S4 — Broker:**
+
 - [ ] `tests/results/table2_kafka_stats.csv`
 - [ ] `tests/results/table2_kafka_metrics.csv`
 - [ ] `tests/results/table2_nginx_stats.csv`
@@ -526,6 +542,7 @@ Cari pesan `Error`, `Exception`, atau `ECONNREFUSED`. Untuk Kafka, tunggu minima
 ### Error `model_p_wave.h5` atau `model_loc_mag.h5` tidak ditemukan
 
 File model H5 harus tersedia di dalam folder masing-masing modul sebelum build:
+
 - `p_wave_detector/model_p_wave.h5`
 - `loc_mag_detector/model_p_wave.h5`
 
@@ -538,6 +555,7 @@ pip install requests websockets
 ### CSV kosong atau hanya berisi header
 
 Pastikan:
+
 1. Container sudah berjalan selama minimal 60 detik sebelum kolektor dijalankan
 2. Argumen `--target-substring` sesuai nama container (cek `docker compose ps`)
 3. Tidak ada error di terminal saat kolektor berjalan
@@ -566,26 +584,26 @@ docker volume prune -f
 
 ## Referensi Mapping Skenario ke Compose File
 
-| Kode Skenario (BAB III) | Compose File | Script Otomatis |
-|---|---|---|
-| S1a — Tanpa Prometheus | `docker-compose-5-1.yml` | `run_s1_overhead.ps1` |
-| S1b — Dengan Prometheus | `docker-compose-5-2.yml` | `run_s1_overhead.ps1` |
-| S2 — Archiver 1 Container | `docker-compose-3-1.yml` | `run_table4_archiver.ps1` |
-| S2 — Archiver 2 Container | `docker-compose-3-2.yml` | `run_table4_archiver.ps1` |
-| S2 — Archiver 3 Container | `docker-compose-3-3.yml` | `run_table4_archiver.ps1` |
-| S2 — Archiver 4 Container | `docker-compose-3-4.yml` | `run_table4_archiver.ps1` |
-| S2 — Archiver 5 Container | `docker-compose-3-5.yml` | `run_table4_archiver.ps1` |
-| S2 — P-Wave Kafka 2C | `docker-compose-3-6.yml` | `run_table5_pwavedetector.ps1` |
-| S2 — P-Wave Kafka 3C | `docker-compose-3-7.yml` | `run_table5_pwavedetector.ps1` |
-| S2 — P-Wave Kafka 4C | `docker-compose-3-8.yml` | `run_table5_pwavedetector.ps1` |
-| S2 — P-Wave Kafka 5C | `docker-compose-3-9.yml` | `run_table5_pwavedetector.ps1` |
-| S2 — P-Wave FastAPI 2C | `docker-compose-3-10.yml` | `run_table5_pwavedetector.ps1` |
-| S2 — P-Wave FastAPI 3C | `docker-compose-3-11.yml` | `run_table5_pwavedetector.ps1` |
-| S2 — P-Wave FastAPI 4C | `docker-compose-3-12.yml` | `run_table5_pwavedetector.ps1` |
-| S2 — P-Wave FastAPI 5C | `docker-compose-3-13.yml` | `run_table5_pwavedetector.ps1` |
-| S3 — Express 1 Client | `docker-compose-4-1.yml` | `run_table6_websocket.ps1` |
-| S3 — Express 5 Client | `docker-compose-4-1.yml` | `run_table6_websocket.ps1` |
-| S3 — FastAPI 1 Client | `docker-compose-4-2.yml` | `run_table6_websocket.ps1` |
-| S3 — FastAPI 5 Client | `docker-compose-4-2.yml` | `run_table6_websocket.ps1` |
-| S4 — Kafka 3 Broker | `docker-compose-2-1.yml` | `run_table2_broker.ps1` |
-| S4 — Kafka 3 Broker + NGINX | `docker-compose-2-2.yml` | `run_table2_broker.ps1` |
+| Kode Skenario (BAB III)     | Compose File              | Script Otomatis                |
+| --------------------------- | ------------------------- | ------------------------------ |
+| S1a — Tanpa Prometheus      | `docker-compose-5-1.yml`  | `run_s1_overhead.ps1`          |
+| S1b — Dengan Prometheus     | `docker-compose-5-2.yml`  | `run_s1_overhead.ps1`          |
+| S2 — Archiver 1 Container   | `docker-compose-3-1.yml`  | `run_table4_archiver.ps1`      |
+| S2 — Archiver 2 Container   | `docker-compose-3-2.yml`  | `run_table4_archiver.ps1`      |
+| S2 — Archiver 3 Container   | `docker-compose-3-3.yml`  | `run_table4_archiver.ps1`      |
+| S2 — Archiver 4 Container   | `docker-compose-3-4.yml`  | `run_table4_archiver.ps1`      |
+| S2 — Archiver 5 Container   | `docker-compose-3-5.yml`  | `run_table4_archiver.ps1`      |
+| S2 — P-Wave Kafka 2C        | `docker-compose-3-6.yml`  | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave Kafka 3C        | `docker-compose-3-7.yml`  | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave Kafka 4C        | `docker-compose-3-8.yml`  | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave Kafka 5C        | `docker-compose-3-9.yml`  | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave FastAPI 2C      | `docker-compose-3-10.yml` | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave FastAPI 3C      | `docker-compose-3-11.yml` | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave FastAPI 4C      | `docker-compose-3-12.yml` | `run_table5_pwavedetector.ps1` |
+| S2 — P-Wave FastAPI 5C      | `docker-compose-3-13.yml` | `run_table5_pwavedetector.ps1` |
+| S3 — Express 1 Client       | `docker-compose-4-1.yml`  | `run_table6_websocket.ps1`     |
+| S3 — Express 5 Client       | `docker-compose-4-1.yml`  | `run_table6_websocket.ps1`     |
+| S3 — FastAPI 1 Client       | `docker-compose-4-2.yml`  | `run_table6_websocket.ps1`     |
+| S3 — FastAPI 5 Client       | `docker-compose-4-2.yml`  | `run_table6_websocket.ps1`     |
+| S4 — Kafka 3 Broker         | `docker-compose-2-1.yml`  | `run_table2_broker.ps1`        |
+| S4 — Kafka 3 Broker + NGINX | `docker-compose-2-2.yml`  | `run_table2_broker.ps1`        |

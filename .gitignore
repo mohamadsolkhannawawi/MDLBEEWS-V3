@@ -1,7 +1,6 @@
 api_server/node_modules
 data_archiver/data_archive
 mongo/*
-grafana/*
 rabbitmq/*
 .env
 influxDB/.env
