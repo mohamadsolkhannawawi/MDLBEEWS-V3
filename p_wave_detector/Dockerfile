@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /root/.cache/pip
 RUN python -m pip install --no-cache-dir --no-compile --retries 10 --timeout 120 --index-url https://pypi.org/simple --trusted-host pypi.org --trusted-host files.pythonhosted.org --only-binary=:all: --no-deps obspy==1.4.1
 RUN python -m pip install --no-cache-dir --no-compile --retries 10 --timeout 120 --index-url https://pypi.org/simple --trusted-host pypi.org --trusted-host files.pythonhosted.org --only-binary=:all: scipy lxml matplotlib sqlalchemy requests decorator
+RUN python -m pip install "setuptools<60.0.0" wheel
 RUN python -m pip install --no-cache-dir --no-compile --retries 10 --timeout 120 --index-url https://pypi.org/simple --trusted-host pypi.org --trusted-host files.pythonhosted.org --only-binary=:all: -r requirements.txt
 
 COPY config/ config/

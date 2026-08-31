@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
+RUN python -m pip install "setuptools<60.0.0" wheel
 RUN python -m pip install --retries 5 --timeout 60 --index-url https://pypi.org/simple --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
 
 COPY config/ config/
