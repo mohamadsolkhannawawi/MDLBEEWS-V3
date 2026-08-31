@@ -53,13 +53,14 @@ def main():
     parser.add_argument('--duration', type=int, default=120)
     parser.add_argument('--interval', type=int, default=5)
     parser.add_argument('--output', type=str, required=True)
-    parser.add_argument('--target-substring', type=str, required=True, help="Substring of the container name to aggregate (e.g. 'data_archiver')")
+    parser.add_argument('--target-substring', type=str, nargs='?', default="", help="Substring of the container name to aggregate (e.g. 'data_archiver')")
     args = parser.parse_args()
     
     output_dir = os.path.dirname(args.output)
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
     
+    target_sub = args.target_substring or ""
     with open(args.output, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['timestamp', 'aggregate_cpu_percent', 'aggregate_mem_mb'])
@@ -73,13 +74,13 @@ def main():
             agg_mem = 0.0
             
             for name, data in stats.items():
-                if args.target_substring in name:
+                if target_sub in name:
                     agg_cpu += data['cpu']
                     agg_mem += data['mem_mb']
                     
             writer.writerow([current_time, round(agg_cpu, 2), round(agg_mem, 2)])
             f.flush()
-            print(f"[{current_time}] Aggregate for '{args.target_substring}': CPU={agg_cpu:.2f}%, Mem={agg_mem:.2f}MB")
+            print(f"[{current_time}] Aggregate for '{target_sub}': CPU={agg_cpu:.2f}%, Mem={agg_mem:.2f}MB")
             
             time.sleep(args.interval)
 
