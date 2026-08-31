@@ -156,7 +156,7 @@
       "title": "P-Wave Inference Latency (P50 / P95)",
       "type": "timeseries",
       "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 18 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
       "id": 7,
       "targets": [
         { "expr": "histogram_quantile(0.95, rate(pwave_inference_latency_seconds_bucket[5m]))", "legendFormat": "Consumer P95", "refId": "A" },
@@ -171,27 +171,10 @@
       }
     },
     {
-      "title": "Load Balancer Forward Latency (P50 / P95)",
-      "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 18 },
-      "id": 8,
-      "targets": [
-        { "expr": "histogram_quantile(0.95, rate(lb_forward_latency_seconds_bucket[5m]))", "legendFormat": "P95", "refId": "A" },
-        { "expr": "histogram_quantile(0.50, rate(lb_forward_latency_seconds_bucket[5m]))", "legendFormat": "P50", "refId": "B" }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "s",
-          "custom": { "lineWidth": 2, "fillOpacity": 10 }
-        }
-      }
-    },
-    {
       "title": "Loc-Mag Inference Latency (P50 / P95)",
       "type": "timeseries",
       "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 18 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
       "id": 9,
       "targets": [
         { "expr": "histogram_quantile(0.95, rate(locmag_inference_latency_seconds_bucket[5m]))", "legendFormat": "P95", "refId": "A" },

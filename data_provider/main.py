@@ -1,5 +1,6 @@
 import sys
 import os
+import shutil
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from multi_process import main
@@ -16,33 +17,56 @@ from utils.logger import get_logger
 
 logger = get_logger("DataProvider")
 
+# =============================================================================
+# Prometheus Multiprocess Setup
+# =============================================================================
+# Clean and prepare the multiprocess directory so child processes can
+# write their metrics to shared files that the main HTTP server aggregates.
+MULTIPROC_DIR = os.environ.get("PROMETHEUS_MULTIPROC_DIR", "/tmp/prometheus_multiproc")
+
 if ENABLE_METRICS:
-    from prometheus_client import REGISTRY, start_http_server, Counter, Gauge
+    # Clean stale files from previous runs
+    if os.path.isdir(MULTIPROC_DIR):
+        shutil.rmtree(MULTIPROC_DIR)
+    os.makedirs(MULTIPROC_DIR, exist_ok=True)
 
-    def get_metric(metric_type, name, documentation, label_names=None):
-        registry_name = name.removesuffix('_total')
-        existing_metric = REGISTRY._names_to_collectors.get(registry_name)
-        if existing_metric is not None:
-            return existing_metric
-        metric_kwargs = {'labelnames': label_names} if label_names else {}
-        return metric_type(name, documentation, **metric_kwargs)
+    from prometheus_client import (
+        Counter, Gauge,
+        CollectorRegistry, multiprocess, generate_latest, CONTENT_TYPE_LATEST
+    )
+    from http.server import HTTPServer, BaseHTTPRequestHandler
 
-    TRACES_SENT = get_metric(
-        Counter,
+    # Metrics — these will be automatically shared across child processes
+    # because PROMETHEUS_MULTIPROC_DIR is set.
+    TRACES_SENT = Counter(
         'data_provider_traces_sent',
         'Total number of trace messages sent to Kafka',
         ['topic']
     )
-    PUBLISH_ERRORS = get_metric(
-        Counter,
+    PUBLISH_ERRORS = Counter(
         'data_provider_publish_errors',
         'Total number of Kafka publish errors'
     )
-    ACTIVE_STREAMS = get_metric(
-        Gauge,
+    ACTIVE_STREAMS = Gauge(
         'data_provider_active_streams',
-        'Number of active SeedLink streams'
+        'Number of active SeedLink streams',
+        multiprocess_mode='livesum'
     )
+
+    class MetricsHandler(BaseHTTPRequestHandler):
+        """Custom HTTP handler that aggregates metrics from all child processes."""
+        def do_GET(self):
+            registry = CollectorRegistry()
+            multiprocess.MultiProcessCollector(registry)
+            output = generate_latest(registry)
+            self.send_response(200)
+            self.send_header('Content-Type', CONTENT_TYPE_LATEST)
+            self.end_headers()
+            self.wfile.write(output)
+
+        def log_message(self, format, *args):
+            pass  # Suppress default access logs
+
 else:
     TRACES_SENT = None
     PUBLISH_ERRORS = None
@@ -52,11 +76,14 @@ else:
 if __name__ == '__main__':
     logger.info("Starting Data Provider...")
 
-    # Start Prometheus metrics server
+    # Start Prometheus metrics server with multiprocess aggregation
     if ENABLE_METRICS:
         try:
-            start_http_server(METRICS_PORT_DATA_PROVIDER)
-            logger.info(f"Prometheus metrics server started on port {METRICS_PORT_DATA_PROVIDER}")
+            server = HTTPServer(('0.0.0.0', METRICS_PORT_DATA_PROVIDER), MetricsHandler)
+            import threading
+            metrics_thread = threading.Thread(target=server.serve_forever, daemon=True)
+            metrics_thread.start()
+            logger.info(f"Prometheus metrics server (multiprocess) started on port {METRICS_PORT_DATA_PROVIDER}")
         except Exception as e:
             logger.error(f"Failed to start metrics server: {e}")
 

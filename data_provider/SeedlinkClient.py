@@ -6,23 +6,28 @@ import time
 import concurrent.futures
 import threading
 
-# --- Prometheus Metrics (imported from main.py module-level) ---
+# --- Prometheus Metrics (shared with main.py via multiprocess mode) ---
 ENABLE_METRICS = os.getenv("ENABLE_METRICS", "true").lower() == "true"
 
 if ENABLE_METRICS:
     from prometheus_client import Counter, Gauge
+
+    # These metric names must match exactly with main.py.
+    # When PROMETHEUS_MULTIPROC_DIR is set, prometheus_client automatically
+    # shares metric state across processes via filesystem-backed files.
     TRACES_SENT = Counter(
-        'data_provider_traces_sent_total',
+        'data_provider_traces_sent',
         'Total number of trace messages sent to Kafka',
         ['topic']
     )
     PUBLISH_ERRORS = Counter(
-        'data_provider_publish_errors_total',
+        'data_provider_publish_errors',
         'Total number of Kafka publish errors'
     )
     ACTIVE_STREAMS = Gauge(
         'data_provider_active_streams',
-        'Number of active SeedLink streams'
+        'Number of active SeedLink streams',
+        multiprocess_mode='livesum'
     )
 else:
     TRACES_SENT = None

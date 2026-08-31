@@ -65,6 +65,9 @@ def create_topic_if_not_exists(topic_name: str, num_partitions: int, replication
             logger.info(f"Topic '{topic_name}' created successfully.")
             break
         except Exception as e:
+            if 'TopicAlreadyExistsError' in str(e) or 'already exists' in str(e):
+                logger.info(f"Topic '{topic_name}' already exists, skipping creation.")
+                break
             logger.error(f"Error creating topic '{topic_name}': {e}")
             sleep(3)
 
