@@ -115,7 +115,7 @@ class TraceConsumer:
 
             # Inference with latency measurement
             inference_start = time()
-            predictions_p_wave = self.model.predict(preprocessed_array, verbose=0)
+            predictions_p_wave = self.model(preprocessed_array, training=False).numpy()
             inference_duration = time() - inference_start
 
             if ENABLE_METRICS and PWAVE_INFERENCE_LATENCY:

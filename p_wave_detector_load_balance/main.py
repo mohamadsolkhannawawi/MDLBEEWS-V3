@@ -124,7 +124,7 @@ async def predict(trace: obspy.Trace, data_provider_time: float) -> None:
         # Inference with latency measurement
         inference_start = time()
         predictions_p_wave = await asyncio.get_event_loop().run_in_executor(
-            None, lambda: model.predict(preprocessed_array, verbose=0)
+            None, lambda: model(preprocessed_array, training=False).numpy()
         )
         inference_duration = time() - inference_start
 

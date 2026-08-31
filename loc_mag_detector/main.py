@@ -86,7 +86,7 @@ class TraceConsumer:
 
             # Inference with latency measurement
             inference_start = time()
-            predictions_loc_mag = self.model.predict(preprocessed_array, verbose=0)
+            predictions_loc_mag = self.model(preprocessed_array, training=False).numpy()
             inference_duration = time() - inference_start
 
             if ENABLE_METRICS and LOCMAG_INFERENCE_LATENCY:
