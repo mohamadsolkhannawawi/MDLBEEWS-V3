@@ -37,5 +37,5 @@ INFLUXDB_TOKEN = os.getenv(
     "eFWu0UGcCzvGAX1w-z43heHjfDk8swujfryImhIsTrAkNJOgfMRSYsgYVki-QTiWHDwKLJtxsSnCmHhxisCN1w=="
 )
 INFLUXDB_ORG = os.getenv("INFLUXDB_ORG", "owner")
-INFLUXDB_BUCKET_TRACE = os.getenv("INFLUXDB_BUCKET_TRACE", "trace")
-INFLUXDB_BUCKET_RESULT = os.getenv("INFLUXDB_BUCKET_RESULT", "result")
+INFLUXDB_BUCKET_TRACE = os.getenv("INFLUXDB_BUCKET_TRACE", os.getenv("INFLUXDB_BUCKET", "eews"))
+INFLUXDB_BUCKET_RESULT = os.getenv("INFLUXDB_BUCKET_RESULT", os.getenv("INFLUXDB_BUCKET", "eews"))

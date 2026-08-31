@@ -82,6 +82,12 @@ app.add_middleware(
 )
 
 connected_clients = set()
+main_loop = None
+
+@app.on_event("startup")
+async def startup_event():
+    global main_loop
+    main_loop = asyncio.get_running_loop()
 
 
 @app.websocket("/ws")
@@ -124,14 +130,8 @@ def consume_trace():
 
         broadcast_start = time.time()
         
-        # Broadcast asynchronously in the background thread
-        # Note: In a real production setup, one might use a queue to pass messages 
-        # to the asyncio event loop instead of running asyncio.run in a loop.
         try:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(broadcast_message(message_data))
-            loop.close()
+            asyncio.run_coroutine_threadsafe(broadcast_message(message_data), main_loop)
         except Exception as e:
             logger.error(f"Error in broadcast loop: {e}")
 
@@ -160,10 +160,7 @@ def consume_loc_mag():
         broadcast_start = time.time()
         
         try:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(broadcast_message(message_data))
-            loop.close()
+            asyncio.run_coroutine_threadsafe(broadcast_message(message_data), main_loop)
         except Exception as e:
             logger.error(f"Error in broadcast loop: {e}")
 
