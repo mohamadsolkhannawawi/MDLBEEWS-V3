@@ -533,23 +533,38 @@ Setiap CSV harus memiliki **lebih dari 5 baris** (header + data). Jika kurang, p
 
 Untuk mendeteksi error pada seluruh modul atau modul tertentu secara menyeluruh:
 
-**Filter Semua Error Sekaligus (Rekomendasi Utama):**
+**Filter Semua Error Terkini Sekaligus (5 Menit Terakhir):**
 - PowerShell (Windows):
   ```powershell
-  docker compose logs --tail 100 | Select-String "ERROR", "Exception", "Traceback"
+  docker compose logs --since 5m | Select-String "ERROR", "Exception", "Traceback"
   ```
 - Bash (Ubuntu / Linux):
   ```bash
-  docker compose logs --tail 100 | grep -iE "ERROR|Exception|Traceback"
+  docker compose logs --since 5m | grep -iE "ERROR|Exception|Traceback"
   ```
 
-**Inspeksi Log per Modul Spesifik:**
-- `data_provider`: `docker compose logs data_provider --tail 50`
-- `p_wave_detector`: `docker compose logs p_wave_detector --tail 50`
-- `loc_mag_detector`: `docker compose logs loc_mag_detector --tail 50`
-- `data_archiver`: `docker compose logs data_archiver --tail 50`
-- `api_server`: `docker compose logs api_server --tail 50`
-- `fast_api`: `docker compose logs fast_api --tail 50`
+**Pengecekan Error Terkini per Modul Spesifik:**
+Jika ingin lebih detail, Anda bisa menjalankan perintah berikut untuk mengecek sisa bug terbaru pada setiap modul:
+
+```powershell
+# Data Provider
+docker compose logs data_provider --since 5m | Select-String "ERROR", "Exception", "Traceback"
+
+# AI Detectors
+docker compose logs p_wave_detector --since 5m | Select-String "ERROR", "Exception", "Traceback"
+docker compose logs loc_mag_detector --since 5m | Select-String "ERROR", "Exception", "Traceback"
+
+# Backend & APIs
+docker compose logs data_archiver --since 5m | Select-String "ERROR", "Exception", "Traceback"
+docker compose logs api_server --since 5m | Select-String "ERROR", "Exception", "Traceback"
+docker compose logs fast_api --since 5m | Select-String "ERROR", "Exception", "Traceback"
+
+# Infrastruktur Inti (Kafka, Zookeeper, dll)
+docker compose logs kafka1 --since 5m | Select-String "ERROR", "Exception", "Traceback"
+docker compose logs zookeeper --since 5m | Select-String "ERROR", "Exception", "Traceback"
+```
+
+*(Tips: Jika Anda menggunakan Mac/Linux, cukup ganti `Select-String "..."` dengan `grep -iE "ERROR|Exception|Traceback"`).*
 
 ### Penanganan Resource Berlebihan (CPU > 100% / Memory Full / Laptop Lambat)
 
@@ -598,6 +613,71 @@ Pastikan:
 
 1. Container sudah berjalan selama minimal 60 detik sebelum kolektor dijalankan
 2. Argumen `--target-substring` sesuai nama container (cek `docker compose ps`)
+
+---
+
+## 13. Verifikasi Penyimpanan Data ke Database
+
+Selain metrik pada Grafana, Anda juga perlu memastikan bahwa seluruh data tersimpan dengan baik di database yang digunakan oleh sistem (InfluxDB, MongoDB, dan Prometheus). 
+
+Berikut adalah cara memverifikasi data di masing-masing database:
+
+### A. Verifikasi InfluxDB (Penyimpanan Metrik Arsitektur)
+InfluxDB menyimpan metrik yang dikumpulkan dari k6, Prometheus, Telegraf, dll (tergantung konfigurasi Anda).
+
+1. Masuk ke dalam container InfluxDB:
+   ```powershell
+   docker compose exec influxdb influx -username admin -password "12345678"
+   ```
+2. Cek database (bucket) yang tersedia:
+   ```sql
+   > show databases
+   ```
+3. Pilih database utama (misal: `metrics` atau `telegraf`):
+   ```sql
+   > use metrics
+   ```
+4. Cek apakah ada data yang masuk dengan menghitung total baris atau menampilkan data terbaru:
+   ```sql
+   > show measurements
+   > select * from "http_reqs" order by time desc limit 10
+   ```
+*(Ketik `exit` untuk keluar dari shell InfluxDB).*
+
+### B. Verifikasi MongoDB (Penyimpanan Hasil Deteksi AI)
+MongoDB digunakan oleh modul `data_archiver` untuk menyimpan hasil prediksi dari modul AI (`p_wave_detector` dan `loc_mag_detector`).
+
+1. Masuk ke dalam container MongoDB (mongosh):
+   ```powershell
+   docker compose exec mongodb mongosh -u admin -p admin123 --authenticationDatabase admin
+   ```
+2. Cek database yang tersedia dan pilih database EEWS:
+   ```javascript
+   test> show dbs
+   test> use eews_db
+   ```
+3. Cek jumlah data (dokumen) di koleksi hasil deteksi:
+   ```javascript
+   eews_db> show collections
+   eews_db> db.p_wave_results.countDocuments()
+   eews_db> db.loc_mag_results.countDocuments()
+   ```
+4. Lihat contoh data terakhir yang disimpan:
+   ```javascript
+   eews_db> db.p_wave_results.find().sort({_id:-1}).limit(1)
+   ```
+*(Ketik `exit` untuk keluar dari shell MongoDB).*
+
+### C. Verifikasi Prometheus (Penyimpanan Metrik Observabilitas)
+Prometheus menarik (scrape) metrik dari seluruh layanan, termasuk Data Provider, Node Exporter, cAdvisor, dan Kafka.
+
+1. Buka browser dan akses **Prometheus Web UI**:
+   - `http://localhost:9090`
+2. Di kolom pencarian (Expression), ketikkan query berikut dan klik **Execute** (pilih tab **Table** atau **Graph**):
+   - Cek metrik dari Data Provider: `data_provider_traces_sent_total`
+   - Cek penggunaan CPU container Kafka: `rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service=~"kafka.*"}[1m])`
+   - Cek metrik API Server HTTP reqs: `http_requests_total`
+3. Jika query mengembalikan tabel nilai (bukan "Empty query result"), artinya Prometheus berhasil menyimpan metrik.
 3. Tidak ada error di terminal saat kolektor berjalan
 
 ### Permission Denied saat menulis CSV
