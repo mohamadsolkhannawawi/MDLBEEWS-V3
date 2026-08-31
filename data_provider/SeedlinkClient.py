@@ -10,21 +10,31 @@ import threading
 ENABLE_METRICS = os.getenv("ENABLE_METRICS", "true").lower() == "true"
 
 if ENABLE_METRICS:
-    from prometheus_client import Counter, Gauge
+    from prometheus_client import Counter, Gauge, REGISTRY
 
-    # These metric names must match exactly with main.py.
-    # When PROMETHEUS_MULTIPROC_DIR is set, prometheus_client automatically
-    # shares metric state across processes via filesystem-backed files.
-    TRACES_SENT = Counter(
+    def get_metric(metric_class, name, desc, labelnames=(), **kwargs):
+        # prometheus_client internally appends _total for Counters, so we check various forms
+        for s_name in [name, f"{name}_total", f"{name}_created"]:
+            if s_name in REGISTRY._names_to_collectors:
+                return REGISTRY._names_to_collectors[s_name]
+        
+        if labelnames:
+            return metric_class(name, desc, labelnames, **kwargs)
+        return metric_class(name, desc, **kwargs)
+
+    TRACES_SENT = get_metric(
+        Counter,
         'data_provider_traces_sent',
         'Total number of trace messages sent to Kafka',
         ['topic']
     )
-    PUBLISH_ERRORS = Counter(
+    PUBLISH_ERRORS = get_metric(
+        Counter,
         'data_provider_publish_errors',
         'Total number of Kafka publish errors'
     )
-    ACTIVE_STREAMS = Gauge(
+    ACTIVE_STREAMS = get_metric(
+        Gauge,
         'data_provider_active_streams',
         'Number of active SeedLink streams',
         multiprocess_mode='livesum'
