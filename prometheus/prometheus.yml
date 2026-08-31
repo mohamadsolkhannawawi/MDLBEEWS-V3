@@ -36,24 +36,6 @@ scrape_configs:
       - source_labels: [__address__]
         target_label: instance
 
-  - job_name: 'p_wave_detector_load_balance'
-    dns_sd_configs:
-      - names: ['p_wave_detector_load_balance']
-        type: 'A'
-        port: 8103
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: instance
-
-  - job_name: 'load_balancer'
-    dns_sd_configs:
-      - names: ['load_balancer']
-        type: 'A'
-        port: 8104
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: instance
-
   - job_name: 'loc_mag_detector'
     dns_sd_configs:
       - names: ['loc_mag_detector']

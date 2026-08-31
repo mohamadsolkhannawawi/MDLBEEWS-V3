@@ -33,7 +33,7 @@
     {
       "title": "Traces Sent Rate (Data Provider)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 8, "x": 0, "y": 1 },
       "id": 1,
       "targets": [
@@ -53,7 +53,7 @@
     {
       "title": "P-Wave Detections Rate",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 8, "x": 8, "y": 1 },
       "id": 2,
       "targets": [
@@ -70,7 +70,7 @@
     {
       "title": "Loc-Mag Estimations Rate",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 8, "x": 16, "y": 1 },
       "id": 3,
       "targets": [
@@ -86,7 +86,7 @@
     {
       "title": "WebSocket Broadcast Rate",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 9 },
       "id": 4,
       "targets": [
@@ -103,7 +103,7 @@
     {
       "title": "Active WebSocket Clients",
       "type": "gauge",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 6, "x": 12, "y": 9 },
       "id": 5,
       "targets": [
@@ -128,7 +128,7 @@
     {
       "title": "Error Rates (All Modules)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 6, "x": 18, "y": 9 },
       "id": 6,
       "targets": [
@@ -155,7 +155,7 @@
     {
       "title": "P-Wave Inference Latency (P50 / P95)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 8, "x": 0, "y": 18 },
       "id": 7,
       "targets": [
@@ -173,7 +173,7 @@
     {
       "title": "Load Balancer Forward Latency (P50 / P95)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 8, "x": 8, "y": 18 },
       "id": 8,
       "targets": [
@@ -190,7 +190,7 @@
     {
       "title": "Loc-Mag Inference Latency (P50 / P95)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 8, "x": 16, "y": 18 },
       "id": 9,
       "targets": [
@@ -207,7 +207,7 @@
     {
       "title": "End-to-End Data Delay (P95)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 26 },
       "id": 10,
       "targets": [
@@ -224,7 +224,7 @@
     {
       "title": "WebSocket Broadcast Latency (P50 / P95)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 26 },
       "id": 11,
       "targets": [
@@ -249,7 +249,7 @@
     {
       "title": "CPU Usage (%)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 35 },
       "id": 12,
       "targets": [
@@ -279,7 +279,7 @@
     {
       "title": "Memory Usage (MB)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 35 },
       "id": 13,
       "targets": [
@@ -299,7 +299,7 @@
     {
       "title": "Prometheus Scrape Duration (per target)",
       "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "h": 8, "w": 24, "x": 0, "y": 43 },
       "id": 14,
       "targets": [

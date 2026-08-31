@@ -27,7 +27,7 @@ from config.settings import (
     KAFKA_TOPIC_TRACE,
     KAFKA_TOPIC_RESULT
 )
-from utils.kafka_helper import get_consumer
+from utils.kafka_helper import get_consumer, check_kafka_connection
 from utils.logger import get_logger
 
 logger = get_logger("FastAPI")
@@ -213,8 +213,22 @@ async def health():
     return {"status": "healthy"}
 
 
+def wait_for_kafka(brokers, max_retries=30, retry_interval=3):
+    """Wait for Kafka brokers to become available before starting consumers."""
+    for attempt in range(1, max_retries + 1):
+        if check_kafka_connection(brokers):
+            logger.info("Kafka brokers are available.")
+            return True
+        logger.warning(f"Kafka not ready (attempt {attempt}/{max_retries}), retrying in {retry_interval}s...")
+        time.sleep(retry_interval)
+    logger.error("Kafka brokers did not become available. Starting anyway...")
+    return False
+
+
 if __name__ == "__main__":
     logger.info("Starting FastAPI WebSocket Server")
+    
+    wait_for_kafka(KAFKA_BROKERS)
     
     consumer_thread = Thread(target=consume_trace, daemon=True)
     consumer_thread2 = Thread(target=consume_loc_mag, daemon=True)

@@ -529,6 +529,46 @@ Setiap CSV harus memiliki **lebih dari 5 baris** (header + data). Jika kurang, p
 
 ## 12. Troubleshooting
 
+### Pengecekan Log Error per Modul
+
+Untuk mendeteksi error pada seluruh modul atau modul tertentu secara menyeluruh:
+
+**Filter Semua Error Sekaligus (Rekomendasi Utama):**
+- PowerShell (Windows):
+  ```powershell
+  docker compose logs --tail 100 | Select-String "ERROR", "Exception", "Traceback"
+  ```
+- Bash (Ubuntu / Linux):
+  ```bash
+  docker compose logs --tail 100 | grep -iE "ERROR|Exception|Traceback"
+  ```
+
+**Inspeksi Log per Modul Spesifik:**
+- `data_provider`: `docker compose logs data_provider --tail 50`
+- `p_wave_detector`: `docker compose logs p_wave_detector --tail 50`
+- `loc_mag_detector`: `docker compose logs loc_mag_detector --tail 50`
+- `data_archiver`: `docker compose logs data_archiver --tail 50`
+- `api_server`: `docker compose logs api_server --tail 50`
+- `fast_api`: `docker compose logs fast_api --tail 50`
+
+### Penanganan Resource Berlebihan (CPU > 100% / Memory Full / Laptop Lambat)
+
+Jika Docker Desktop menggunakan resource berlebihan (misalnya CPU 1000%+ atau RAM penuh) saat pengujian lokal:
+
+1. **Turunkan Beban Data Provider di `.env`:**
+   Secara default konfigurasi produksi menggunakan 30 proses dan 6000 stasiun. Untuk pengujian skala lokal/laptop, sesuaikan nilai berikut di file `.env`:
+   ```env
+   DATA_PROVIDER_NUM_PROCESSES=2
+   DATA_PROVIDER_NUM_STATIONS=50
+   ```
+2. **Restrukturisasi/Rebuild Container:**
+   ```powershell
+   docker compose down -v
+   docker compose up -d --build
+   ```
+3. **Batasi Resource pada Docker Desktop (Windows):**
+   Masuk ke Settings > Resources di Docker Desktop, batasi penggunaan CPU (misal max 4 core) dan RAM (misal max 8 GB).
+
 ### Container langsung Exiting atau Restarting
 
 ```powershell

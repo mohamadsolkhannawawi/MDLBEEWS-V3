@@ -29,18 +29,18 @@ if ENABLE_METRICS:
 
     TRACES_SENT = get_metric(
         Counter,
-        'TRACES_SENT',
+        'data_provider_traces_sent',
         'Total number of trace messages sent to Kafka',
         ['topic']
     )
     PUBLISH_ERRORS = get_metric(
         Counter,
-        'PUBLISH_ERRORS',
+        'data_provider_publish_errors',
         'Total number of Kafka publish errors'
     )
     ACTIVE_STREAMS = get_metric(
         Gauge,
-        'ACTIVE_STREAMS',
+        'data_provider_active_streams',
         'Number of active SeedLink streams'
     )
 else:
