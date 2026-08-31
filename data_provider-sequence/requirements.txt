@@ -1,2 +1,2 @@
 kafka-python==2.2.13
-obspy==1.4.2
+obspy==1.4.2prometheus_client==0.21.1
