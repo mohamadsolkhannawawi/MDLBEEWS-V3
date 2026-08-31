@@ -3,7 +3,7 @@ import os
 import shutil
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from multi_process import main
+
 from config.settings import (
     ENABLE_METRICS,
     METRICS_PORT_DATA_PROVIDER,
@@ -106,4 +106,5 @@ if __name__ == '__main__':
     num_stations = int(os.getenv("DATA_PROVIDER_NUM_STATIONS", "6000"))
 
     logger.info(f"Launching multi_process with {num_processes} processes and {num_stations} stations")
+    from multi_process import main
     main(station_path='./data/stations.json', num_processes=num_processes, num_station_configs=num_stations)
