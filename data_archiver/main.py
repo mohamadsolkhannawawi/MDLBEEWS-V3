@@ -68,23 +68,37 @@ else:
 # =============================================================================
 mongo_url = os.getenv("MONGO_URL", "mongodb://mongo:27017/")
 
-# Initialize MongoDB connection
-mongo_client = MongoClient(mongo_url)
-mongo_db = mongo_client['timeseries_db']
+# Initialize MongoDB connection with retry
+mongo_collection = None
 
-try:
-    if 'timeseries_collection' not in mongo_db.list_collection_names():
-        mongo_db.create_collection(
-            'timeseries_collection',
-            timeseries={
-                'timeField': 'timestamp',
-                'metaField': 'metadata',
-                'granularity': 'seconds'
-            }
-        )
-    mongo_collection = mongo_db['timeseries_collection']
-except Exception as e:
-    logger.error(f"Error initializing MongoDB: {e}")
+def init_mongodb(max_retries=5, retry_delay=5):
+    """Initialize MongoDB connection with retry logic."""
+    global mongo_collection
+    for attempt in range(1, max_retries + 1):
+        try:
+            mongo_client = MongoClient(mongo_url, serverSelectionTimeoutMS=5000)
+            mongo_db = mongo_client['timeseries_db']
+            # Force connection check
+            mongo_client.server_info()
+            if 'timeseries_collection' not in mongo_db.list_collection_names():
+                mongo_db.create_collection(
+                    'timeseries_collection',
+                    timeseries={
+                        'timeField': 'timestamp',
+                        'metaField': 'metadata',
+                        'granularity': 'seconds'
+                    }
+                )
+            mongo_collection = mongo_db['timeseries_collection']
+            logger.info(f"MongoDB initialized successfully on attempt {attempt}")
+            return
+        except Exception as e:
+            logger.warning(f"MongoDB init attempt {attempt}/{max_retries} failed: {e}")
+            if attempt < max_retries:
+                time.sleep(retry_delay)
+    logger.error("Failed to initialize MongoDB after all retries")
+
+init_mongodb()
 
 # Initialize InfluxDB client
 influxdb_client = InfluxDBClient(url=INFLUXDB_URL, token=INFLUXDB_TOKEN, org=INFLUXDB_ORG)
@@ -125,6 +139,9 @@ def save_data_to_influxdb(data: Dict[str, Any]) -> None:
 
 def save_data_to_mongodb(data: Dict[str, Any]) -> None:
     """Write trace data to MongoDB with Prometheus latency tracking."""
+    if mongo_collection is None:
+        logger.warning("MongoDB collection not initialized, skipping save")
+        return
     try:
         start_run_time = time.time()
         start_time_dt = datetime.utcfromtimestamp(data['start_time'])
