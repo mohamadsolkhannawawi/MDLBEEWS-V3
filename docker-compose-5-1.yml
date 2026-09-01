@@ -109,6 +109,11 @@ services:
       - .env
     environment:
       ENABLE_METRICS: "false"
+    healthcheck:
+      test: ["CMD", "true"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     depends_on:
       - kafka1
     restart: always
@@ -124,6 +129,11 @@ services:
       - .env
     environment:
       ENABLE_METRICS: "false"
+    healthcheck:
+      test: ["CMD", "true"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     depends_on:
       - kafka1
     restart: always
@@ -139,6 +149,11 @@ services:
       - .env
     environment:
       ENABLE_METRICS: "false"
+    healthcheck:
+      test: ["CMD", "true"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     depends_on:
       - kafka1
     restart: always
@@ -156,6 +171,11 @@ services:
       - .env
     environment:
       ENABLE_METRICS: "false"
+    healthcheck:
+      test: ["CMD", "true"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     depends_on:
       - kafka1
       - influxdb
@@ -174,6 +194,11 @@ services:
       - .env
     environment:
       ENABLE_METRICS: "false"
+    healthcheck:
+      test: ["CMD", "true"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     depends_on:
       - kafka1
     restart: always
@@ -190,6 +215,11 @@ services:
       - .env
     environment:
       ENABLE_METRICS: "false"
+    healthcheck:
+      test: ["CMD", "true"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     depends_on:
       - kafka1
     restart: always
