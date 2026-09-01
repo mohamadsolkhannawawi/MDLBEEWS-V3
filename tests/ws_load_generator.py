@@ -7,13 +7,25 @@ async def connect_client(uri, client_id, duration):
     try:
         async with websockets.connect(uri) as websocket:
             print(f"Client {client_id} connected to {uri}")
+            
+            # Handle Socket.IO 4.x protocol handshake if connecting to Express.js Socket.IO server
+            if "socket.io" in uri:
+                # 1. Server sends Engine.IO Open Packet '0{"sid":...}'
+                init_msg = await websocket.recv()
+                if init_msg.startswith("0"):
+                    # 2. Client sends Socket.IO Connect Packet '40'
+                    await websocket.send("40")
+                    # 3. Server responds with Socket.IO Connect Ack '40{"sid":...}'
+                    await websocket.recv()
+            
             start_time = time.time()
             while time.time() - start_time < duration:
                 try:
-                    # Receive messages to keep connection alive and simulate active client
                     msg = await asyncio.wait_for(websocket.recv(), timeout=5.0)
+                    # Engine.IO Heartbeat: Respond to Ping '2' with Pong '3'
+                    if "socket.io" in uri and msg == "2":
+                        await websocket.send("3")
                 except asyncio.TimeoutError:
-                    # No message received in 5s, that's fine, keep alive
                     pass
             print(f"Client {client_id} disconnecting.")
     except Exception as e:
@@ -21,7 +33,7 @@ async def connect_client(uri, client_id, duration):
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--uri', type=str, required=True, help="WebSocket URI, e.g., ws://localhost:3333")
+    parser.add_argument('--uri', type=str, required=True, help="WebSocket URI, e.g., ws://localhost:3334/ws")
     parser.add_argument('--clients', type=int, required=True, help="Number of concurrent clients")
     parser.add_argument('--duration', type=int, default=120, help="Duration in seconds to hold connections")
     args = parser.parse_args()
