@@ -18,8 +18,8 @@ foreach ($s in $Scenarios) {
     Write-Host "Running Table 2 Scenario: $($s.Name)" -ForegroundColor Cyan
     Write-Host "============================================================" -ForegroundColor Cyan
     
-    docker compose -f $($s.File) down -v
-    docker compose -f $($s.File) up -d --build
+    docker compose -f $($s.File) down -v --remove-orphans
+    docker compose -f $($s.File) up -d --build --remove-orphans
     
     Write-Host "Waiting 60s for stabilization..."
     Start-Sleep -Seconds 60

@@ -797,7 +797,7 @@ Fokus perekaman *resource* CPU & RAM pada layanan `data_provider`.
 **Skenario 1.1: Sequence**
 ```powershell
 docker compose -f docker-compose-1-1.yml down -v
-docker compose -f docker-compose-1-1.yml up -d --build
+docker compose -f docker-compose-1-1.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_1-1.csv --target-substring data_provider
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_1-1.csv
 ```
@@ -805,7 +805,7 @@ python tests/collect_metrics.py --duration 120 --output tests/results/metrics_1-
 **Skenario 1.2: Multi-thread**
 ```powershell
 docker compose -f docker-compose-1-2.yml down -v
-docker compose -f docker-compose-1-2.yml up -d --build
+docker compose -f docker-compose-1-2.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_1-2.csv --target-substring data_provider
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_1-2.csv
 ```
@@ -813,7 +813,7 @@ python tests/collect_metrics.py --duration 120 --output tests/results/metrics_1-
 **Skenario 1.3: Multi-process**
 ```powershell
 docker compose -f docker-compose-1-3.yml down -v
-docker compose -f docker-compose-1-3.yml up -d --build
+docker compose -f docker-compose-1-3.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_1-3.csv --target-substring data_provider
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_1-3.csv
 ```
@@ -821,7 +821,7 @@ python tests/collect_metrics.py --duration 120 --output tests/results/metrics_1-
 **Skenario 1.4: Multi-process & Multi-thread**
 ```powershell
 docker compose -f docker-compose-1-4.yml down -v
-docker compose -f docker-compose-1-4.yml up -d --build
+docker compose -f docker-compose-1-4.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_1-4.csv --target-substring data_provider
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_1-4.csv
 ```
@@ -833,7 +833,7 @@ Fokus perekaman *resource* CPU & RAM pada layanan `kafka`.
 **Skenario 2.1: Kafka 3 Broker (Tanpa NGINX)**
 ```powershell
 docker compose -f docker-compose-2-1.yml down -v
-docker compose -f docker-compose-2-1.yml up -d --build
+docker compose -f docker-compose-2-1.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_2-1.csv --target-substring kafka
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_2-1.csv
 ```
@@ -841,7 +841,7 @@ python tests/collect_metrics.py --duration 120 --output tests/results/metrics_2-
 **Skenario 2.2: Kafka 3 Broker (Dengan NGINX Load Balancer)**
 ```powershell
 docker compose -f docker-compose-2-2.yml down -v
-docker compose -f docker-compose-2-2.yml up -d --build
+docker compose -f docker-compose-2-2.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_2-2.csv --target-substring kafka
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_2-2.csv
 ```
@@ -853,31 +853,31 @@ Fokus pada container `data_archiver` atau `p_wave_detector`.
 ```powershell
 # 1 Container
 docker compose -f docker-compose-3-1.yml down -v
-docker compose -f docker-compose-3-1.yml up -d --build
+docker compose -f docker-compose-3-1.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-1.csv --target-substring data_archiver
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-1.csv
 
 # 2 Container
 docker compose -f docker-compose-3-2.yml down -v
-docker compose -f docker-compose-3-2.yml up -d --build
+docker compose -f docker-compose-3-2.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-2.csv --target-substring data_archiver
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-2.csv
 
 # 3 Container
 docker compose -f docker-compose-3-3.yml down -v
-docker compose -f docker-compose-3-3.yml up -d --build
+docker compose -f docker-compose-3-3.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-3.csv --target-substring data_archiver
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-3.csv
 
 # 4 Container
 docker compose -f docker-compose-3-4.yml down -v
-docker compose -f docker-compose-3-4.yml up -d --build
+docker compose -f docker-compose-3-4.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-4.csv --target-substring data_archiver
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-4.csv
 
 # 5 Container
 docker compose -f docker-compose-3-5.yml down -v
-docker compose -f docker-compose-3-5.yml up -d --build
+docker compose -f docker-compose-3-5.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-5.csv --target-substring data_archiver
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-5.csv
 ```
@@ -886,25 +886,25 @@ python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-
 ```powershell
 # 2 Container
 docker compose -f docker-compose-3-6.yml down -v
-docker compose -f docker-compose-3-6.yml up -d --build
+docker compose -f docker-compose-3-6.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-6.csv --target-substring p_wave_detector
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-6.csv
 
 # 3 Container
 docker compose -f docker-compose-3-7.yml down -v
-docker compose -f docker-compose-3-7.yml up -d --build
+docker compose -f docker-compose-3-7.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-7.csv --target-substring p_wave_detector
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-7.csv
 
 # 4 Container
 docker compose -f docker-compose-3-8.yml down -v
-docker compose -f docker-compose-3-8.yml up -d --build
+docker compose -f docker-compose-3-8.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-8.csv --target-substring p_wave_detector
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-8.csv
 
 # 5 Container
 docker compose -f docker-compose-3-9.yml down -v
-docker compose -f docker-compose-3-9.yml up -d --build
+docker compose -f docker-compose-3-9.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-9.csv --target-substring p_wave_detector
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-9.csv
 ```
@@ -913,25 +913,25 @@ python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-
 ```powershell
 # 2 Container
 docker compose -f docker-compose-3-10.yml down -v
-docker compose -f docker-compose-3-10.yml up -d --build
+docker compose -f docker-compose-3-10.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-10.csv --target-substring p_wave_detector_load_balance
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-10.csv
 
 # 3 Container
 docker compose -f docker-compose-3-11.yml down -v
-docker compose -f docker-compose-3-11.yml up -d --build
+docker compose -f docker-compose-3-11.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-11.csv --target-substring p_wave_detector_load_balance
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-11.csv
 
 # 4 Container
 docker compose -f docker-compose-3-12.yml down -v
-docker compose -f docker-compose-3-12.yml up -d --build
+docker compose -f docker-compose-3-12.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-12.csv --target-substring p_wave_detector_load_balance
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-12.csv
 
 # 5 Container
 docker compose -f docker-compose-3-13.yml down -v
-docker compose -f docker-compose-3-13.yml up -d --build
+docker compose -f docker-compose-3-13.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-13.csv --target-substring p_wave_detector_load_balance
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-13.csv
 ```
@@ -942,7 +942,7 @@ Fokus pada container `api_server` (Express) atau `fast_api` (FastAPI).
 **Skenario 4.1: Express API (1 atau 5 Klien)**
 ```powershell
 docker compose -f docker-compose-4-1.yml down -v
-docker compose -f docker-compose-4-1.yml up -d --build
+docker compose -f docker-compose-4-1.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_4-1.csv --target-substring api_server
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_4-1.csv
 ```
@@ -950,7 +950,7 @@ python tests/collect_metrics.py --duration 120 --output tests/results/metrics_4-
 **Skenario 4.2: FastAPI (1 atau 5 Klien)**
 ```powershell
 docker compose -f docker-compose-4-2.yml down -v
-docker compose -f docker-compose-4-2.yml up -d --build
+docker compose -f docker-compose-4-2.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_4-2.csv --target-substring fast_api
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_4-2.csv
 ```
@@ -961,7 +961,7 @@ Fokus membandingkan `data_provider` tanpa dan dengan *library* Prometheus.
 **Skenario 5.1: Tanpa Instrumentasi Prometheus**
 ```powershell
 docker compose -f docker-compose-5-1.yml down -v
-docker compose -f docker-compose-5-1.yml up -d --build
+docker compose -f docker-compose-5-1.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_5-1.csv --target-substring data_provider
 # (Skrip metrik tidak dipanggil karena fitur observabilitas dimatikan secara khusus pada skenario ini)
 ```
@@ -969,7 +969,7 @@ python tests/collect_docker_stats.py --duration 120 --output tests/results/stats
 **Skenario 5.2: Dengan Instrumentasi Prometheus**
 ```powershell
 docker compose -f docker-compose-5-2.yml down -v
-docker compose -f docker-compose-5-2.yml up -d --build
+docker compose -f docker-compose-5-2.yml up -d --build --remove-orphans
 python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_5-2.csv --target-substring data_provider
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_5-2.csv
 ```
