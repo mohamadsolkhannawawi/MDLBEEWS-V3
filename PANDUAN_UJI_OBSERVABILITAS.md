@@ -622,49 +622,60 @@ Selain metrik pada Grafana, Anda juga perlu memastikan bahwa seluruh data tersim
 
 Berikut adalah cara memverifikasi data di masing-masing database:
 
-### A. Verifikasi InfluxDB (Penyimpanan Metrik Arsitektur)
-InfluxDB menyimpan metrik yang dikumpulkan dari k6, Prometheus, Telegraf, dll (tergantung konfigurasi Anda).
+### A. Verifikasi InfluxDB (Penyimpanan Data Gelombang & Metrik)
+InfluxDB v2 menggunakan konsep **bucket** dan bahasa query **Flux**. Anda dapat memverifikasi data yang tersimpan secara langsung via terminal PowerShell menggunakan CLI InfluxDB v2 dengan token dan nama organisasi.
 
-1. Masuk ke dalam container InfluxDB:
+1. **Cek daftar bucket yang tersedia:**
    ```powershell
-   docker compose exec influxdb influx -username admin -password "12345678"
+   docker compose exec influxdb influx bucket list --token "eFWu0UGcCzvGAX1w-z43heHjfDk8swujfryImhIsTrAkNJOgfMRSYsgYVki-QTiWHDwKLJtxsSnCmHhxisCN1w==" --org "owner"
    ```
-2. Cek database (bucket) yang tersedia:
-   ```sql
-   > show databases
+
+2. **Cek data gelombang seismik terbaru (bucket `eews`):**
+   Jalankan query Flux untuk menampilkan 10 sampel data dalam rentang 1 jam terakhir:
+   ```powershell
+   docker compose exec influxdb influx query 'from(bucket: \"eews\") |> range(start: -1h) |> limit(n: 10)' --token "eFWu0UGcCzvGAX1w-z43heHjfDk8swujfryImhIsTrAkNJOgfMRSYsgYVki-QTiWHDwKLJtxsSnCmHhxisCN1w==" --org "owner"
    ```
-3. Pilih database utama (misal: `metrics` atau `telegraf`):
-   ```sql
-   > use metrics
-   ```
-4. Cek apakah ada data yang masuk dengan menghitung total baris atau menampilkan data terbaru:
-   ```sql
-   > show measurements
-   > select * from "http_reqs" order by time desc limit 10
-   ```
-*(Ketik `exit` untuk keluar dari shell InfluxDB).*
+
+3. **Cek data Real-Time (Data mutakhir yang baru saja masuk):**
+   - **Melihat data 1 menit terakhir (10 sampel paling akhir):**
+     ```powershell
+     docker compose exec influxdb influx query 'from(bucket: \"eews\") |> range(start: -1m) |> tail(n: 10)' --token "eFWu0UGcCzvGAX1w-z43heHjfDk8swujfryImhIsTrAkNJOgfMRSYsgYVki-QTiWHDwKLJtxsSnCmHhxisCN1w==" --org "owner"
+     ```
+   - **Melihat titik sampel paling mutakhir (`last()`) untuk tiap sensor/stasiun:**
+     ```powershell
+     docker compose exec influxdb influx query 'from(bucket: \"eews\") |> range(start: -5m) |> last()' --token "eFWu0UGcCzvGAX1w-z43heHjfDk8swujfryImhIsTrAkNJOgfMRSYsgYVki-QTiWHDwKLJtxsSnCmHhxisCN1w==" --org "owner"
+     ```
+   - **Melihat 10 data terbaru diurutkan dari timestamp paling baru (descending):**
+     ```powershell
+     docker compose exec influxdb influx query 'from(bucket: \"eews\") |> range(start: -5m) |> sort(columns: [\"_time\"], desc: true) |> limit(n: 10)' --token "eFWu0UGcCzvGAX1w-z43heHjfDk8swujfryImhIsTrAkNJOgfMRSYsgYVki-QTiWHDwKLJtxsSnCmHhxisCN1w==" --org "owner"
+     ```
+
+   > **Catatan PowerShell:** Pastikan menggunakan tanda petik tunggal (`'...'`) di luar query dan meng-escape nama bucket/kolom dengan backslash (`\"eews\"`, `\"_time\"`) agar tidak terpotong oleh parser PowerShell.
 
 ### B. Verifikasi MongoDB (Penyimpanan Hasil Deteksi AI)
-MongoDB digunakan oleh modul `data_archiver` untuk menyimpan hasil prediksi dari modul AI (`p_wave_detector` dan `loc_mag_detector`).
+MongoDB digunakan oleh modul `data_archiver` untuk menyimpan data timeseries dan hasil analisis dari modul AI.
 
-1. Masuk ke dalam container MongoDB (mongosh):
+1. **Masuk ke dalam container MongoDB (menggunakan `mongosh`):**
+   *(Catatan: Nama service container di docker-compose adalah `mongo`)*
    ```powershell
-   docker compose exec mongodb mongosh -u admin -p admin123 --authenticationDatabase admin
+   docker compose exec mongo mongosh
    ```
-2. Cek database yang tersedia dan pilih database EEWS:
+2. **Cek database yang tersedia dan pilih database `timeseries_db`:**
    ```javascript
    test> show dbs
-   test> use eews_db
+   test> use timeseries_db
    ```
-3. Cek jumlah data (dokumen) di koleksi hasil deteksi:
+3. **Cek koleksi data yang tersedia:**
    ```javascript
-   eews_db> show collections
-   eews_db> db.p_wave_results.countDocuments()
-   eews_db> db.loc_mag_results.countDocuments()
+   timeseries_db> show collections
    ```
-4. Lihat contoh data terakhir yang disimpan:
+4. **Cek jumlah dokumen / data yang sudah tersimpan:**
    ```javascript
-   eews_db> db.p_wave_results.find().sort({_id:-1}).limit(1)
+   timeseries_db> db.timeseries_collection.countDocuments()
+   ```
+5. **Tampilkan data mutakhir/terbaru yang masuk:**
+   ```javascript
+   timeseries_db> db.timeseries_collection.find().sort({_id: -1}).limit(1)
    ```
 *(Ketik `exit` untuk keluar dari shell MongoDB).*
 

@@ -274,6 +274,10 @@ def consume_and_save_data() -> None:
 
             start_time = time.time()
             threading.Thread(target=save_data_to_influxdb, args=(data,)).start()
+            
+            # Jika opsi pengarsipan MongoDB diaktifkan (default: True)
+            if os.getenv("ENABLE_MONGO_ARCHIVE", "true").lower() in ("true", "1", "yes"):
+                threading.Thread(target=save_data_to_mongodb, args=(data,)).start()
 
             logger.debug(
                 f"Delay: {time.time() - data['data_provider_time']:.4f}s | "
