@@ -826,13 +826,6 @@ python tests/collect_docker_stats.py --duration 120 --output tests/results/stats
 python tests/collect_metrics.py --duration 120 --output tests/results/metrics_1-4.csv
 ```
 
-**Skenario 1.5: Generator (FastAPI)**
-```powershell
-docker compose -f docker-compose-1-5.yml down -v
-docker compose -f docker-compose-1-5.yml up -d --build
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_1-5.csv --target-substring data_provider
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_1-5.csv
-```
 
 ### B. Skenario Arsitektur Message Broker Kafka (docker-compose-2-x)
 Fokus perekaman *resource* CPU & RAM pada layanan `kafka`.
