@@ -12,9 +12,9 @@ COPY config/ config/
 COPY utils/ utils/
 COPY load_balancer/ .
 
-EXPOSE 8104
+EXPOSE 8103
 
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8104')" || exit 1
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8103')" || exit 1
 
 CMD ["python", "main.py"]
