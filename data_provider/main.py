@@ -107,4 +107,4 @@ if __name__ == '__main__':
 
     logger.info(f"Launching multi_process with {num_processes} processes and {num_stations} stations")
     from multi_process import main
-    main(station_path='./data/stations.json', num_processes=num_processes, num_station_configs=num_stations)
+    main(server='rtserve.iris.washington.edu:18000', station_path='./data/stations.json', num_processes=num_processes, num_station_configs=50)

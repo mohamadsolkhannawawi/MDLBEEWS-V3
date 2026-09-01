@@ -64,4 +64,5 @@ if __name__ == '__main__':
     )
 
     logger.info("Launching main data provider loop...")
-    main(station_path='./data_provider-multiprocess-multithread/data/stations.json', num_processes=30, num_station_configs=6000)
+    main(server='rtserve.iris.washington.edu:18000', station_path='./data/stations.json', num_processes=30, num_station_configs=50)
+
