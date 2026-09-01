@@ -6,3 +6,11 @@ rabbitmq/*
 influxDB/.env
 **/__pycache__/
 *.pyc
+
+# Ignore seluruh folder data runtime InfluxDB & Grafana
+influxDB/*
+grafana/grafana.db
+grafana/plugins/
+
+# KECUALIKAN file .env.example agar tetap masuk ke Git
+!influxDB/.env.example
