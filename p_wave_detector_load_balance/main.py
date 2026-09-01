@@ -77,7 +77,7 @@ else:
 
 app = FastAPI()
 last_waveform = LRUCache(maxsize=6000)
-model = tf.keras.models.load_model('./p_wave_detector_load_balance/model_p_wave.h5', compile=False)
+model = tf.keras.models.load_model('./model_p_wave.h5', compile=False)
 
 create_topic_if_not_exists(
     topic_name=KAFKA_TOPIC_LOCMAG,

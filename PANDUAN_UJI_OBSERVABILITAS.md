@@ -727,3 +727,47 @@ docker volume prune -f
 | S3 — FastAPI 5 Client       | `docker-compose-4-2.yml`  | `run_table6_websocket.ps1`     |
 | S4 — Kafka 3 Broker         | `docker-compose-2-1.yml`  | `run_table2_broker.ps1`        |
 | S4 — Kafka 3 Broker + NGINX | `docker-compose-2-2.yml`  | `run_table2_broker.ps1`        |
+
+---
+
+## 16. Panduan Eksekusi dan Pengambilan Data Manual (Per Compose)
+
+Jika Anda ingin mengontrol jalannya pengujian secara manual per-*compose* (satu per satu), menghidupkannya, mengekstrak datanya sendiri dengan perintah Python, lalu mematikannya, berikut adalah langkah-langkah presisinya:
+
+### Langkah 1: Hidupkan Skenario Spesifik
+Contoh kita gunakan `docker-compose-1-1.yml`:
+```powershell
+docker compose -f docker-compose-1-1.yml down -v
+docker compose -f docker-compose-1-1.yml up -d --build
+```
+*(Tunggu sekitar 60 detik setelah `up -d` agar sistem Kafka dan Prometheus benar-benar stabil sebelum mulai mengambil data).*
+
+### Langkah 2: Ambil Datanya
+Buka terminal baru, atau jalankan perintah Python ini. Terdapat dua skrip utama yang bisa Anda gunakan sesuai kebutuhan:
+
+**A. Mengambil Data CPU & Memori (Docker Stats)**
+Gunakan skrip `collect_docker_stats.py`. Anda harus menentukan target nama container yang ingin difokuskan (misalnya `data_provider`).
+```powershell
+python tests/collect_docker_stats.py --duration 120 --output tests/results/data_1-1_stats.csv --target-substring data_provider
+```
+*(Ini akan merekam penggunaan CPU & RAM container yang mengandung nama `data_provider` selama 120 detik).*
+
+**B. Mengambil Data Latency & Throughput (Prometheus)**
+Gunakan skrip `collect_metrics.py` untuk mengambil data dari metrik sistem (seperti latensi pemrosesan atau pesan per detik).
+```powershell
+python tests/collect_metrics.py --duration 120 --output tests/results/data_1-1_metrics.csv
+```
+
+### Langkah 3: Matikan Setelah Selesai
+Setelah file CSV selesai digenerate dan Anda sudah puas dengan datanya, bersihkan sistem:
+```powershell
+docker compose -f docker-compose-1-1.yml down -v
+```
+
+**Tips Tambahan untuk Parameter `--target-substring`:**
+Saat Anda menguji *compose* lain, cukup ubah targetnya. Contoh:
+- Untuk `docker-compose-3-x.yml` (Archiver), gunakan: `--target-substring data_archiver`
+- Untuk `docker-compose-2-x.yml` (Kafka Broker), gunakan: `--target-substring kafka`
+- Untuk `docker-compose-4-x.yml` (Backend/WebSocket), gunakan: `--target-substring fast_api` atau `api_server`
+
+Dengan cara ini, Anda punya kontrol penuh untuk bereksperimen, mengganti durasi (misal `--duration 300` untuk 5 menit), atau mengubah nama file output sesuai kemauan Anda.

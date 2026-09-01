@@ -64,4 +64,4 @@ if __name__ == '__main__':
     )
 
     logger.info("Launching main data provider loop...")
-    main(station_path='./data_provider-multiprocess/data/stations.json', num_processes=30, num_station_configs=6000)
+    main(station_path='./data/stations.json', num_processes=30, num_station_configs=6000)
