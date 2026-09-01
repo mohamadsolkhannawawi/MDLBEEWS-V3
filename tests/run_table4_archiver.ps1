@@ -31,11 +31,11 @@ foreach ($s in $Scenarios) {
     $proc1 = Start-Process -FilePath $PythonExecutable -ArgumentList "tests/collect_docker_stats.py --duration $DurationSec --output $($s.OutStats) --target-substring data_archiver" -PassThru -NoNewWindow
     $proc2 = Start-Process -FilePath $PythonExecutable -ArgumentList "tests/collect_metrics.py --duration $DurationSec --output $($s.OutMetrics)" -PassThru -NoNewWindow
 
-    Wait-Process -Id $proc1.Id
-    Wait-Process -Id $proc2.Id
+    Wait-Process -ErrorAction SilentlyContinue -Id $proc1.Id
+    Wait-Process -ErrorAction SilentlyContinue -Id $proc2.Id
 
     Write-Host "Tearing down $($s.Name)..."
-    docker compose -f $($s.File) down -v
+docker compose -f $($s.File) down -v --remove-orphans
 }
 
 Write-Host "Table 4 testing completed!" -ForegroundColor Green

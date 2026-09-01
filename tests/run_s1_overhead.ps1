@@ -29,7 +29,7 @@ foreach ($s in $Scenarios) {
     & $PythonExecutable tests/collect_docker_stats.py --duration $DurationSec --output $($s.OutStats) --target-substring ""
 
     Write-Host "Tearing down $($s.Name)..."
-    docker compose -f $($s.File) down -v
+docker compose -f $($s.File) down -v --remove-orphans
 }
 
 Write-Host "Skripsi S1 testing completed!" -ForegroundColor Green
