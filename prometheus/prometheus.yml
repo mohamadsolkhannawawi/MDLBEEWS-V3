@@ -78,7 +78,7 @@ scrape_configs:
     dns_sd_configs:
       - names: ['p_wave_detector_load_balance']
         type: 'A'
-        port: 8104
+        port: 8004
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
