@@ -1,3 +1,0 @@
-metric,baseline_file,observed_file,baseline_mean,observed_mean,absolute_change,percent_change,status,baseline_valid,baseline_missing,observed_valid,observed_missing,observed_missing_percent,rule
-aggregate_cpu_percent,tests/results/s1_overhead_no_metrics_stats.csv,tests/results/s1_overhead_with_metrics_stats.csv,46.2081,39.2382,-6.9699,-15.0837,comparable,16,0,17,0,0.0,"Compare means only when both files have valid numeric data; blanks are excluded, never zero-filled"
-aggregate_mem_mb,tests/results/s1_overhead_no_metrics_stats.csv,tests/results/s1_overhead_with_metrics_stats.csv,2874.6069,3009.5453,134.9384,4.6942,comparable,16,0,17,0,0.0,"Compare means only when both files have valid numeric data; blanks are excluded, never zero-filled"
