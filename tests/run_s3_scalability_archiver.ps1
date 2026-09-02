@@ -9,16 +9,16 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="1 Container"; File="docker-compose-3-1.yml"; OutStats="tests/results/table4_1_container_stats.csv"; OutMetrics="tests/results/table4_1_container_metrics.csv" },
-    @{ Name="2 Container"; File="docker-compose-3-2.yml"; OutStats="tests/results/table4_2_container_stats.csv"; OutMetrics="tests/results/table4_2_container_metrics.csv" },
-    @{ Name="3 Container"; File="docker-compose-3-3.yml"; OutStats="tests/results/table4_3_container_stats.csv"; OutMetrics="tests/results/table4_3_container_metrics.csv" },
-    @{ Name="4 Container"; File="docker-compose-3-4.yml"; OutStats="tests/results/table4_4_container_stats.csv"; OutMetrics="tests/results/table4_4_container_metrics.csv" },
-    @{ Name="5 Container"; File="docker-compose-3-5.yml"; OutStats="tests/results/table4_5_container_stats.csv"; OutMetrics="tests/results/table4_5_container_metrics.csv" }
+    @{ Name="1 Container"; File="docker-compose-3-1.yml"; OutStats="tests/results/s3_archiver_1_container_stats.csv"; OutMetrics="tests/results/s3_archiver_1_container_metrics.csv" },
+    @{ Name="2 Container"; File="docker-compose-3-2.yml"; OutStats="tests/results/s3_archiver_2_container_stats.csv"; OutMetrics="tests/results/s3_archiver_2_container_metrics.csv" },
+    @{ Name="3 Container"; File="docker-compose-3-3.yml"; OutStats="tests/results/s3_archiver_3_container_stats.csv"; OutMetrics="tests/results/s3_archiver_3_container_metrics.csv" },
+    @{ Name="4 Container"; File="docker-compose-3-4.yml"; OutStats="tests/results/s3_archiver_4_container_stats.csv"; OutMetrics="tests/results/s3_archiver_4_container_metrics.csv" },
+    @{ Name="5 Container"; File="docker-compose-3-5.yml"; OutStats="tests/results/s3_archiver_5_container_stats.csv"; OutMetrics="tests/results/s3_archiver_5_container_metrics.csv" }
 )
 
 foreach ($s in $Scenarios) {
     Write-Host "============================================================" -ForegroundColor Cyan
-    Write-Host "Running Table 4 Scenario: $($s.Name)" -ForegroundColor Cyan
+    Write-Host "Running S3 Archiver Scenario: $($s.Name)" -ForegroundColor Cyan
     Write-Host "============================================================" -ForegroundColor Cyan
     
     docker compose -f $($s.File) down -v --remove-orphans
@@ -38,4 +38,4 @@ foreach ($s in $Scenarios) {
 docker compose -f $($s.File) down -v --remove-orphans
 }
 
-Write-Host "Table 4 testing completed!" -ForegroundColor Green
+Write-Host "S3 Archiver testing completed!" -ForegroundColor Green

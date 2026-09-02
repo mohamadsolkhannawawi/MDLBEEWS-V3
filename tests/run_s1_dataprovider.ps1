@@ -9,15 +9,15 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="Sequential"; File="docker-compose-1-1.yml"; OutStats="tests/results/table1_sequential_stats.csv" },
-    @{ Name="Multithreading"; File="docker-compose-1-2.yml"; OutStats="tests/results/table1_multithread_stats.csv" },
-    @{ Name="Multiprocessing"; File="docker-compose-1-3.yml"; OutStats="tests/results/table1_multiprocess_stats.csv" },
-    @{ Name="MP_MT"; File="docker-compose-1-4.yml"; OutStats="tests/results/table1_mp_mt_stats.csv" }
+    @{ Name="Sequential"; File="docker-compose-1-1.yml"; OutStats="tests/results/s1_sequential_stats.csv" },
+    @{ Name="Multithreading"; File="docker-compose-1-2.yml"; OutStats="tests/results/s1_multithread_stats.csv" },
+    @{ Name="Multiprocessing"; File="docker-compose-1-3.yml"; OutStats="tests/results/s1_multiprocess_stats.csv" },
+    @{ Name="MP_MT"; File="docker-compose-1-4.yml"; OutStats="tests/results/s1_mp_mt_stats.csv" }
 )
 
 foreach ($s in $Scenarios) {
     Write-Host "============================================================" -ForegroundColor Cyan
-    Write-Host "Running Table 1 Scenario: $($s.Name)" -ForegroundColor Cyan
+    Write-Host "Running S1 Scenario: $($s.Name)" -ForegroundColor Cyan
     Write-Host "============================================================" -ForegroundColor Cyan
     
     docker compose -f $($s.File) down -v --remove-orphans
@@ -34,4 +34,4 @@ foreach ($s in $Scenarios) {
 docker compose -f $($s.File) down -v --remove-orphans
 }
 
-Write-Host "Table 1 testing completed!" -ForegroundColor Green
+Write-Host "S1 testing completed!" -ForegroundColor Green

@@ -5,8 +5,8 @@ import os
 import statistics
 
 BASELINE_COLUMNS = {
-    "cpu_usage_percent": "cpu_usage_percent",
-    "memory_used_mb": "memory_used_mb",
+    "aggregate_cpu_percent": "aggregate_cpu_percent",
+    "aggregate_mem_mb": "aggregate_mem_mb",
 }
 
 
@@ -122,10 +122,10 @@ def write_summary(path, baseline_path, observed_path, baseline_columns, observed
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Analyze S1a baseline versus S1b Prometheus metrics")
-    parser.add_argument("--s1a", default="tests/results/s1a_no_metrics.csv", help="S1a host metrics CSV")
-    parser.add_argument("--s1b", default="tests/results/s1b_with_metrics.csv", help="S1b Prometheus metrics CSV")
-    parser.add_argument("--output", default="tests/results/s1_comparison.csv", help="Comparison output CSV")
+    parser = argparse.ArgumentParser(description="Analyze S2 overhead baseline versus metrics")
+    parser.add_argument("--s1a", default="tests/results/s2_overhead_no_metrics_stats.csv", help="S2 without metrics CSV")
+    parser.add_argument("--s1b", default="tests/results/s2_overhead_with_metrics_stats.csv", help="S2 with metrics CSV")
+    parser.add_argument("--output", default="tests/results/s2_comparison.csv", help="Comparison output CSV")
     args = parser.parse_args()
 
     for path in (args.s1a, args.s1b):

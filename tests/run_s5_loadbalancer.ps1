@@ -9,13 +9,13 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="Kafka 3 Container"; File="docker-compose-2-1.yml"; OutStats="tests/results/table2_kafka_stats.csv"; OutMetrics="tests/results/table2_kafka_metrics.csv" },
-    @{ Name="Kafka 3 Container + NGINX"; File="docker-compose-2-2.yml"; OutStats="tests/results/table2_nginx_stats.csv"; OutMetrics="tests/results/table2_nginx_metrics.csv" }
+    @{ Name="Kafka 3 Container"; File="docker-compose-2-1.yml"; OutStats="tests/results/s5_broker_kafka_stats.csv"; OutMetrics="tests/results/s5_broker_kafka_metrics.csv" },
+    @{ Name="Kafka 3 Container + NGINX"; File="docker-compose-2-2.yml"; OutStats="tests/results/s5_broker_nginx_stats.csv"; OutMetrics="tests/results/s5_broker_nginx_metrics.csv" }
 )
 
 foreach ($s in $Scenarios) {
     Write-Host "============================================================" -ForegroundColor Cyan
-    Write-Host "Running Table 2 Scenario: $($s.Name)" -ForegroundColor Cyan
+    Write-Host "Running S5 Load Balancer Scenario: $($s.Name)" -ForegroundColor Cyan
     Write-Host "============================================================" -ForegroundColor Cyan
     
     docker compose -f $($s.File) down -v --remove-orphans
@@ -35,4 +35,4 @@ foreach ($s in $Scenarios) {
 docker compose -f $($s.File) down -v --remove-orphans
 }
 
-Write-Host "Table 2 testing completed!" -ForegroundColor Green
+Write-Host "S5 Load Balancer testing completed!" -ForegroundColor Green

@@ -9,13 +9,13 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="Without Metrics"; File="docker-compose-5-1.yml"; OutStats="tests/results/s1_overhead_no_metrics_stats.csv" },
-    @{ Name="With Metrics"; File="docker-compose-5-2.yml"; OutStats="tests/results/s1_overhead_with_metrics_stats.csv" }
+    @{ Name="Without Metrics"; File="docker-compose-5-1.yml"; OutStats="tests/results/s2_overhead_no_metrics_stats.csv" },
+    @{ Name="With Metrics"; File="docker-compose-5-2.yml"; OutStats="tests/results/s2_overhead_with_metrics_stats.csv" }
 )
 
 foreach ($s in $Scenarios) {
     Write-Host "============================================================" -ForegroundColor Cyan
-    Write-Host "Running Skripsi S1 Scenario: $($s.Name)" -ForegroundColor Cyan
+    Write-Host "Running Skripsi S2 Scenario: $($s.Name)" -ForegroundColor Cyan
     Write-Host "============================================================" -ForegroundColor Cyan
     
     docker compose -f $($s.File) down -v --remove-orphans
