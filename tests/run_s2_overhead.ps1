@@ -1,5 +1,6 @@
 param (
-    [int]$DurationSec = 120
+    [int]$DurationSec = 120,
+    [string]$ScenarioName = "All"
 )
 
 $PythonExecutable = "python"
@@ -9,9 +10,18 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="Without Metrics"; File="docker-compose-5-1.yml"; OutStats="tests/results/s2_overhead_no_metrics_stats.csv" },
-    @{ Name="With Metrics"; File="docker-compose-5-2.yml"; OutStats="tests/results/s2_overhead_with_metrics_stats.csv" }
+    @{ Name="NoMetrics"; File="docker-compose-5-1.yml"; OutStats="tests/results/s2_overhead_no_metrics_stats.csv" },
+    @{ Name="WithMetrics"; File="docker-compose-5-2.yml"; OutStats="tests/results/s2_overhead_with_metrics_stats.csv" }
 )
+
+if ($ScenarioName -ne "All") {
+    $Scenarios = $Scenarios | Where-Object { $_.Name -eq $ScenarioName }
+    if ($Scenarios.Count -eq 0) {
+        Write-Host "Scenario '$ScenarioName' not found. Available scenarios:" -ForegroundColor Red
+        @("NoMetrics", "WithMetrics") | ForEach-Object { Write-Host " - $_" }
+        exit 1
+    }
+}
 
 foreach ($s in $Scenarios) {
     Write-Host "============================================================" -ForegroundColor Cyan

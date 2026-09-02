@@ -1,5 +1,6 @@
 param (
-    [int]$DurationSec = 120
+    [int]$DurationSec = 120,
+    [string]$ScenarioName = "All"
 )
 
 $PythonExecutable = "python"
@@ -9,9 +10,18 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="Kafka 3 Container"; File="docker-compose-2-1.yml"; OutStats="tests/results/s5_broker_kafka_stats.csv"; OutMetrics="tests/results/s5_broker_kafka_metrics.csv" },
-    @{ Name="Kafka 3 Container + NGINX"; File="docker-compose-2-2.yml"; OutStats="tests/results/s5_broker_nginx_stats.csv"; OutMetrics="tests/results/s5_broker_nginx_metrics.csv" }
+    @{ Name="Kafka"; File="docker-compose-2-1.yml"; OutStats="tests/results/s5_broker_kafka_stats.csv"; OutMetrics="tests/results/s5_broker_kafka_metrics.csv" },
+    @{ Name="NGINX"; File="docker-compose-2-2.yml"; OutStats="tests/results/s5_broker_nginx_stats.csv"; OutMetrics="tests/results/s5_broker_nginx_metrics.csv" }
 )
+
+if ($ScenarioName -ne "All") {
+    $Scenarios = $Scenarios | Where-Object { $_.Name -eq $ScenarioName }
+    if ($Scenarios.Count -eq 0) {
+        Write-Host "Scenario '$ScenarioName' not found. Available scenarios:" -ForegroundColor Red
+        @("Kafka", "NGINX") | ForEach-Object { Write-Host " - $_" }
+        exit 1
+    }
+}
 
 foreach ($s in $Scenarios) {
     Write-Host "============================================================" -ForegroundColor Cyan

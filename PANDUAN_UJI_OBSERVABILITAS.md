@@ -53,13 +53,13 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ```powershell
 git clone https://github.com/mohamadsolkhannawawi/MDLBEEWS-V3.git
-cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS"
+cd MDLBEEWS-V3
 ```
 
 ### Update jika sudah pernah clone
 
 ```powershell
-cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS"
+cd MDLBEEWS-V3
 git pull origin main
 ```
 
@@ -105,7 +105,7 @@ Sebelum menjalankan skenario apapun, pastikan sistem berjalan dengan benar mengg
 ### Langkah 4.1 — Jalankan docker compose utama
 
 ```powershell
-cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS"
+cd MDLBEEWS-V3
 docker compose up -d --build
 ```
 
@@ -210,8 +210,16 @@ Screenshot berikut wajib diambil **satu kali** setelah validasi sistem berhasil 
 ### Cara Menjalankan S1 (Otomatis)
 
 ```powershell
-cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
+cd tests
+
+# Menjalankan seluruh variasi S1 sekaligus secara berurutan:
 .\run_s1_dataprovider.ps1
+
+# ATAU, jalankan salah satu variasi berikut secara spesifik:
+.\run_s1_dataprovider.ps1 -ScenarioName Sequential
+.\run_s1_dataprovider.ps1 -ScenarioName Multithread
+.\run_s1_dataprovider.ps1 -ScenarioName Multiprocess
+.\run_s1_dataprovider.ps1 -ScenarioName MP_MT
 ```
 
 *(Untuk eksekusi manual per skenario, silakan merujuk ke Bagian 17 - Sub S1).*
@@ -232,8 +240,10 @@ cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
 ### Cara Menjalankan S2 (Otomatis)
 
 ```powershell
-cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
-.\run_s2_overhead.ps1
+cd tests
+# Jalankan salah satu dari parameter berikut sesuai kebutuhan:
+.\run_s2_overhead.ps1 -ScenarioName NoMetrics
+.\run_s2_overhead.ps1 -ScenarioName WithMetrics
 ```
 
 *(Untuk eksekusi manual per skenario, silakan merujuk ke Bagian 17 - Sub S2).*
@@ -257,9 +267,33 @@ cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
 ### Cara Menjalankan S3 (Otomatis)
 
 ```powershell
-cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
+cd tests
+
+# Menjalankan seluruh variasi Archiver sekaligus secara berurutan:
 .\run_s3_scalability_archiver.ps1
+# Menjalankan seluruh variasi P-Wave sekaligus secara berurutan:
 .\run_s3_scalability_pwave.ps1
+
+# ATAU, jalankan salah satu variasi berikut secara spesifik:
+
+# Archiver (Pilih salah satu)
+.\run_s3_scalability_archiver.ps1 -ScenarioName 1c
+.\run_s3_scalability_archiver.ps1 -ScenarioName 2c
+.\run_s3_scalability_archiver.ps1 -ScenarioName 3c
+.\run_s3_scalability_archiver.ps1 -ScenarioName 4c
+.\run_s3_scalability_archiver.ps1 -ScenarioName 5c
+
+# P-Wave Kafka (Pilih salah satu)
+.\run_s3_scalability_pwave.ps1 -ScenarioName Kafka2c
+.\run_s3_scalability_pwave.ps1 -ScenarioName Kafka3c
+.\run_s3_scalability_pwave.ps1 -ScenarioName Kafka4c
+.\run_s3_scalability_pwave.ps1 -ScenarioName Kafka5c
+
+# P-Wave FastAPI (Pilih salah satu)
+.\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI2c
+.\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI3c
+.\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI4c
+.\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI5c
 ```
 
 *(Untuk eksekusi manual per skenario, silakan merujuk ke Bagian 17 - Sub S3).*
@@ -283,8 +317,12 @@ cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
 ### Cara Menjalankan S4 (Otomatis)
 
 ```powershell
-cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
-.\run_s4_websocket.ps1
+cd tests
+# Jalankan salah satu dari parameter berikut sesuai kebutuhan:
+.\run_s4_websocket.ps1 -ScenarioName Express1c
+.\run_s4_websocket.ps1 -ScenarioName Express5c
+.\run_s4_websocket.ps1 -ScenarioName FastAPI1c
+.\run_s4_websocket.ps1 -ScenarioName FastAPI5c
 ```
 
 *(Untuk eksekusi manual per skenario, silakan merujuk ke Bagian 17 - Sub S4).*
@@ -306,8 +344,10 @@ cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
 ### Cara Menjalankan S5 (Otomatis)
 
 ```powershell
-cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
-.\run_s5_loadbalancer.ps1
+cd tests
+# Jalankan salah satu dari parameter berikut sesuai kebutuhan:
+.\run_s5_loadbalancer.ps1 -ScenarioName Kafka
+.\run_s5_loadbalancer.ps1 -ScenarioName NGINX
 ```
 
 *(Untuk eksekusi manual per skenario, silakan merujuk ke Bagian 17 - Sub S5).*
@@ -319,7 +359,7 @@ cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
 Jika Anda ingin menjalankan S1 hingga S5 secara berurutan tanpa intervensi manual, gunakan master runner:
 
 ```powershell
-cd "e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\tests"
+cd tests
 .\run_all_tests.ps1
 ```
 
@@ -617,235 +657,125 @@ docker volume prune -f
 
 ---
 
-## 16. Panduan Eksekusi dan Pengambilan Data Manual (Per Compose)
+## 16. Panduan Eksekusi Otomatis per Skenario Spesifik
 
-Jika Anda ingin mengontrol jalannya pengujian secara manual per-*compose* (satu per satu), menghidupkannya, mengekstrak datanya sendiri dengan perintah Python, lalu mematikannya, berikut adalah langkah-langkah presisinya:
+Sistem kini dilengkapi dengan skrip otomatis (`.ps1`) yang mengabstraksi seluruh proses _build_ Docker, _startup_, _warm-up delay_ (60 detik), hingga pengumpulan metrik (120 detik) dan pembongkaran (_teardown_) secara otomatis.
 
-### Langkah 1: Hidupkan Skenario Spesifik
-Contoh kita gunakan `docker-compose-1-1.yml`:
+Jika Anda ingin menjalankan **hanya satu tipe skenario tertentu** tanpa harus menjalankan keseluruhan skrip, Anda bisa menggunakan argumen `-ScenarioName` diikuti dengan _keyword_ (nama pendek) skenario tersebut.
+
+**Contoh Kasus:**
+Anda hanya ingin menjalankan skenario pengujian S1 dengan metode Multiprocessing.
 ```powershell
-docker compose -f docker-compose-1-1.yml down -v
-docker compose -f docker-compose-1-1.yml up -d --build
+.\run_s1_dataprovider.ps1 -ScenarioName Multiprocess
 ```
-*(Tunggu sekitar 60 detik setelah `up -d` agar sistem Kafka dan Prometheus benar-benar stabil sebelum mulai mengambil data).*
-
-### Langkah 2: Ambil Datanya
-Buka terminal baru, atau jalankan perintah Python ini. Terdapat dua skrip utama yang bisa Anda gunakan sesuai kebutuhan:
-
-**A. Mengambil Data CPU & Memori (Docker Stats)**
-Gunakan skrip `collect_docker_stats.py`. Anda harus menentukan target nama container yang ingin difokuskan (misalnya `data_provider`).
-```powershell
-python tests/collect_docker_stats.py --duration 120 --output tests/results/data_1-1_stats.csv --target-substring data_provider
-```
-*(Ini akan merekam penggunaan CPU & RAM container yang mengandung nama `data_provider` selama 120 detik).*
-
-**B. Mengambil Data Latency & Throughput (Prometheus)**
-Gunakan skrip `collect_metrics.py` untuk mengambil data dari metrik sistem (seperti latensi pemrosesan atau pesan per detik).
-```powershell
-python tests/collect_metrics.py --duration 120 --output tests/results/data_1-1_metrics.csv
-```
-
-### Langkah 3: Matikan Setelah Selesai
-Setelah file CSV selesai digenerate dan Anda sudah puas dengan datanya, bersihkan sistem:
-```powershell
-docker compose -f docker-compose-1-1.yml down -v
-```
-
-**Tips Tambahan untuk Parameter `--target-substring`:**
-Saat Anda menguji *compose* lain, cukup ubah targetnya. Contoh:
-- Untuk `docker-compose-3-x.yml` (Archiver), gunakan: `--target-substring data_archiver`
-- Untuk `docker-compose-2-x.yml` (Kafka Broker), gunakan: `--target-substring kafka`
-- Untuk `docker-compose-4-x.yml` (Backend/WebSocket), gunakan: `--target-substring fast_api` atau `api_server`
-
-Dengan cara ini, Anda punya kontrol penuh untuk bereksperimen, mengganti durasi (misal `--duration 300` untuk 5 menit), atau mengubah nama file output sesuai kemauan Anda.
 
 ---
 
-## 17. Daftar Lengkap Perintah Eksekusi Manual Seluruh Skenario
+## 17. Daftar Lengkap Perintah Eksekusi per Skenario
 
-Berikut adalah kumpulan perintah lengkap (*copy-paste*) untuk menghidupkan lingkungan dan merekam data metrik maupun performa untuk **setiap skenario**. Anda cukup mengubah angka `--duration 120` (dalam detik) jika ingin mengambil data lebih lama.
+Berikut adalah kumpulan perintah lengkap (*copy-paste*) untuk menghidupkan dan mengekstrak data dari **setiap variasi skenario** secara otomatis, spesifik, dan terisolasi.
 
-> **PENTING:** Selalu beri jeda waktu tunggu (sekitar 60 detik) setelah Anda menekan *Enter* pada perintah `docker compose up -d` sebelum Anda menjalankan perintah pengambilan data `python`. Hal ini agar sistem Kafka dan sistem lainnya menyala dan stabil sepenuhnya.
+> **Catatan Penting:** Seluruh perintah di bawah ini harus dijalankan di dalam direktori `tests`.
+> ```powershell
+> cd tests
+> ```
 
-### S1. Skenario Kinerja Data Provider (docker-compose-1-x)
-Fokus perekaman *resource* CPU & RAM pada layanan `data_provider`.
+### S1. Strategi Konkurensi Data Provider (`run_s1_dataprovider.ps1`)
 
-**Skenario 1.1: Sequence**
-```powershell
-docker compose -f docker-compose-1-1.yml down -v
-docker compose -f docker-compose-1-1.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_1-1.csv --target-substring data_provider
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_1-1.csv
-```
+* Skenario 1.1: **Sequence** (Sekuensial)
+  ```powershell
+  .\run_s1_dataprovider.ps1 -ScenarioName Sequential
+  ```
+* Skenario 1.2: **Multi-thread**
+  ```powershell
+  .\run_s1_dataprovider.ps1 -ScenarioName Multithread
+  ```
+* Skenario 1.3: **Multi-process**
+  ```powershell
+  .\run_s1_dataprovider.ps1 -ScenarioName Multiprocess
+  ```
+* Skenario 1.4: **Multi-process & Multi-thread**
+  ```powershell
+  .\run_s1_dataprovider.ps1 -ScenarioName MP_MT
+  ```
 
-**Skenario 1.2: Multi-thread**
-```powershell
-docker compose -f docker-compose-1-2.yml down -v
-docker compose -f docker-compose-1-2.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_1-2.csv --target-substring data_provider
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_1-2.csv
-```
+### S2. Overhead Instrumentasi (`run_s2_overhead.ps1`)
 
-**Skenario 1.3: Multi-process**
-```powershell
-docker compose -f docker-compose-1-3.yml down -v
-docker compose -f docker-compose-1-3.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_1-3.csv --target-substring data_provider
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_1-3.csv
-```
+* Skenario 5.1: **Tanpa Metrik Prometheus**
+  ```powershell
+  .\run_s2_overhead.ps1 -ScenarioName NoMetrics
+  ```
+* Skenario 5.2: **Dengan Metrik Prometheus**
+  ```powershell
+  .\run_s2_overhead.ps1 -ScenarioName WithMetrics
+  ```
 
-**Skenario 1.4: Multi-process & Multi-thread**
-```powershell
-docker compose -f docker-compose-1-4.yml down -v
-docker compose -f docker-compose-1-4.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_1-4.csv --target-substring data_provider
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_1-4.csv
-```
+### S3. Skalabilitas Data Archiver (`run_s3_scalability_archiver.ps1`)
 
+* **1 Container**
+  ```powershell
+  .\run_s3_scalability_archiver.ps1 -ScenarioName 1c
+  ```
+* **2 Container**
+  ```powershell
+  .\run_s3_scalability_archiver.ps1 -ScenarioName 2c
+  ```
+* **3 Container**
+  ```powershell
+  .\run_s3_scalability_archiver.ps1 -ScenarioName 3c
+  ```
+* **4 Container**
+  ```powershell
+  .\run_s3_scalability_archiver.ps1 -ScenarioName 4c
+  ```
+* **5 Container**
+  ```powershell
+  .\run_s3_scalability_archiver.ps1 -ScenarioName 5c
+  ```
 
-### S5. Skenario Arsitektur Message Broker (docker-compose-2-x)
-Fokus perekaman *resource* CPU & RAM pada layanan `kafka`.
+### S3. Skalabilitas P-Wave Detector (`run_s3_scalability_pwave.ps1`)
 
-**Skenario 2.1: Kafka 3 Broker (Tanpa NGINX)**
-```powershell
-docker compose -f docker-compose-2-1.yml down -v
-docker compose -f docker-compose-2-1.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_2-1.csv --target-substring kafka
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_2-1.csv
-```
+* **Kafka Native (2 hingga 5 Container)**
+  ```powershell
+  .\run_s3_scalability_pwave.ps1 -ScenarioName Kafka2c
+  .\run_s3_scalability_pwave.ps1 -ScenarioName Kafka3c
+  .\run_s3_scalability_pwave.ps1 -ScenarioName Kafka4c
+  .\run_s3_scalability_pwave.ps1 -ScenarioName Kafka5c
+  ```
+* **FastAPI HTTP Load Balanced (2 hingga 5 Container)**
+  ```powershell
+  .\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI2c
+  .\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI3c
+  .\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI4c
+  .\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI5c
+  ```
 
-**Skenario 2.2: Kafka 3 Broker (Dengan NGINX Load Balancer)**
-```powershell
-docker compose -f docker-compose-2-2.yml down -v
-docker compose -f docker-compose-2-2.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_2-2.csv --target-substring kafka
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_2-2.csv
-```
+### S4. WebSocket Server (`run_s4_websocket.ps1`)
 
-### S3. Skenario Scalability Worker Node (docker-compose-3-x)
-Fokus pada container `data_archiver` atau `p_wave_detector`.
+* **Express.js / Socket.IO (1 Klien)**
+  ```powershell
+  .\run_s4_websocket.ps1 -ScenarioName Express1c
+  ```
+* **Express.js / Socket.IO (5 Klien)**
+  ```powershell
+  .\run_s4_websocket.ps1 -ScenarioName Express5c
+  ```
+* **FastAPI WebSocket (1 Klien)**
+  ```powershell
+  .\run_s4_websocket.ps1 -ScenarioName FastAPI1c
+  ```
+* **FastAPI WebSocket (5 Klien)**
+  ```powershell
+  .\run_s4_websocket.ps1 -ScenarioName FastAPI5c
+  ```
 
-**Data Archiver (1 hingga 5 Container)**
-```powershell
-# 1 Container
-docker compose -f docker-compose-3-1.yml down -v
-docker compose -f docker-compose-3-1.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-1.csv --target-substring data_archiver
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-1.csv
+### S5. Load Balancer Message Broker (`run_s5_loadbalancer.ps1`)
 
-# 2 Container
-docker compose -f docker-compose-3-2.yml down -v
-docker compose -f docker-compose-3-2.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-2.csv --target-substring data_archiver
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-2.csv
-
-# 3 Container
-docker compose -f docker-compose-3-3.yml down -v
-docker compose -f docker-compose-3-3.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-3.csv --target-substring data_archiver
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-3.csv
-
-# 4 Container
-docker compose -f docker-compose-3-4.yml down -v
-docker compose -f docker-compose-3-4.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-4.csv --target-substring data_archiver
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-4.csv
-
-# 5 Container
-docker compose -f docker-compose-3-5.yml down -v
-docker compose -f docker-compose-3-5.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-5.csv --target-substring data_archiver
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-5.csv
-```
-
-**P-Wave Detector (Direct Kafka - 2 hingga 5 Container)**
-```powershell
-# 2 Container
-docker compose -f docker-compose-3-6.yml down -v
-docker compose -f docker-compose-3-6.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-6.csv --target-substring p_wave_detector
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-6.csv
-
-# 3 Container
-docker compose -f docker-compose-3-7.yml down -v
-docker compose -f docker-compose-3-7.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-7.csv --target-substring p_wave_detector
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-7.csv
-
-# 4 Container
-docker compose -f docker-compose-3-8.yml down -v
-docker compose -f docker-compose-3-8.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-8.csv --target-substring p_wave_detector
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-8.csv
-
-# 5 Container
-docker compose -f docker-compose-3-9.yml down -v
-docker compose -f docker-compose-3-9.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-9.csv --target-substring p_wave_detector
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-9.csv
-```
-
-**P-Wave Detector (FastAPI HTTP + NGINX - 2 hingga 5 Container)**
-```powershell
-# 2 Container
-docker compose -f docker-compose-3-10.yml down -v
-docker compose -f docker-compose-3-10.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-10.csv --target-substring p_wave_detector_load_balance
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-10.csv
-
-# 3 Container
-docker compose -f docker-compose-3-11.yml down -v
-docker compose -f docker-compose-3-11.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-11.csv --target-substring p_wave_detector_load_balance
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-11.csv
-
-# 4 Container
-docker compose -f docker-compose-3-12.yml down -v
-docker compose -f docker-compose-3-12.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-12.csv --target-substring p_wave_detector_load_balance
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-12.csv
-
-# 5 Container
-docker compose -f docker-compose-3-13.yml down -v
-docker compose -f docker-compose-3-13.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_3-13.csv --target-substring p_wave_detector_load_balance
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_3-13.csv
-```
-
-### S4. Skenario WebSocket dan Backend (docker-compose-4-x)
-Fokus pada container `api_server` (Express) atau `fast_api` (FastAPI).
-
-**Skenario 4.1: Express API (1 atau 5 Klien)**
-```powershell
-docker compose -f docker-compose-4-1.yml down -v
-docker compose -f docker-compose-4-1.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_4-1.csv --target-substring api_server
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_4-1.csv
-```
-
-**Skenario 4.2: FastAPI (1 atau 5 Klien)**
-```powershell
-docker compose -f docker-compose-4-2.yml down -v
-docker compose -f docker-compose-4-2.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_4-2.csv --target-substring fast_api
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_4-2.csv
-```
-
-### S2. Skenario Perbandingan Overhead Instrumentasi (docker-compose-5-x)
-Fokus membandingkan `data_provider` tanpa dan dengan *library* Prometheus.
-
-**Skenario 5.1: Tanpa Instrumentasi Prometheus**
-```powershell
-docker compose -f docker-compose-5-1.yml down -v
-docker compose -f docker-compose-5-1.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_5-1.csv --target-substring data_provider
-# (Skrip metrik tidak dipanggil karena fitur observabilitas dimatikan secara khusus pada skenario ini)
-```
-
-**Skenario 5.2: Dengan Instrumentasi Prometheus**
-```powershell
-docker compose -f docker-compose-5-2.yml down -v
-docker compose -f docker-compose-5-2.yml up -d --build --remove-orphans
-python tests/collect_docker_stats.py --duration 120 --output tests/results/stats_5-2.csv --target-substring data_provider
-python tests/collect_metrics.py --duration 120 --output tests/results/metrics_5-2.csv
-```
+* **Kafka (3 Broker tanpa NGINX)**
+  ```powershell
+  .\run_s5_loadbalancer.ps1 -ScenarioName Kafka
+  ```
+* **Kafka + NGINX (3 Broker di belakang NGINX)**
+  ```powershell
+  .\run_s5_loadbalancer.ps1 -ScenarioName NGINX
+  ```

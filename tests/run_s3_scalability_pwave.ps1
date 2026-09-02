@@ -1,5 +1,6 @@
 param (
-    [int]$DurationSec = 120
+    [int]$DurationSec = 120,
+    [string]$ScenarioName = "All"
 )
 
 $PythonExecutable = "python"
@@ -9,15 +10,24 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="Kafka 2 Container"; File="docker-compose-3-6.yml"; OutStats="tests/results/s3_pwave_kafka_2c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_2c_metrics.csv" },
-    @{ Name="Kafka 3 Container"; File="docker-compose-3-7.yml"; OutStats="tests/results/s3_pwave_kafka_3c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_3c_metrics.csv" },
-    @{ Name="Kafka 4 Container"; File="docker-compose-3-8.yml"; OutStats="tests/results/s3_pwave_kafka_4c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_4c_metrics.csv" },
-    @{ Name="Kafka 5 Container"; File="docker-compose-3-9.yml"; OutStats="tests/results/s3_pwave_kafka_5c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_5c_metrics.csv" },
-    @{ Name="FastAPI 2 Container"; File="docker-compose-3-10.yml"; OutStats="tests/results/s3_pwave_fastapi_2c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_2c_metrics.csv" },
-    @{ Name="FastAPI 3 Container"; File="docker-compose-3-11.yml"; OutStats="tests/results/s3_pwave_fastapi_3c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_3c_metrics.csv" },
-    @{ Name="FastAPI 4 Container"; File="docker-compose-3-12.yml"; OutStats="tests/results/s3_pwave_fastapi_4c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_4c_metrics.csv" },
-    @{ Name="FastAPI 5 Container"; File="docker-compose-3-13.yml"; OutStats="tests/results/s3_pwave_fastapi_5c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_5c_metrics.csv" }
+    @{ Name="Kafka2c"; File="docker-compose-3-6.yml"; OutStats="tests/results/s3_pwave_kafka_2c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_2c_metrics.csv" },
+    @{ Name="Kafka3c"; File="docker-compose-3-7.yml"; OutStats="tests/results/s3_pwave_kafka_3c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_3c_metrics.csv" },
+    @{ Name="Kafka4c"; File="docker-compose-3-8.yml"; OutStats="tests/results/s3_pwave_kafka_4c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_4c_metrics.csv" },
+    @{ Name="Kafka5c"; File="docker-compose-3-9.yml"; OutStats="tests/results/s3_pwave_kafka_5c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_5c_metrics.csv" },
+    @{ Name="FastAPI2c"; File="docker-compose-3-10.yml"; OutStats="tests/results/s3_pwave_fastapi_2c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_2c_metrics.csv" },
+    @{ Name="FastAPI3c"; File="docker-compose-3-11.yml"; OutStats="tests/results/s3_pwave_fastapi_3c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_3c_metrics.csv" },
+    @{ Name="FastAPI4c"; File="docker-compose-3-12.yml"; OutStats="tests/results/s3_pwave_fastapi_4c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_4c_metrics.csv" },
+    @{ Name="FastAPI5c"; File="docker-compose-3-13.yml"; OutStats="tests/results/s3_pwave_fastapi_5c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_5c_metrics.csv" }
 )
+
+if ($ScenarioName -ne "All") {
+    $Scenarios = $Scenarios | Where-Object { $_.Name -eq $ScenarioName }
+    if ($Scenarios.Count -eq 0) {
+        Write-Host "Scenario '$ScenarioName' not found. Available scenarios:" -ForegroundColor Red
+        @("Kafka2c", "Kafka3c", "Kafka4c", "Kafka5c", "FastAPI2c", "FastAPI3c", "FastAPI4c", "FastAPI5c") | ForEach-Object { Write-Host " - $_" }
+        exit 1
+    }
+}
 
 foreach ($s in $Scenarios) {
     Write-Host "============================================================" -ForegroundColor Cyan

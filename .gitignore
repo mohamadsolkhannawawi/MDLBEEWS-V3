@@ -9,6 +9,7 @@ influxDB/.env
 
 # Ignore seluruh folder data runtime InfluxDB & Grafana
 influxDB/*
+influxDB/**/*
 grafana/grafana.db
 grafana/plugins/
 

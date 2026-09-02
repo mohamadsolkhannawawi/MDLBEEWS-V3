@@ -1,5 +1,6 @@
 param (
-    [int]$DurationSec = 60
+    [int]$DurationSec = 120,
+    [string]$ScenarioName = "All"
 )
 
 $PythonExecutable = "python"
@@ -9,11 +10,20 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="Express JS 1 Client"; File="docker-compose-4-1.yml"; TargetURI="ws://localhost:3333/socket.io/?EIO=4&transport=websocket"; Clients=1; OutStats="tests/results/s4_websocket_express_1c_stats.csv"; OutMetrics="tests/results/s4_websocket_express_1c_metrics.csv" },
-    @{ Name="Express JS 5 Client"; File="docker-compose-4-1.yml"; TargetURI="ws://localhost:3333/socket.io/?EIO=4&transport=websocket"; Clients=5; OutStats="tests/results/s4_websocket_express_5c_stats.csv"; OutMetrics="tests/results/s4_websocket_express_5c_metrics.csv" },
-    @{ Name="FastAPI 1 Client"; File="docker-compose-4-2.yml"; TargetURI="ws://localhost:3334/ws"; Clients=1; OutStats="tests/results/s4_websocket_fastapi_1c_stats.csv"; OutMetrics="tests/results/s4_websocket_fastapi_1c_metrics.csv" },
-    @{ Name="FastAPI 5 Client"; File="docker-compose-4-2.yml"; TargetURI="ws://localhost:3334/ws"; Clients=5; OutStats="tests/results/s4_websocket_fastapi_5c_stats.csv"; OutMetrics="tests/results/s4_websocket_fastapi_5c_metrics.csv" }
+    @{ Name="Express1c"; File="docker-compose-4-1.yml"; TargetURI="ws://localhost:3333/socket.io/?EIO=4&transport=websocket"; Clients=1; OutStats="tests/results/s4_websocket_express_1c_stats.csv"; OutMetrics="tests/results/s4_websocket_express_1c_metrics.csv" },
+    @{ Name="Express5c"; File="docker-compose-4-1.yml"; TargetURI="ws://localhost:3333/socket.io/?EIO=4&transport=websocket"; Clients=5; OutStats="tests/results/s4_websocket_express_5c_stats.csv"; OutMetrics="tests/results/s4_websocket_express_5c_metrics.csv" },
+    @{ Name="FastAPI1c"; File="docker-compose-4-2.yml"; TargetURI="ws://localhost:3334/ws"; Clients=1; OutStats="tests/results/s4_websocket_fastapi_1c_stats.csv"; OutMetrics="tests/results/s4_websocket_fastapi_1c_metrics.csv" },
+    @{ Name="FastAPI5c"; File="docker-compose-4-2.yml"; TargetURI="ws://localhost:3334/ws"; Clients=5; OutStats="tests/results/s4_websocket_fastapi_5c_stats.csv"; OutMetrics="tests/results/s4_websocket_fastapi_5c_metrics.csv" }
 )
+
+if ($ScenarioName -ne "All") {
+    $Scenarios = $Scenarios | Where-Object { $_.Name -eq $ScenarioName }
+    if ($Scenarios.Count -eq 0) {
+        Write-Host "Scenario '$ScenarioName' not found. Available scenarios:" -ForegroundColor Red
+        @("Express1c", "Express5c", "FastAPI1c", "FastAPI5c") | ForEach-Object { Write-Host " - $_" }
+        exit 1
+    }
+}
 
 foreach ($s in $Scenarios) {
     Write-Host "============================================================" -ForegroundColor Cyan

@@ -1,5 +1,6 @@
 param (
-    [int]$DurationSec = 120
+    [int]$DurationSec = 120,
+    [string]$ScenarioName = "All"
 )
 
 $PythonExecutable = "python"
@@ -9,12 +10,21 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="1 Container"; File="docker-compose-3-1.yml"; OutStats="tests/results/s3_archiver_1_container_stats.csv"; OutMetrics="tests/results/s3_archiver_1_container_metrics.csv" },
-    @{ Name="2 Container"; File="docker-compose-3-2.yml"; OutStats="tests/results/s3_archiver_2_container_stats.csv"; OutMetrics="tests/results/s3_archiver_2_container_metrics.csv" },
-    @{ Name="3 Container"; File="docker-compose-3-3.yml"; OutStats="tests/results/s3_archiver_3_container_stats.csv"; OutMetrics="tests/results/s3_archiver_3_container_metrics.csv" },
-    @{ Name="4 Container"; File="docker-compose-3-4.yml"; OutStats="tests/results/s3_archiver_4_container_stats.csv"; OutMetrics="tests/results/s3_archiver_4_container_metrics.csv" },
-    @{ Name="5 Container"; File="docker-compose-3-5.yml"; OutStats="tests/results/s3_archiver_5_container_stats.csv"; OutMetrics="tests/results/s3_archiver_5_container_metrics.csv" }
+    @{ Name="1c"; File="docker-compose-3-1.yml"; OutStats="tests/results/s3_archiver_1_container_stats.csv"; OutMetrics="tests/results/s3_archiver_1_container_metrics.csv" },
+    @{ Name="2c"; File="docker-compose-3-2.yml"; OutStats="tests/results/s3_archiver_2_container_stats.csv"; OutMetrics="tests/results/s3_archiver_2_container_metrics.csv" },
+    @{ Name="3c"; File="docker-compose-3-3.yml"; OutStats="tests/results/s3_archiver_3_container_stats.csv"; OutMetrics="tests/results/s3_archiver_3_container_metrics.csv" },
+    @{ Name="4c"; File="docker-compose-3-4.yml"; OutStats="tests/results/s3_archiver_4_container_stats.csv"; OutMetrics="tests/results/s3_archiver_4_container_metrics.csv" },
+    @{ Name="5c"; File="docker-compose-3-5.yml"; OutStats="tests/results/s3_archiver_5_container_stats.csv"; OutMetrics="tests/results/s3_archiver_5_container_metrics.csv" }
 )
+
+if ($ScenarioName -ne "All") {
+    $Scenarios = $Scenarios | Where-Object { $_.Name -eq $ScenarioName }
+    if ($Scenarios.Count -eq 0) {
+        Write-Host "Scenario '$ScenarioName' not found. Available scenarios:" -ForegroundColor Red
+        @("1c", "2c", "3c", "4c", "5c") | ForEach-Object { Write-Host " - $_" }
+        exit 1
+    }
+}
 
 foreach ($s in $Scenarios) {
     Write-Host "============================================================" -ForegroundColor Cyan
