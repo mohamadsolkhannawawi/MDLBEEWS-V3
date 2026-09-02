@@ -1,5 +1,10 @@
 import sys
 import os
+
+# MUST set PROMETHEUS_MULTIPROC_DIR before ANY prometheus_client imports
+MULTIPROC_DIR = "/tmp/prometheus_multiproc"
+os.environ["PROMETHEUS_MULTIPROC_DIR"] = MULTIPROC_DIR
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from multi_process import main
@@ -20,9 +25,6 @@ if ENABLE_METRICS:
     import shutil
     from prometheus_client import CollectorRegistry, multiprocess, generate_latest, CONTENT_TYPE_LATEST
     from http.server import HTTPServer, BaseHTTPRequestHandler
-    
-    MULTIPROC_DIR = "/tmp/prometheus_multiproc"
-    os.environ["PROMETHEUS_MULTIPROC_DIR"] = MULTIPROC_DIR
     
     # Clean stale files from previous runs
     if os.path.isdir(MULTIPROC_DIR):
