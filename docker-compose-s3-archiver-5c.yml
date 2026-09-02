@@ -1,7 +1,7 @@
 # ==============================================================================
-# SKENARIO    : S1 — Strategi Konkurensi Data Provider
-# KONFIGURASI : Sequential (Pemrosesan sekuensial baris demi baris, 1 core CPU)
-# PERINTAH    : docker compose -f docker-compose-1-1.yml up -d --build
+# SKENARIO    : S3 — Skalabilitas Worker Node (Data Archiver)
+# KONFIGURASI : 5 Container Data Archiver
+# PERINTAH    : docker compose -f docker-compose-s3-archiver-5c.yml up -d --build
 # ==============================================================================
 
 services:
@@ -105,6 +105,19 @@ services:
       - ./influxDB/.env
     restart: always
 
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: always
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -137,18 +150,7 @@ services:
     container_name: data_provider
     build:
       context: .
-      dockerfile: data_provider-sequence/Dockerfile
-    tty: true
-    depends_on:
-      - kafka1
-    restart: always
-
-  load_balancer:
-    build:
-      context: .
-      dockerfile: load_balancer/Dockerfile
-    deploy:
-      replicas: 1
+      dockerfile: data_provider-multiprocess/Dockerfile
     tty: true
     depends_on:
       - kafka1
@@ -167,60 +169,6 @@ services:
       - kafka1
     restart: always
 
-  restarter:
-    image: docker:cli
-    restart: unless-stopped
-    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-    entrypoint: ["/bin/sh","-c"]
-    command:
-      - |
-        while true; do
-          # docker ps
-
-          sleep 600
-          docker restart paper-eews-p_wave_detector_load_balance-1
-          docker restart paper-eews-p_wave_detector-1
-          docker restart paper-eews-data_archiver-1
-          
-          # for topic in $(docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:9092 --list); do
-          #   for partition in $(docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:9092 --describe --topic $topic | grep 'Partition:' | awk '{print $2}'); do
-          #     docker exec kafka1 /opt/kafka/bin/kafka-delete-records.sh --bootstrap-server kafka1:9092 --offset-json "{\"partitions\":[{\"topic\":\"$topic\",\"partition\":$partition,\"offset\":10}]}"
-          #   done
-          # done
-          
-          sleep 30
-          docker restart paper-eews-p_wave_detector_load_balance-2
-          docker restart paper-eews-p_wave_detector-2
-          docker restart paper-eews-data_archiver-2
-
-          sleep 30
-          docker restart paper-eews-p_wave_detector_load_balance-3
-          docker restart paper-eews-p_wave_detector-3
-          docker restart paper-eews-data_archiver-3
-
-          # for topic in $(docker exec kafka2 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka2:9093 --list); do
-          #   for partition in $(docker exec kafka2 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka2:9093 --describe --topic $topic | grep 'Partition:' | awk '{print $2}'); do
-          #     docker exec kafka2 /opt/kafka/bin/kafka-delete-records.sh --bootstrap-server kafka2:9093 --offset-json "{\"partitions\":[{\"topic\":\"$topic\",\"partition\":$partition,\"offset\":10}]}"
-          #   done
-          # done
-
-          sleep 30
-          docker restart paper-eews-p_wave_detector_load_balance-4
-          docker restart paper-eews-p_wave_detector-4
-          docker restart paper-eews-data_archiver-4
-          
-          sleep 30
-          docker restart paper-eews-p_wave_detector_load_balance-5
-          docker restart paper-eews-p_wave_detector-5
-          docker restart paper-eews-data_archiver-5
-
-          # for topic in $(docker exec kafka3 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka3:9094 --list); do
-          #   for partition in $(docker exec kafka3 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka3:9094 --describe --topic $topic | grep 'Partition:' | awk '{print $2}'); do
-          #     docker exec kafka3 /opt/kafka/bin/kafka-delete-records.sh --bootstrap-server kafka3:9094 --offset-json "{\"partitions\":[{\"topic\":\"$topic\",\"partition\":$partition,\"offset\":10}]}"
-          #   done
-          # done
-        done
-
   loc_mag_detector:
     build:
       context: .
@@ -232,12 +180,77 @@ services:
       - kafka1
     restart: always
 
+  load_balancer:
+    build:
+      context: .
+      dockerfile: load_balancer/Dockerfile
+    deploy:
+      replicas: 1
+    tty: true
+    depends_on:
+      - kafka1
+    restart: always
+
+  restarter:
+    image: docker:cli
+    restart: unless-stopped
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+    entrypoint: ["/bin/sh","-c"]
+    command:
+      - |
+        while true; do
+          # docker ps
+
+          sleep 600
+          docker restart mdlbeews-v3-p_wave_detector_load_balance-1
+          docker restart mdlbeews-v3-p_wave_detector-1
+          docker restart mdlbeews-v3-data_archiver-1
+          
+          # for topic in $(docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:9092 --list); do
+          #   for partition in $(docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:9092 --describe --topic $topic | grep 'Partition:' | awk '{print $2}'); do
+          #     docker exec kafka1 /opt/kafka/bin/kafka-delete-records.sh --bootstrap-server kafka1:9092 --offset-json "{\"partitions\":[{\"topic\":\"$topic\",\"partition\":$partition,\"offset\":10}]}"
+          #   done
+          # done
+          
+          sleep 30
+          docker restart mdlbeews-v3-p_wave_detector_load_balance-2
+          docker restart mdlbeews-v3-p_wave_detector-2
+          docker restart mdlbeews-v3-data_archiver-2
+
+          sleep 30
+          docker restart mdlbeews-v3-p_wave_detector_load_balance-3
+          docker restart mdlbeews-v3-p_wave_detector-3
+          docker restart mdlbeews-v3-data_archiver-3
+
+          # for topic in $(docker exec kafka2 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka2:9093 --list); do
+          #   for partition in $(docker exec kafka2 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka2:9093 --describe --topic $topic | grep 'Partition:' | awk '{print $2}'); do
+          #     docker exec kafka2 /opt/kafka/bin/kafka-delete-records.sh --bootstrap-server kafka2:9093 --offset-json "{\"partitions\":[{\"topic\":\"$topic\",\"partition\":$partition,\"offset\":10}]}"
+          #   done
+          # done
+
+          sleep 30
+          docker restart mdlbeews-v3-p_wave_detector_load_balance-4
+          docker restart mdlbeews-v3-p_wave_detector-4
+          docker restart mdlbeews-v3-data_archiver-4
+          
+          sleep 30
+          docker restart mdlbeews-v3-p_wave_detector_load_balance-5
+          docker restart mdlbeews-v3-p_wave_detector-5
+          docker restart mdlbeews-v3-data_archiver-5
+
+          # for topic in $(docker exec kafka3 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka3:9094 --list); do
+          #   for partition in $(docker exec kafka3 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka3:9094 --describe --topic $topic | grep 'Partition:' | awk '{print $2}'); do
+          #     docker exec kafka3 /opt/kafka/bin/kafka-delete-records.sh --bootstrap-server kafka3:9094 --offset-json "{\"partitions\":[{\"topic\":\"$topic\",\"partition\":$partition,\"offset\":10}]}"
+          #   done
+          # done
+        done
+
   data_archiver:
     build:
       context: .
       dockerfile: data_archiver/Dockerfile
     deploy:
-      replicas: 3
+      replicas: 5
     volumes:
       - ./data_archiver/data_archive:/mnt/data
     tty: true
@@ -271,18 +284,5 @@ services:
     depends_on:
       - kafka1
     restart: always
-  prometheus:
-    image: prom/prometheus:v2.54.1
-    container_name: prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-    restart: always
-
 volumes:
   prometheus_data:

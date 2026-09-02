@@ -199,7 +199,7 @@ Screenshot berikut wajib diambil **satu kali** setelah validasi sistem berhasil 
 
 **Tujuan:** Mengevaluasi mekanisme konkurensi (sekuensial, multi-thread, multi-process, atau gabungan) pada tahap ingesti data.
 
-**Compose file yang digunakan:** `docker-compose-1-1.yml` hingga `docker-compose-1-4.yml`
+**Compose file yang digunakan:** `docker-compose-s1-sequential.yml` hingga `docker-compose-s1-mp_mt.yml`
 
 **Output yang dihasilkan:**
 - `tests/results/s1_sequential_stats.csv`
@@ -230,7 +230,7 @@ cd tests
 
 **Tujuan:** Mengukur selisih CPU (%), memori (MB), dan latensi (ms) antara sistem _tanpa_ instrumentasi Prometheus dan sistem _dengan_ instrumentasi Prometheus.
 
-**Compose file yang digunakan:** `docker-compose-5-1.yml` (tanpa metrik) dan `docker-compose-5-2.yml` (dengan metrik)
+**Compose file yang digunakan:** `docker-compose-s2-no_metrics.yml` (tanpa metrik) dan `docker-compose-s2-with_metrics.yml` (dengan metrik)
 
 **Output yang dihasilkan:**
 
@@ -255,9 +255,9 @@ cd tests
 **Tujuan:** Mengukur pengaruh jumlah _instance_ (1 hingga 5 container) terhadap performa modul **Data Archiver** dan **P-Wave Detector**.
 
 **Compose file yang digunakan:**
-- Data Archiver (1–5 container): `docker-compose-3-1.yml` hingga `docker-compose-3-5.yml`
-- P-Wave Detector Kafka native (2–5 container): `docker-compose-3-6.yml` hingga `docker-compose-3-9.yml`
-- P-Wave Detector FastAPI (2–5 container): `docker-compose-3-10.yml` hingga `docker-compose-3-13.yml`
+- Data Archiver (1–5 container): `docker-compose-s3-archiver-1c.yml` hingga `docker-compose-s3-archiver-5c.yml`
+- P-Wave Detector Kafka native (2–5 container): `docker-compose-s3-pwave-kafka-2c.yml` hingga `docker-compose-s3-pwave-kafka-5c.yml`
+- P-Wave Detector FastAPI (2–5 container): `docker-compose-s3-pwave-fastapi-2c.yml` hingga `docker-compose-s3-pwave-fastapi-5c.yml`
 
 **Output yang dihasilkan:**
 - Data Archiver: `tests/results/s3_archiver_1_container_stats.csv` hingga `s3_archiver_5_container_stats.csv` (serta file metrics)
@@ -305,8 +305,8 @@ cd tests
 **Tujuan:** Membandingkan performa Express.js/Socket.IO versus FastAPI dalam menangani koneksi WebSocket pada 1 client dan 5 client konkuren.
 
 **Compose file yang digunakan:**
-- Express.js: `docker-compose-4-1.yml`
-- FastAPI: `docker-compose-4-2.yml`
+- Express.js: `docker-compose-s4-express.yml`
+- FastAPI: `docker-compose-s4-fastapi.yml`
 
 **Output yang dihasilkan:**
 - `tests/results/s4_websocket_express_1c_stats.csv` (dan metrics)
@@ -334,8 +334,8 @@ cd tests
 **Tujuan:** Membandingkan konfigurasi _message broker_ Kafka native (3 broker) versus Kafka+NGINX sebagai _load balancer_ eksternal.
 
 **Compose file yang digunakan:**
-- Kafka 3 Container: `docker-compose-2-1.yml`
-- Kafka 3 Container + NGINX: `docker-compose-2-2.yml`
+- Kafka 3 Container: `docker-compose-s5-kafka.yml`
+- Kafka 3 Container + NGINX: `docker-compose-s5-nginx.yml`
 
 **Output yang dihasilkan:**
 - `tests/results/s5_broker_kafka_stats.csv` (dan metrics)
@@ -626,7 +626,7 @@ Pastikan file CSV tidak sedang dibuka di Excel atau editor lain. Tutup semua apl
 
 ```powershell
 docker builder prune -af
-docker compose -f docker-compose-5-2.yml build --no-cache --progress=plain
+docker compose -f docker-compose-s2-with_metrics.yml build --no-cache --progress=plain
 ```
 
 ### Hapus semua data volume (reset total)
@@ -645,15 +645,15 @@ docker volume prune -f
 | Kode Skenario (BAB III)     | Compose File              | Script Otomatis                |
 | --------------------------- | ------------------------- | ------------------------------ |
 | S1 — Strategi Konkurensi    | `1-1.yml` - `1-4.yml`     | `run_s1_dataprovider.ps1`      |
-| S2 — Tanpa Prometheus       | `docker-compose-5-1.yml`  | `run_s2_overhead.ps1`          |
-| S2 — Dengan Prometheus      | `docker-compose-5-2.yml`  | `run_s2_overhead.ps1`          |
-| S3 — Archiver (1-5 C)       | `docker-compose-3-1.yml`  | `run_s3_scalability_archiver.ps1`|
-| S3 — P-Wave Kafka (2-5 C)   | `docker-compose-3-6.yml`  | `run_s3_scalability_pwave.ps1` |
-| S3 — P-Wave FastAPI (2-5 C) | `docker-compose-3-10.yml` | `run_s3_scalability_pwave.ps1` |
-| S4 — Express (1, 5 Client)  | `docker-compose-4-1.yml`  | `run_s4_websocket.ps1`         |
-| S4 — FastAPI (1, 5 Client)  | `docker-compose-4-2.yml`  | `run_s4_websocket.ps1`         |
-| S5 — Kafka 3 Broker         | `docker-compose-2-1.yml`  | `run_s5_loadbalancer.ps1`      |
-| S5 — Kafka 3 Broker + NGINX | `docker-compose-2-2.yml`  | `run_s5_loadbalancer.ps1`      |
+| S2 — Tanpa Prometheus       | `docker-compose-s2-no_metrics.yml`  | `run_s2_overhead.ps1`          |
+| S2 — Dengan Prometheus      | `docker-compose-s2-with_metrics.yml`  | `run_s2_overhead.ps1`          |
+| S3 — Archiver (1-5 C)       | `docker-compose-s3-archiver-1c.yml`  | `run_s3_scalability_archiver.ps1`|
+| S3 — P-Wave Kafka (2-5 C)   | `docker-compose-s3-pwave-kafka-2c.yml`  | `run_s3_scalability_pwave.ps1` |
+| S3 — P-Wave FastAPI (2-5 C) | `docker-compose-s3-pwave-fastapi-2c.yml` | `run_s3_scalability_pwave.ps1` |
+| S4 — Express (1, 5 Client)  | `docker-compose-s4-express.yml`  | `run_s4_websocket.ps1`         |
+| S4 — FastAPI (1, 5 Client)  | `docker-compose-s4-fastapi.yml`  | `run_s4_websocket.ps1`         |
+| S5 — Kafka 3 Broker         | `docker-compose-s5-kafka.yml`  | `run_s5_loadbalancer.ps1`      |
+| S5 — Kafka 3 Broker + NGINX | `docker-compose-s5-nginx.yml`  | `run_s5_loadbalancer.ps1`      |
 
 ---
 

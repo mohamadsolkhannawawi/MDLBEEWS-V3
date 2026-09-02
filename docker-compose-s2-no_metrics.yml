@@ -1,7 +1,7 @@
 # ==============================================================================
 # SKENARIO    : S2 — Overhead Instrumentasi Prometheus
 # KONFIGURASI : Tanpa Instrumentasi Prometheus (Library observabilitas dinonaktifkan sepenuhnya)
-# PERINTAH    : docker compose -f docker-compose-5-1.yml up -d --build
+# PERINTAH    : docker compose -f docker-compose-s2-no_metrics.yml up -d --build
 # ==============================================================================
 
 services:

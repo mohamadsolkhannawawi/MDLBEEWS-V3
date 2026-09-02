@@ -1,7 +1,7 @@
 # ==============================================================================
-# SKENARIO    : S3 — Skalabilitas Worker Node (P-Wave Detector)
-# KONFIGURASI : Kafka Native - 2 Container P-Wave Detector
-# PERINTAH    : docker compose -f docker-compose-3-6.yml up -d --build
+# SKENARIO    : S1 — Strategi Konkurensi Data Provider
+# KONFIGURASI : Multiprocess + Multithread (Pendekatan gabungan/Hybrid)
+# PERINTAH    : docker compose -f docker-compose-s1-mp_mt.yml up -d --build
 # ==============================================================================
 
 services:
@@ -105,6 +105,19 @@ services:
       - ./influxDB/.env
     restart: always
 
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: always
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -122,22 +135,57 @@ services:
     depends_on:
       - influxdb
 
+  nginx:
+    image: nginx:latest
+    container_name: nginx_load_balancer
+    ports:
+      - "8004:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - p_wave_detector_load_balance
+    restart: always
+
   data_provider:
     container_name: data_provider
     build:
       context: .
-      dockerfile: data_provider-multiprocess/Dockerfile
+      dockerfile: data_provider-multiprocess-multithread/Dockerfile
     tty: true
     depends_on:
       - kafka1
     restart: always
 
-  p_wave_detector:
+  p_wave_detector_load_balance:
     build:
       context: .
-      dockerfile: p_wave_detector/Dockerfile
+      dockerfile: p_wave_detector_load_balance/Dockerfile
+    ports:
+      - "8004"
     deploy:
-      replicas: 2
+      replicas: 4
+    tty: true
+    depends_on:
+      - kafka1
+    restart: always
+
+  loc_mag_detector:
+    build:
+      context: .
+      dockerfile: loc_mag_detector/Dockerfile
+    deploy:
+      replicas: 1
+    tty: true
+    depends_on:
+      - kafka1
+    restart: always
+
+  load_balancer:
+    build:
+      context: .
+      dockerfile: load_balancer/Dockerfile
+    deploy:
+      replicas: 1
     tty: true
     depends_on:
       - kafka1
@@ -154,9 +202,9 @@ services:
           # docker ps
 
           sleep 600
-          docker restart mdlbeews-v3-p_wave_detector_load_balance-1
-          docker restart mdlbeews-v3-p_wave_detector-1
-          docker restart mdlbeews-v3-data_archiver-1
+          docker restart paper-eews-p_wave_detector_load_balance-1
+          docker restart paper-eews-p_wave_detector-1
+          docker restart paper-eews-data_archiver-1
           
           # for topic in $(docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:9092 --list); do
           #   for partition in $(docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:9092 --describe --topic $topic | grep 'Partition:' | awk '{print $2}'); do
@@ -165,14 +213,14 @@ services:
           # done
           
           sleep 30
-          docker restart mdlbeews-v3-p_wave_detector_load_balance-2
-          docker restart mdlbeews-v3-p_wave_detector-2
-          docker restart mdlbeews-v3-data_archiver-2
+          docker restart paper-eews-p_wave_detector_load_balance-2
+          docker restart paper-eews-p_wave_detector-2
+          docker restart paper-eews-data_archiver-2
 
           sleep 30
-          docker restart mdlbeews-v3-p_wave_detector_load_balance-3
-          docker restart mdlbeews-v3-p_wave_detector-3
-          docker restart mdlbeews-v3-data_archiver-3
+          docker restart paper-eews-p_wave_detector_load_balance-3
+          docker restart paper-eews-p_wave_detector-3
+          docker restart paper-eews-data_archiver-3
 
           # for topic in $(docker exec kafka2 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka2:9093 --list); do
           #   for partition in $(docker exec kafka2 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka2:9093 --describe --topic $topic | grep 'Partition:' | awk '{print $2}'); do
@@ -181,14 +229,14 @@ services:
           # done
 
           sleep 30
-          docker restart mdlbeews-v3-p_wave_detector_load_balance-4
-          docker restart mdlbeews-v3-p_wave_detector-4
-          docker restart mdlbeews-v3-data_archiver-4
+          docker restart paper-eews-p_wave_detector_load_balance-4
+          docker restart paper-eews-p_wave_detector-4
+          docker restart paper-eews-data_archiver-4
           
           sleep 30
-          docker restart mdlbeews-v3-p_wave_detector_load_balance-5
-          docker restart mdlbeews-v3-p_wave_detector-5
-          docker restart mdlbeews-v3-data_archiver-5
+          docker restart paper-eews-p_wave_detector_load_balance-5
+          docker restart paper-eews-p_wave_detector-5
+          docker restart paper-eews-data_archiver-5
 
           # for topic in $(docker exec kafka3 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka3:9094 --list); do
           #   for partition in $(docker exec kafka3 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka3:9094 --describe --topic $topic | grep 'Partition:' | awk '{print $2}'); do
@@ -197,23 +245,12 @@ services:
           # done
         done
 
-  loc_mag_detector:
-    build:
-      context: .
-      dockerfile: loc_mag_detector/Dockerfile
-    deploy:
-      replicas: 1
-    tty: true
-    depends_on:
-      - kafka1
-    restart: always
-
   data_archiver:
     build:
       context: .
       dockerfile: data_archiver/Dockerfile
     deploy:
-      replicas: 5
+      replicas: 3
     volumes:
       - ./data_archiver/data_archive:/mnt/data
     tty: true
@@ -247,18 +284,5 @@ services:
     depends_on:
       - kafka1
     restart: always
-  prometheus:
-    image: prom/prometheus:v2.54.1
-    container_name: prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-    restart: always
-
 volumes:
   prometheus_data:

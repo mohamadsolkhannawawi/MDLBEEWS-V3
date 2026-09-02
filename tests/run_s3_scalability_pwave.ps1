@@ -10,14 +10,14 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="Kafka2c"; File="docker-compose-3-6.yml"; OutStats="tests/results/s3_pwave_kafka_2c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_2c_metrics.csv" },
-    @{ Name="Kafka3c"; File="docker-compose-3-7.yml"; OutStats="tests/results/s3_pwave_kafka_3c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_3c_metrics.csv" },
-    @{ Name="Kafka4c"; File="docker-compose-3-8.yml"; OutStats="tests/results/s3_pwave_kafka_4c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_4c_metrics.csv" },
-    @{ Name="Kafka5c"; File="docker-compose-3-9.yml"; OutStats="tests/results/s3_pwave_kafka_5c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_5c_metrics.csv" },
-    @{ Name="FastAPI2c"; File="docker-compose-3-10.yml"; OutStats="tests/results/s3_pwave_fastapi_2c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_2c_metrics.csv" },
-    @{ Name="FastAPI3c"; File="docker-compose-3-11.yml"; OutStats="tests/results/s3_pwave_fastapi_3c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_3c_metrics.csv" },
-    @{ Name="FastAPI4c"; File="docker-compose-3-12.yml"; OutStats="tests/results/s3_pwave_fastapi_4c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_4c_metrics.csv" },
-    @{ Name="FastAPI5c"; File="docker-compose-3-13.yml"; OutStats="tests/results/s3_pwave_fastapi_5c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_5c_metrics.csv" }
+    @{ Name="Kafka2c"; File="docker-compose-s3-pwave-kafka-2c.yml"; OutStats="tests/results/s3_pwave_kafka_2c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_2c_metrics.csv" },
+    @{ Name="Kafka3c"; File="docker-compose-s3-pwave-kafka-3c.yml"; OutStats="tests/results/s3_pwave_kafka_3c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_3c_metrics.csv" },
+    @{ Name="Kafka4c"; File="docker-compose-s3-pwave-kafka-4c.yml"; OutStats="tests/results/s3_pwave_kafka_4c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_4c_metrics.csv" },
+    @{ Name="Kafka5c"; File="docker-compose-s3-pwave-kafka-5c.yml"; OutStats="tests/results/s3_pwave_kafka_5c_stats.csv"; OutMetrics="tests/results/s3_pwave_kafka_5c_metrics.csv" },
+    @{ Name="FastAPI2c"; File="docker-compose-s3-pwave-fastapi-2c.yml"; OutStats="tests/results/s3_pwave_fastapi_2c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_2c_metrics.csv" },
+    @{ Name="FastAPI3c"; File="docker-compose-s3-pwave-fastapi-3c.yml"; OutStats="tests/results/s3_pwave_fastapi_3c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_3c_metrics.csv" },
+    @{ Name="FastAPI4c"; File="docker-compose-s3-pwave-fastapi-4c.yml"; OutStats="tests/results/s3_pwave_fastapi_4c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_4c_metrics.csv" },
+    @{ Name="FastAPI5c"; File="docker-compose-s3-pwave-fastapi-5c.yml"; OutStats="tests/results/s3_pwave_fastapi_5c_stats.csv"; OutMetrics="tests/results/s3_pwave_fastapi_5c_metrics.csv" }
 )
 
 if ($ScenarioName -ne "All") {

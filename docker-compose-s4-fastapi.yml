@@ -1,7 +1,7 @@
 # ==============================================================================
-# SKENARIO    : S1 — Strategi Konkurensi Data Provider
-# KONFIGURASI : Multiprocess + Multithread (Pendekatan gabungan/Hybrid)
-# PERINTAH    : docker compose -f docker-compose-1-4.yml up -d --build
+# SKENARIO    : S4 — Perbandingan WebSocket Server
+# KONFIGURASI : FastAPI WebSocket (Koneksi bisa disimulasikan 1 atau 5 Klien via Script)
+# PERINTAH    : docker compose -f docker-compose-s4-fastapi.yml up -d --build
 # ==============================================================================
 
 services:
@@ -105,6 +105,19 @@ services:
       - ./influxDB/.env
     restart: always
 
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: always
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -137,18 +150,7 @@ services:
     container_name: data_provider
     build:
       context: .
-      dockerfile: data_provider-multiprocess-multithread/Dockerfile
-    tty: true
-    depends_on:
-      - kafka1
-    restart: always
-
-  load_balancer:
-    build:
-      context: .
-      dockerfile: load_balancer/Dockerfile
-    deploy:
-      replicas: 1
+      dockerfile: data_provider-multiprocess/Dockerfile
     tty: true
     depends_on:
       - kafka1
@@ -162,6 +164,28 @@ services:
       - "8004"
     deploy:
       replicas: 4
+    tty: true
+    depends_on:
+      - kafka1
+    restart: always
+
+  loc_mag_detector:
+    build:
+      context: .
+      dockerfile: loc_mag_detector/Dockerfile
+    deploy:
+      replicas: 1
+    tty: true
+    depends_on:
+      - kafka1
+    restart: always
+
+  load_balancer:
+    build:
+      context: .
+      dockerfile: load_balancer/Dockerfile
+    deploy:
+      replicas: 1
     tty: true
     depends_on:
       - kafka1
@@ -221,17 +245,6 @@ services:
           # done
         done
 
-  loc_mag_detector:
-    build:
-      context: .
-      dockerfile: loc_mag_detector/Dockerfile
-    deploy:
-      replicas: 1
-    tty: true
-    depends_on:
-      - kafka1
-    restart: always
-
   data_archiver:
     build:
       context: .
@@ -248,18 +261,6 @@ services:
       - mongo-express
     restart: always
 
-  api_server:
-    container_name: api_server
-    build:
-      context: .
-      dockerfile: api_server/Dockerfile
-    ports:
-      - "3333:3333"
-    tty: true
-    depends_on:
-      - kafka1
-    restart: always
-
   fast_api:
     container_name: fast_api
     build:
@@ -271,18 +272,5 @@ services:
     depends_on:
       - kafka1
     restart: always
-  prometheus:
-    image: prom/prometheus:v2.54.1
-    container_name: prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-    restart: always
-
 volumes:
   prometheus_data:

@@ -10,8 +10,8 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="Kafka"; File="docker-compose-2-1.yml"; OutStats="tests/results/s5_broker_kafka_stats.csv"; OutMetrics="tests/results/s5_broker_kafka_metrics.csv" },
-    @{ Name="NGINX"; File="docker-compose-2-2.yml"; OutStats="tests/results/s5_broker_nginx_stats.csv"; OutMetrics="tests/results/s5_broker_nginx_metrics.csv" }
+    @{ Name="Kafka"; File="docker-compose-s5-kafka.yml"; OutStats="tests/results/s5_broker_kafka_stats.csv"; OutMetrics="tests/results/s5_broker_kafka_metrics.csv" },
+    @{ Name="NGINX"; File="docker-compose-s5-nginx.yml"; OutStats="tests/results/s5_broker_nginx_stats.csv"; OutMetrics="tests/results/s5_broker_nginx_metrics.csv" }
 )
 
 if ($ScenarioName -ne "All") {

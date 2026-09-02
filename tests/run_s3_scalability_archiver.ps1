@@ -10,11 +10,11 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="1c"; File="docker-compose-3-1.yml"; OutStats="tests/results/s3_archiver_1_container_stats.csv"; OutMetrics="tests/results/s3_archiver_1_container_metrics.csv" },
-    @{ Name="2c"; File="docker-compose-3-2.yml"; OutStats="tests/results/s3_archiver_2_container_stats.csv"; OutMetrics="tests/results/s3_archiver_2_container_metrics.csv" },
-    @{ Name="3c"; File="docker-compose-3-3.yml"; OutStats="tests/results/s3_archiver_3_container_stats.csv"; OutMetrics="tests/results/s3_archiver_3_container_metrics.csv" },
-    @{ Name="4c"; File="docker-compose-3-4.yml"; OutStats="tests/results/s3_archiver_4_container_stats.csv"; OutMetrics="tests/results/s3_archiver_4_container_metrics.csv" },
-    @{ Name="5c"; File="docker-compose-3-5.yml"; OutStats="tests/results/s3_archiver_5_container_stats.csv"; OutMetrics="tests/results/s3_archiver_5_container_metrics.csv" }
+    @{ Name="1c"; File="docker-compose-s3-archiver-1c.yml"; OutStats="tests/results/s3_archiver_1_container_stats.csv"; OutMetrics="tests/results/s3_archiver_1_container_metrics.csv" },
+    @{ Name="2c"; File="docker-compose-s3-archiver-2c.yml"; OutStats="tests/results/s3_archiver_2_container_stats.csv"; OutMetrics="tests/results/s3_archiver_2_container_metrics.csv" },
+    @{ Name="3c"; File="docker-compose-s3-archiver-3c.yml"; OutStats="tests/results/s3_archiver_3_container_stats.csv"; OutMetrics="tests/results/s3_archiver_3_container_metrics.csv" },
+    @{ Name="4c"; File="docker-compose-s3-archiver-4c.yml"; OutStats="tests/results/s3_archiver_4_container_stats.csv"; OutMetrics="tests/results/s3_archiver_4_container_metrics.csv" },
+    @{ Name="5c"; File="docker-compose-s3-archiver-5c.yml"; OutStats="tests/results/s3_archiver_5_container_stats.csv"; OutMetrics="tests/results/s3_archiver_5_container_metrics.csv" }
 )
 
 if ($ScenarioName -ne "All") {

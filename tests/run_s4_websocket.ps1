@@ -10,10 +10,10 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="Express1c"; File="docker-compose-4-1.yml"; TargetURI="ws://localhost:3333/socket.io/?EIO=4&transport=websocket"; Clients=1; OutStats="tests/results/s4_websocket_express_1c_stats.csv"; OutMetrics="tests/results/s4_websocket_express_1c_metrics.csv" },
-    @{ Name="Express5c"; File="docker-compose-4-1.yml"; TargetURI="ws://localhost:3333/socket.io/?EIO=4&transport=websocket"; Clients=5; OutStats="tests/results/s4_websocket_express_5c_stats.csv"; OutMetrics="tests/results/s4_websocket_express_5c_metrics.csv" },
-    @{ Name="FastAPI1c"; File="docker-compose-4-2.yml"; TargetURI="ws://localhost:3334/ws"; Clients=1; OutStats="tests/results/s4_websocket_fastapi_1c_stats.csv"; OutMetrics="tests/results/s4_websocket_fastapi_1c_metrics.csv" },
-    @{ Name="FastAPI5c"; File="docker-compose-4-2.yml"; TargetURI="ws://localhost:3334/ws"; Clients=5; OutStats="tests/results/s4_websocket_fastapi_5c_stats.csv"; OutMetrics="tests/results/s4_websocket_fastapi_5c_metrics.csv" }
+    @{ Name="Express1c"; File="docker-compose-s4-express.yml"; TargetURI="ws://localhost:3333/socket.io/?EIO=4&transport=websocket"; Clients=1; OutStats="tests/results/s4_websocket_express_1c_stats.csv"; OutMetrics="tests/results/s4_websocket_express_1c_metrics.csv" },
+    @{ Name="Express5c"; File="docker-compose-s4-express.yml"; TargetURI="ws://localhost:3333/socket.io/?EIO=4&transport=websocket"; Clients=5; OutStats="tests/results/s4_websocket_express_5c_stats.csv"; OutMetrics="tests/results/s4_websocket_express_5c_metrics.csv" },
+    @{ Name="FastAPI1c"; File="docker-compose-s4-fastapi.yml"; TargetURI="ws://localhost:3334/ws"; Clients=1; OutStats="tests/results/s4_websocket_fastapi_1c_stats.csv"; OutMetrics="tests/results/s4_websocket_fastapi_1c_metrics.csv" },
+    @{ Name="FastAPI5c"; File="docker-compose-s4-fastapi.yml"; TargetURI="ws://localhost:3334/ws"; Clients=5; OutStats="tests/results/s4_websocket_fastapi_5c_stats.csv"; OutMetrics="tests/results/s4_websocket_fastapi_5c_metrics.csv" }
 )
 
 if ($ScenarioName -ne "All") {

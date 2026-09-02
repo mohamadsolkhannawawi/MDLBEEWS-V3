@@ -1,7 +1,7 @@
 # ==============================================================================
 # SKENARIO    : S3 — Skalabilitas Worker Node (Data Archiver)
-# KONFIGURASI : 4 Container Data Archiver
-# PERINTAH    : docker compose -f docker-compose-3-4.yml up -d --build
+# KONFIGURASI : 1 Container Data Archiver
+# PERINTAH    : docker compose -f docker-compose-s3-archiver-1c.yml up -d --build
 # ==============================================================================
 
 services:
@@ -105,6 +105,19 @@ services:
       - ./influxDB/.env
     restart: always
 
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: always
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -143,17 +156,6 @@ services:
       - kafka1
     restart: always
 
-  load_balancer:
-    build:
-      context: .
-      dockerfile: load_balancer/Dockerfile
-    deploy:
-      replicas: 1
-    tty: true
-    depends_on:
-      - kafka1
-    restart: always
-
   p_wave_detector_load_balance:
     build:
       context: .
@@ -162,6 +164,28 @@ services:
       - "8004"
     deploy:
       replicas: 4
+    tty: true
+    depends_on:
+      - kafka1
+    restart: always
+
+  loc_mag_detector:
+    build:
+      context: .
+      dockerfile: loc_mag_detector/Dockerfile
+    deploy:
+      replicas: 1
+    tty: true
+    depends_on:
+      - kafka1
+    restart: always
+
+  load_balancer:
+    build:
+      context: .
+      dockerfile: load_balancer/Dockerfile
+    deploy:
+      replicas: 1
     tty: true
     depends_on:
       - kafka1
@@ -221,23 +245,12 @@ services:
           # done
         done
 
-  loc_mag_detector:
-    build:
-      context: .
-      dockerfile: loc_mag_detector/Dockerfile
-    deploy:
-      replicas: 1
-    tty: true
-    depends_on:
-      - kafka1
-    restart: always
-
   data_archiver:
     build:
       context: .
       dockerfile: data_archiver/Dockerfile
     deploy:
-      replicas: 4
+      replicas: 1
     volumes:
       - ./data_archiver/data_archive:/mnt/data
     tty: true
@@ -271,18 +284,5 @@ services:
     depends_on:
       - kafka1
     restart: always
-  prometheus:
-    image: prom/prometheus:v2.54.1
-    container_name: prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-    restart: always
-
 volumes:
   prometheus_data:

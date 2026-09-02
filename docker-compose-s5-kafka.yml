@@ -1,7 +1,7 @@
 # ==============================================================================
 # SKENARIO    : S5 — Load Balancer Message Broker
 # KONFIGURASI : Kafka Native (3 Broker Kafka tanpa NGINX)
-# PERINTAH    : docker compose -f docker-compose-2-1.yml up -d --build
+# PERINTAH    : docker compose -f docker-compose-s5-kafka.yml up -d --build
 # ==============================================================================
 
 services:
@@ -102,21 +102,6 @@ services:
       - '--storage.tsdb.retention.time=30d'
     restart: always
 
-  node-exporter:
-    image: prom/node-exporter:v1.8.2
-    container_name: node-exporter
-    ports:
-      - "9100:9100"
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--path.rootfs=/rootfs'
-    restart: always
-
   grafana:
     image: grafana/grafana:11.2.2
     container_name: grafana
@@ -213,6 +198,21 @@ services:
       ENABLE_METRICS: "true"
     depends_on:
       - kafka1
+    restart: always
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
     restart: always
 
 volumes:

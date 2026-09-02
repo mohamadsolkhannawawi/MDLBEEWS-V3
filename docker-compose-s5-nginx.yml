@@ -1,7 +1,7 @@
 # ==============================================================================
-# SKENARIO    : S2 — Overhead Instrumentasi Prometheus
-# KONFIGURASI : Dengan Instrumentasi Prometheus (Semua metrik aktif dan dipantau Grafana)
-# PERINTAH    : docker compose -f docker-compose-5-2.yml up -d --build
+# SKENARIO    : S5 — Load Balancer Message Broker
+# KONFIGURASI : Kafka + NGINX (3 Broker Kafka di belakang Load Balancer NGINX)
+# PERINTAH    : docker compose -f docker-compose-s5-nginx.yml up -d --build
 # ==============================================================================
 
 services:
@@ -102,21 +102,6 @@ services:
       - '--storage.tsdb.retention.time=30d'
     restart: always
 
-  node-exporter:
-    image: prom/node-exporter:v1.8.2
-    container_name: node-exporter
-    ports:
-      - "9100:9100"
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--path.rootfs=/rootfs'
-    restart: always
-
   grafana:
     image: grafana/grafana:11.2.2
     container_name: grafana
@@ -148,12 +133,13 @@ services:
       - kafka1
     restart: always
 
-  p_wave_detector:
+  # Kafka -> Load Balancer Service -> NGINX -> HTTP P-Wave Detectors
+  p_wave_detector_load_balance:
     build:
       context: .
-      dockerfile: p_wave_detector/Dockerfile
+      dockerfile: p_wave_detector_load_balance/Dockerfile
     deploy:
-      replicas: 3
+      replicas: 4
     tty: true
     env_file:
       - .env
@@ -178,12 +164,28 @@ services:
       - kafka1
     restart: always
 
+  load_balancer:
+    build:
+      context: .
+      dockerfile: load_balancer/Dockerfile
+    deploy:
+      replicas: 1
+    tty: true
+    env_file:
+      - .env
+    environment:
+      ENABLE_METRICS: "true"
+      LB_TARGET_URL: "http://nginx_load_balancer:80/trace"
+    depends_on:
+      - kafka1
+    restart: always
+
   data_archiver:
     build:
       context: .
       dockerfile: data_archiver/Dockerfile
     deploy:
-      replicas: 3
+      replicas: 1
     volumes:
       - ./data_archiver/data_archive:/mnt/data
     tty: true
@@ -214,21 +216,30 @@ services:
       - kafka1
     restart: always
 
-  fast_api:
-    container_name: fast_api
-    build:
-      context: .
-      dockerfile: fast_api/Dockerfile
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: node-exporter
     ports:
-      - "3334:3333"
-      - "8108:8108"
-    tty: true
-    env_file:
-      - .env
-    environment:
-      ENABLE_METRICS: "true"
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+    restart: always
+
+  nginx_load_balancer:
+    image: nginx:1.27
+    container_name: nginx_load_balancer
+    ports:
+      - "8004:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - kafka1
+      - p_wave_detector_load_balance
     restart: always
 
 volumes:
