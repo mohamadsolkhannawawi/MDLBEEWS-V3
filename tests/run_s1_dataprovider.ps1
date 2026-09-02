@@ -10,8 +10,8 @@ Set-Location $RootDir
 
 $Scenarios = @(
     @{ Name="Sequential"; File="docker-compose-1-1.yml"; OutStats="tests/results/s1_sequential_stats.csv"; OutMetrics="tests/results/s1_sequential_metrics.csv" },
-    @{ Name="Multithreading"; File="docker-compose-1-2.yml"; OutStats="tests/results/s1_multithread_stats.csv"; OutMetrics="tests/results/s1_multithread_metrics.csv" },
-    @{ Name="Multiprocessing"; File="docker-compose-1-3.yml"; OutStats="tests/results/s1_multiprocess_stats.csv"; OutMetrics="tests/results/s1_multiprocess_metrics.csv" },
+    @{ Name="Multiprocessing"; File="docker-compose-1-2.yml"; OutStats="tests/results/s1_multiprocess_stats.csv"; OutMetrics="tests/results/s1_multiprocess_metrics.csv" },
+    @{ Name="Multithreading"; File="docker-compose-1-3.yml"; OutStats="tests/results/s1_multithread_stats.csv"; OutMetrics="tests/results/s1_multithread_metrics.csv" },
     @{ Name="MP_MT"; File="docker-compose-1-4.yml"; OutStats="tests/results/s1_mp_mt_stats.csv"; OutMetrics="tests/results/s1_mp_mt_metrics.csv" }
 )
 

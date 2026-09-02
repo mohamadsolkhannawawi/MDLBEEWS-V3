@@ -17,8 +17,27 @@ from utils.logger import get_logger
 logger = get_logger("dataprovidermultiprocessmultithread")
 
 if ENABLE_METRICS:
-    from prometheus_client import start_http_server
+    import shutil
+    from prometheus_client import CollectorRegistry, multiprocess, generate_latest, CONTENT_TYPE_LATEST
+    from http.server import HTTPServer, BaseHTTPRequestHandler
+    
+    MULTIPROC_DIR = "/tmp/prometheus_multiproc"
+    os.environ["PROMETHEUS_MULTIPROC_DIR"] = MULTIPROC_DIR
+    
+    # Clean stale files from previous runs
+    if os.path.isdir(MULTIPROC_DIR):
+        shutil.rmtree(MULTIPROC_DIR)
+    os.makedirs(MULTIPROC_DIR, exist_ok=True)
 
+    class MetricsHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            registry = CollectorRegistry()
+            multiprocess.MultiProcessCollector(registry)
+            data = generate_latest(registry)
+            self.send_response(200)
+            self.send_header('Content-Type', CONTENT_TYPE_LATEST)
+            self.end_headers()
+            self.wfile.write(data)
 
 
 if __name__ == '__main__':
@@ -27,7 +46,10 @@ if __name__ == '__main__':
     # Start Prometheus metrics server
     if ENABLE_METRICS:
         try:
-            start_http_server(METRICS_PORT_DATA_PROVIDER)
+            server = HTTPServer(('0.0.0.0', METRICS_PORT_DATA_PROVIDER), MetricsHandler)
+            import threading
+            metrics_thread = threading.Thread(target=server.serve_forever, daemon=True)
+            metrics_thread.start()
             logger.info(f"Prometheus metrics server started on port {METRICS_PORT_DATA_PROVIDER}")
         except Exception as e:
             logger.error(f"Failed to start metrics server: {e}")
