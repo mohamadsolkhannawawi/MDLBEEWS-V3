@@ -1,9 +1,32 @@
+import os
 from obspy.clients.seedlink.easyseedlink import EasySeedLinkClient
 from kafka import KafkaProducer
 import json
 import time
 import concurrent.futures
 import threading
+
+ENABLE_METRICS = os.getenv("ENABLE_METRICS", "true").lower() == "true"
+
+if ENABLE_METRICS:
+    from prometheus_client import Counter, Gauge, REGISTRY
+
+    def get_metric(metric_class, name, desc, labelnames=(), **kwargs):
+        for s_name in [name, f"{name}_total", f"{name}_created"]:
+            if s_name in REGISTRY._names_to_collectors:
+                return REGISTRY._names_to_collectors[s_name]
+        if labelnames:
+            return metric_class(name, desc, labelnames, **kwargs)
+        return metric_class(name, desc, **kwargs)
+
+    TRACES_SENT = get_metric(
+        Counter,
+        'data_provider_traces_sent',
+        'Total number of trace messages sent to Kafka',
+        ['topic']
+    )
+else:
+    TRACES_SENT = None
 
 
 # Subclass the client class
@@ -91,10 +114,14 @@ class SeedlinkClient(EasySeedLinkClient):
         }
         self.producer.send('trace_topic', data, key=f"{data['station']}-{data['channel']}").add_callback(self.on_send_success).add_errback(self.on_send_error)
         self.producer.flush()
+        if ENABLE_METRICS and TRACES_SENT:
+            TRACES_SENT.labels(topic='trace_topic').inc()
 
         if trace.stats.channel.endswith('Z'):
             self.producer2.send('p_wave_topic', data, key=f"{data['station']}-{data['channel']}").add_callback(self.on_send_success).add_errback(self.on_send_error)
             self.producer2.flush()
+            if ENABLE_METRICS and TRACES_SENT:
+                TRACES_SENT.labels(topic='p_wave_topic').inc()
 
         # self.producer.flush()
 
