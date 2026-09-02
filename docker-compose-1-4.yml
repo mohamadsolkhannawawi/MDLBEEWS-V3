@@ -133,9 +133,6 @@ services:
       context: .
       dockerfile: data_provider-multiprocess-multithread/Dockerfile
     tty: true
-    volumes:
-      - ./data_provider-multiprocess-multithread:/app
-      - ./config:/app/config
     depends_on:
       - kafka1
     restart: always

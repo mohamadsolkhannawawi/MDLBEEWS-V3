@@ -25,7 +25,7 @@ foreach ($s in $Scenarios) {
     Write-Host "============================================================" -ForegroundColor Cyan
     
     docker compose -f $($s.File) down -v --remove-orphans
-    docker compose -f $($s.File) up -d --remove-orphans
+    docker compose -f $($s.File) up -d --build --remove-orphans
     
     Write-Host "Waiting 60s for stabilization..."
     Start-Sleep -Seconds 60
