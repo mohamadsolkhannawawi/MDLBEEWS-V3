@@ -17,24 +17,8 @@ from utils.logger import get_logger
 logger = get_logger("dataprovidermultithread")
 
 if ENABLE_METRICS:
-    from prometheus_client import start_http_server, Counter, Gauge
-    TRACES_SENT = Counter(
-        'data_provider_traces_sent_total',
-        'Total number of trace messages sent to Kafka',
-        ['topic']
-    )
-    PUBLISH_ERRORS = Counter(
-        'data_provider_publish_errors_total',
-        'Total number of Kafka publish errors'
-    )
-    ACTIVE_STREAMS = Gauge(
-        'data_provider_active_streams',
-        'Number of active SeedLink streams'
-    )
-else:
-    TRACES_SENT = None
-    PUBLISH_ERRORS = None
-    ACTIVE_STREAMS = None
+    from prometheus_client import start_http_server
+
 
 
 if __name__ == '__main__':
