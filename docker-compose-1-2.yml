@@ -1,3 +1,9 @@
+# ==============================================================================
+# SKENARIO    : S1 — Strategi Konkurensi Data Provider
+# KONFIGURASI : Multiprocess (Memecah beban ke multiple core CPU secara paralel)
+# PERINTAH    : docker compose -f docker-compose-1-2.yml up -d --build
+# ==============================================================================
+
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.7.1

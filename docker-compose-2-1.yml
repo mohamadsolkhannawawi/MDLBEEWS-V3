@@ -1,6 +1,7 @@
 # ==============================================================================
-# Skenario S4a — Observabilitas Load Balancing: Kafka Native (Consumer Group)
-# docker compose -f docker-compose-2-1.yml up -d --build
+# SKENARIO    : S5 — Load Balancer Message Broker
+# KONFIGURASI : Kafka Native (3 Broker Kafka tanpa NGINX)
+# PERINTAH    : docker compose -f docker-compose-2-1.yml up -d --build
 # ==============================================================================
 
 services:

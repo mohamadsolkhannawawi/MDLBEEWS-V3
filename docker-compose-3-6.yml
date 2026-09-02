@@ -1,3 +1,9 @@
+# ==============================================================================
+# SKENARIO    : S3 — Skalabilitas Worker Node (P-Wave Detector)
+# KONFIGURASI : Kafka Native - 2 Container P-Wave Detector
+# PERINTAH    : docker compose -f docker-compose-3-6.yml up -d --build
+# ==============================================================================
+
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.7.1

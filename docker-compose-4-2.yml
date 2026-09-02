@@ -1,3 +1,9 @@
+# ==============================================================================
+# SKENARIO    : S4 — Perbandingan WebSocket Server
+# KONFIGURASI : FastAPI WebSocket (Koneksi bisa disimulasikan 1 atau 5 Klien via Script)
+# PERINTAH    : docker compose -f docker-compose-4-2.yml up -d --build
+# ==============================================================================
+
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.7.1

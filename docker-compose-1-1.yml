@@ -1,3 +1,9 @@
+# ==============================================================================
+# SKENARIO    : S1 — Strategi Konkurensi Data Provider
+# KONFIGURASI : Sequential (Pemrosesan sekuensial baris demi baris, 1 core CPU)
+# PERINTAH    : docker compose -f docker-compose-1-1.yml up -d --build
+# ==============================================================================
+
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.7.1

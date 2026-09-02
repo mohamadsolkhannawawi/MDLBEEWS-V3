@@ -1,6 +1,7 @@
 # ==============================================================================
-# EEWS Microservices — Docker Compose (Main / Default)
-# Includes full pipeline + Prometheus + Grafana + Node Exporter
+# SKENARIO    : Master Compose (Mode Produksi / Default Full Stack)
+# KONFIGURASI : Seluruh layanan mikro EEWS berjalan bersamaan dengan setelan pabrik.
+# PERINTAH    : docker compose -f docker-compose.yml up -d --build
 # ==============================================================================
 
 services:

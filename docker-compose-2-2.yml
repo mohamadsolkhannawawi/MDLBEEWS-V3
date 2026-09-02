@@ -1,6 +1,7 @@
 # ==============================================================================
-# Skenario S4b — Observabilitas Load Balancing: Kafka + NGINX + HTTP
-# docker compose -f docker-compose-2-2.yml up -d --build
+# SKENARIO    : S5 — Load Balancer Message Broker
+# KONFIGURASI : Kafka + NGINX (3 Broker Kafka di belakang Load Balancer NGINX)
+# PERINTAH    : docker compose -f docker-compose-2-2.yml up -d --build
 # ==============================================================================
 
 services:
