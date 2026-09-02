@@ -1,5 +1,6 @@
 param (
-    [int]$DurationSec = 120
+    [int]$DurationSec = 120,
+    [string]$ScenarioName = "All"
 )
 
 $PythonExecutable = "python"
@@ -14,6 +15,14 @@ $Scenarios = @(
     @{ Name="Multithreading"; File="docker-compose-1-3.yml"; OutStats="tests/results/s1_multithread_stats.csv"; OutMetrics="tests/results/s1_multithread_metrics.csv" },
     @{ Name="MP_MT"; File="docker-compose-1-4.yml"; OutStats="tests/results/s1_mp_mt_stats.csv"; OutMetrics="tests/results/s1_mp_mt_metrics.csv" }
 )
+
+if ($ScenarioName -ne "All") {
+    $Scenarios = $Scenarios | Where-Object { $_.Name -eq $ScenarioName }
+    if ($Scenarios.Count -eq 0) {
+        Write-Host "Error: Scenario '$ScenarioName' not found! Valid options are: Sequential, Multiprocessing, Multithreading, MP_MT" -ForegroundColor Red
+        exit 1
+    }
+}
 
 foreach ($s in $Scenarios) {
     Write-Host "============================================================" -ForegroundColor Cyan
