@@ -32,4 +32,4 @@ foreach ($s in $Scenarios) {
 docker compose -f $($s.File) down -v --remove-orphans
 }
 
-Write-Host "Skripsi S1 testing completed!" -ForegroundColor Green
+Write-Host "Skripsi S2 testing completed!" -ForegroundColor Green
