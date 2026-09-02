@@ -136,7 +136,6 @@ services:
     volumes:
       - ./data_provider-multithread:/app
       - ./config:/app/config
-      - ./utils:/app/utils
     depends_on:
       - kafka1
     restart: always
