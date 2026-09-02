@@ -133,6 +133,10 @@ services:
       context: .
       dockerfile: data_provider-sequence/Dockerfile
     tty: true
+    volumes:
+      - ./data_provider-sequence:/app
+      - ./config:/app/config
+      - ./utils:/app/utils
     depends_on:
       - kafka1
     restart: always
