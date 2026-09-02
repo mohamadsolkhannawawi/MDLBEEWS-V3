@@ -15,22 +15,22 @@ if (-not (Test-Path "results")) {
 }
 
 Write-Host "`n[1/6] Menjalankan Skenario S1 (Data Provider)..." -ForegroundColor Yellow
-& .\run_s1_dataprovider.ps1
+& "$ScriptDir\run_s1_dataprovider.ps1"
 
 Write-Host "`n[2/6] Menjalankan Skenario S2 (Instrumentasi Overhead)..." -ForegroundColor Yellow
-& .\run_s2_overhead.ps1
+& "$ScriptDir\run_s2_overhead.ps1"
 
 Write-Host "`n[3/6] Menjalankan Skenario S3 (Data Archiver Scalability)..." -ForegroundColor Yellow
-& .\run_s3_scalability_archiver.ps1
+& "$ScriptDir\run_s3_scalability_archiver.ps1"
 
 Write-Host "`n[4/6] Menjalankan Skenario S3 (P-Wave Detector Scalability)..." -ForegroundColor Yellow
-& .\run_s3_scalability_pwave.ps1
+& "$ScriptDir\run_s3_scalability_pwave.ps1"
 
 Write-Host "`n[5/6] Menjalankan Skenario S4 (WebSocket Express vs FastAPI)..." -ForegroundColor Yellow
-& .\run_s4_websocket.ps1
+& "$ScriptDir\run_s4_websocket.ps1"
 
 Write-Host "`n[6/6] Menjalankan Skenario S5 (Load Balancer - Kafka vs NGINX)..." -ForegroundColor Yellow
-& .\run_s5_loadbalancer.ps1
+& "$ScriptDir\run_s5_loadbalancer.ps1"
 
 Write-Host "============================================================" -ForegroundColor Green
 Write-Host " SEMUA PENGUJIAN SELESAI! Hasil tersedia di tests/results/" -ForegroundColor Green
