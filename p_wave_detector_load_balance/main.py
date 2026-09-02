@@ -59,12 +59,12 @@ if ENABLE_METRICS:
     PWAVE_LB_INFERENCE_LATENCY = Histogram(
         'pwave_lb_inference_latency_seconds',
         'Latency of P-wave model inference (load-balanced)',
-        buckets=[0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0]
+        buckets=[0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
     )
-    PWAVE_LB_REQUEST_LATENCY = Histogram(
-        'pwave_lb_request_latency_seconds',
+    PWAVE_E2E_LATENCY = Histogram(
+        'pwave_end_to_end_latency_seconds',
         'Total latency of processing a /trace HTTP request',
-        buckets=[0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
+        buckets=[0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
     )
 else:
     PWAVE_LB_REQUESTS = None
@@ -72,7 +72,7 @@ else:
     PWAVE_LB_ERRORS = None
     PWAVE_LB_CACHE_SIZE = None
     PWAVE_LB_INFERENCE_LATENCY = None
-    PWAVE_LB_REQUEST_LATENCY = None
+    PWAVE_E2E_LATENCY = None
 
 
 app = FastAPI()
@@ -192,8 +192,8 @@ async def process(data: Dict[str, Any], data_delay: float) -> None:
         last_waveform[key] = []
 
     process_duration = time() - start_time
-    if ENABLE_METRICS and PWAVE_LB_REQUEST_LATENCY:
-        PWAVE_LB_REQUEST_LATENCY.observe(process_duration)
+    if ENABLE_METRICS and PWAVE_E2E_LATENCY:
+        PWAVE_E2E_LATENCY.observe(process_duration)
 
     logger.debug(f"Delay Kafka: {data_delay:.4f}s | Process Time: {process_duration:.4f}s")
 

@@ -9,8 +9,6 @@ from urllib3.util.retry import Retry
 
 # Define the PromQL queries we want to run and record
 QUERIES = {
-    "cpu_usage_percent": '100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)',
-    "memory_used_mb": '(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / 1024 / 1024',
     "pwave_inference_latency_p95": 'histogram_quantile(0.95, rate(pwave_inference_latency_seconds_bucket[1m]))',
     "pwave_lb_inference_latency_p95": 'histogram_quantile(0.95, rate(pwave_lb_inference_latency_seconds_bucket[1m]))',
     "lb_forward_latency_p95": 'histogram_quantile(0.95, rate(lb_forward_latency_seconds_bucket[1m]))',
@@ -34,7 +32,7 @@ def create_session():
     session.mount("http://", HTTPAdapter(max_retries=retry))
     session.mount("https://", HTTPAdapter(max_retries=retry))
     return session
-
+  
 
 def wait_for_prometheus(session, prometheus_url, timeout_sec=60):
     ready_url = prometheus_url.rsplit('/api/v1/query', 1)[0] + '/-/ready'

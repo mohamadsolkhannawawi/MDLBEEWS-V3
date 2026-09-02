@@ -56,12 +56,12 @@ if ENABLE_METRICS:
     PWAVE_INFERENCE_LATENCY = Histogram(
         'pwave_inference_latency_seconds',
         'Latency of P-wave model inference',
-        buckets=[0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0]
+        buckets=[0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
     )
     PWAVE_E2E_LATENCY = Histogram(
         'pwave_end_to_end_latency_seconds',
         'End-to-end latency from data provider to P-wave detection',
-        buckets=[0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0]
+        buckets=[0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
     )
 else:
     PWAVE_REQUESTS = None
@@ -121,6 +121,10 @@ class TraceConsumer:
             if ENABLE_METRICS and PWAVE_INFERENCE_LATENCY:
                 PWAVE_INFERENCE_LATENCY.observe(inference_duration)
 
+            # End-to-end latency - recorded for ALL processed traces regardless of P-wave detection
+            if ENABLE_METRICS and PWAVE_E2E_LATENCY:
+                PWAVE_E2E_LATENCY.observe(time() - data_provider_time)
+
             # Find best P-wave detection window
             idx = 0
             max_value = 0
@@ -155,10 +159,6 @@ class TraceConsumer:
 
             self.producer.send(KAFKA_TOPIC_LOCMAG, data, key=f"{data['station']}-{data['channel']}")
             self.producer.flush()
-
-            # End-to-end latency
-            if ENABLE_METRICS and PWAVE_E2E_LATENCY:
-                PWAVE_E2E_LATENCY.observe(time() - data_provider_time)
 
             logger.info(f"P-Wave detected for {trace.stats.station}-{trace.stats.channel}")
 
