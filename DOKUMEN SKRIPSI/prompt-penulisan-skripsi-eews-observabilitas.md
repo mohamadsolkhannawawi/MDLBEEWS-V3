@@ -30,7 +30,7 @@ Lampirkan **seluruh file** pada baris yang sesuai dengan bab/subbab yang sedang 
 | ABSTRAK & ABSTRACT | `konteks-aplikasi-eews-observabilitas.md`, `rancangan-isi-skripsi-eews-observabilitas.md`, `rancangan-daftar-pustaka-eews-observabilitas.md` | `BAB_I_Pendahuluan.md`, `BAB_V_Penutup.md` (khususnya Sub Bab 5.1 yang sudah diisi data nyata) |
 | BAB I — Pendahuluan (revisi granular; bab ini sudah final) | idem | — (bab sudah final; lampirkan `BAB_I_Pendahuluan.md` itu sendiri sebagai basis revisi) |
 | BAB II — Tinjauan Pustaka (revisi granular; bab ini sudah final) | idem | `BAB_I_Pendahuluan.md` (untuk cek konsistensi verbatim paragraf pembuka & istilah), `BAB_II_Tinjauan_Pustaka.md` itu sendiri sebagai basis revisi |
-| **BAB III — Metode Penelitian** | idem | `BAB_I_Pendahuluan.md` **dan** `BAB_II_Tinjauan_Pustaka.md` — **wajib**, karena BAB III harus merujuk balik ke notasi (C4 *Model*, DFD) dan teori (Sugiyono 2022, Raptis dkk. 2024, Tzanettis dkk. 2022, Martín dkk. 2022) yang sudah ditulis di BAB II Sub Bab 2.2.8–2.2.10, bukan mendefinisikan ulang dari nol |
+| **BAB III — Metode Penelitian** | idem | `BAB_I_Pendahuluan.md` **dan** `BAB_II_Tinjauan_Pustaka.md` — **wajib**, karena BAB III harus merujuk balik ke notasi (C4 *Model*, DFD) dan teori (Raptis dkk. 2024, Tzanettis dkk. 2022, Martín dkk. 2022) yang sudah ditulis di BAB II Sub Bab 2.2.8–2.2.10, bukan mendefinisikan ulang dari nol |
 | BAB IV — Implementasi dan Pengujian | idem | `BAB_III_Metode_Penelitian.md` (draf final Bab III yang sedang/sudah ditulis) |
 | BAB V — Penutup | idem | `BAB_I_Pendahuluan.md` (untuk pencocokan 1-ke-1 dengan Tujuan Penelitian) dan `BAB_IV_Implementasi_dan_Pengujian.md` Sub Bab 4.6–4.7 yang sudah diisi data nyata |
 | Daftar Pustaka & Lampiran | idem | Seluruh draf Bab I–V yang sudah ditulis sejauh sesi ini berjalan |
@@ -93,8 +93,8 @@ ATURAN TEKNIS YANG TIDAK BOLEH DILANGGAR:
   mengutip pustaka dari Bagian 2 (dikeluarkan) atau Bagian 3 (marginal/ditolak), dan
   JANGAN mengarang pustaka baru yang tidak ada di dokumen acuan. Pengecualian: bila
   salah satu file bab final yang dilampirkan (mis. BAB_II_Tinjauan_Pustaka.md) sudah
-  mengutip pustaka tambahan yang terbukti relevan (mis. Sugiyono 2022, Kitchenham &
-  Charters 2007, Newman 2021, Sommerville 2016, Brown 2022, Kendall & Kendall 2011),
+  mengutip pustaka tambahan yang terbukti relevan,
+  Newman 2021, Sommerville 2016, Brown 2022, Kendall & Kendall 2011),
   pustaka tersebut TETAP SAH dipakai secara konsisten di bab-bab berikutnya walau belum
   eksplisit tercantum di rancangan-daftar-pustaka — verifikasi dulu bahwa pustaka itu
   memang benar-benar muncul di file bab final yang dilampirkan, jangan menduga-duga.
@@ -385,7 +385,7 @@ isi subbab [SUBBAB] yang SUDAH ADA di BAB_II_Tinjauan_Pustaka.md yang dilampirka
 diminta eksplisit). Sebelum menulis, sebutkan secara eksplisit daftar pustaka yang akan
 dipakai/dipertahankan untuk subbab ini, merujuk baik ke
 rancangan-daftar-pustaka-eews-observabilitas.md maupun ke pustaka yang SUDAH terbukti
-dikutip di subbab tersebut pada BAB_II_Tinjauan_Pustaka.md (mis. Sugiyono 2022 untuk
+dikutip di subbab tersebut pada BAB_II_Tinjauan_Pustaka.md (mis. Faseeha dkk. 2025 untuk
 2.2.9, Sommerville 2016 untuk 2.2.10, Brown 2022 untuk 2.2.8.3), baru tulis isi subbab.
 Jika subbab yang diminta adalah 2.2.4 (WebSocket) atau 2.2.5 (Load Balancing NGINX),
 tegaskan kembali batasan kecocokan pustaka sesuai catatan di rancangan-daftar-pustaka
@@ -398,7 +398,7 @@ KELUARAN: teks subbab yang diminta saja, siap tempel ke draf.
 
 ## 5. PROMPT BAB III — METODE PENELITIAN
 
-> **[REVISI UTAMA]** Bagian ini dirombak total mengikuti `rancangan-isi-skripsi-eews-observabilitas.md` Bagian 4 (Revisi-1). Tiga perbedaan penting dari versi lama: (1) wajib melampirkan `BAB_I_Pendahuluan.md` dan `BAB_II_Tinjauan_Pustaka.md` karena BAB III sekarang merujuk balik ke teori dan notasi yang sudah ditulis di sana, bukan mendefinisikan ulang; (2) ditambahkan Gambar 3.1 alur metodologi menyeluruh serta notasi arsitektur eksplisit (C4 *Model*, DFD); (3) Tabel skenario pengujian (S1–S4) mendapat kolom profil beban kerja dan prosedur otomatisasi, plus opsi S5 yang bersifat opsional.
+> **[REVISI UTAMA]** Bagian ini dirombak total mengikuti `rancangan-isi-skripsi-eews-observabilitas.md` Bagian 4 (Revisi-1). Tiga perbedaan penting dari versi lama: (1) wajib melampirkan `BAB_I_Pendahuluan.md` dan `BAB_II_Tinjauan_Pustaka.md` karena BAB III sekarang merujuk balik ke teori dan notasi yang sudah ditulis di sana, bukan mendefinisikan ulang; (2) ditambahkan Gambar 3.1 alur metodologi menyeluruh serta notasi arsitektur eksplisit (C4 *Model*, DFD); (3) Tabel skenario pengujian (S1–S5) mendapat kolom profil beban kerja dan prosedur otomatisasi.
 
 ### 5.1 Prompt Bab III (versi lengkap sekaligus)
 
@@ -432,16 +432,16 @@ gambar, mengikuti gaya penulisan deskripsi gambar pada kedua contoh skripsi acua
 
 3.1 JENIS DAN PENDEKATAN PENELITIAN:
 - Jenis: penelitian eksperimental (experimental research) dengan pendekatan kuantitatif.
-  RUJUK BALIK (jangan definisikan ulang dari nol) ke definisi Sugiyono (2022) yang SUDAH
+  RUJUK BALIK (jangan definisikan ulang dari nol) ke konsep yang SUDAH
   dijelaskan di Sub Bab 2.2.9 BAB_II_Tinjauan_Pustaka.md — cukup satu kalimat rujukan
   singkat lalu langsung terapkan ke konteks penelitian ini.
 - Tegaskan secara eksplisit prinsip "satu variabel bebas per rangkaian pengujian",
   diadopsi dari pola Raptis dkk. (2024) yang SUDAH disebut di Sub Bab 2.2.9
   BAB_II_Tinjauan_Pustaka.md — kutip kembali secara singkat (bukan re-derivasi), lalu
-  jelaskan bahwa setiap skenario S1–S4 di Sub Bab 3.5 hanya memvariasikan satu variabel
-  bebas.
-- Buat Tabel 3.1 Definisi Variabel Penelitian dengan EMPAT baris (bukan tiga seperti
-  versi lama): Variabel bebas (rinci per skenario S1–S4, rujuk ke Tabel 3.3 Sub Bab 3.5),
+  jelaskan bahwa setiap skenario S1–S5 di Sub Bab 3.5 hanya memvariasikan satu variabel
+  bebas per rangkaian pengujian.
+- VARIABEL PENELITIAN (jangan gunakan format tabel, ubah jadi teks naratif seperti pada
+  versi lama): Variabel bebas (rinci per skenario S1–S5, rujuk ke Tabel 3.3 Sub Bab 3.5),
   Variabel terikat (latensi ms, CPU %, memori MB, data delay end-to-end s — PERSIS empat
   metrik pada Ruang Lingkup Bab I, JANGAN menambah metrik lain), Variabel kontrol
   (spesifikasi mesin host, dataset seismik, bobot model deep learning tetap, topologi
@@ -453,7 +453,7 @@ gambar, mengikuti gaya penulisan deskripsi gambar pada kedua contoh skripsi acua
 
 3.2 STUDI LITERATUR DAN ANALISIS KEBUTUHAN:
 - Sumber literatur: basis data jurnal terindeks Scopus, rentang tahun 2020–2026 — SEBUT
-  bahwa ini kelanjutan langsung dari metodologi SLR yang sudah dijelaskan di Sub Bab 2.1
+  bahwa ini kelanjutan langsung dari penelusuran literatur yang sudah dijelaskan di Sub Bab 2.1
   BAB_II_Tinjauan_Pustaka.md, bukan proses studi literatur terpisah.
 - Kebutuhan fungsional: daftar modul dan alur data (mengacu Bagian 3
   konteks-aplikasi-eews-observabilitas.md).
@@ -595,7 +595,7 @@ KELUARAN: teks subbab yang diminta saja, siap tempel ke draf.
 
 ```
 [Sertakan PROMPT MASTER. WAJIB lampirkan juga BAB_III_Metode_Penelitian.md (draf final
-Bab III) karena Bab IV harus konsisten dengan rancangan arsitektur, tabel skenario S1–S4,
+Bab III) karena Bab IV harus konsisten dengan rancangan arsitektur, tabel skenario S1–S5,
 dan definisi variabel yang sudah ditetapkan di sana — JANGAN mengubah kode/nama skenario
 dari yang sudah ada di Bab III.]
 
@@ -648,17 +648,19 @@ konteks-aplikasi-eews-observabilitas.md). Tandai bagian tangkapan layar dashboar
 seismik ([SPESIFIKASI PERANGKAT]); prosedur eksekusi pengujian (skrip otomatis, jumlah
 trial, cara reset sistem) konsisten dengan Bagian 5 rancangan-isi-skripsi (3.5).
 
-4.6 HASIL PENGUJIAN PER SKENARIO — untuk S1–S4, gunakan struktur konsisten per skenario:
+4.6 HASIL PENGUJIAN PER SKENARIO — untuk S1–S5, gunakan struktur konsisten per skenario:
+  *(PENTING: Jelaskan secara eksplisit bahwa S1 bertujuan mencari strategi konkurensi terbaik (yaitu multiprocess), dan strategi pemenang ini kemudian wajib dinyatakan sebagai landasan konfigurasi untuk menjalankan S2 hingga S5).*
   1. Tujuan skenario (1 kalimat, mengulang Bab III).
   2. Prosedur pelaksanaan (ringkas, merujuk Bab III).
   3. Tabel/grafik hasil — WAJIB [DATA HASIL PENGUJIAN], bukan angka karangan.
   4. Pembahasan hasil — interpretasi dikaitkan teori Bab II (mis. overhead observabilitas
      dikaitkan dengan Faseeha dkk. 2025).
   Sub-subbab:
-    4.6.1 Hasil Pengujian S1 — Overhead Instrumentasi Prometheus
-    4.6.2 Hasil Pengujian S2 — Skalabilitas Multi-Container
-    4.6.3 Hasil Pengujian S3 — Perbandingan Implementasi WebSocket Server
-    4.6.4 Hasil Pengujian S4 — Observabilitas Kafka + NGINX Load Balancer
+    4.6.1 Hasil Pengujian S1 — Evaluasi Strategi Konkurensi Ingesti (Data Provider)
+    4.6.2 Hasil Pengujian S2 — Overhead Instrumentasi Prometheus
+    4.6.3 Hasil Pengujian S3 — Skalabilitas Multi-Container (P-Wave Detector & Archiver)
+    4.6.4 Hasil Pengujian S4 — Perbandingan Implementasi WebSocket Server
+    4.6.5 Hasil Pengujian S5 — Observabilitas Kafka + NGINX Load Balancer
 
 4.7 ANALISIS DAN PEMBAHASAN KESELURUHAN — sintesis lintas-skenario (pola umum, mis.
 trade-off overhead vs visibilitas performa); kaitkan hasil dengan rumusan masalah/tujuan
@@ -771,8 +773,8 @@ berikut sebelum menerima hasilnya:
       muncul di manapun (kecuali kalimat historis eksplisit yang sengaja diminta).
 - [ ] Semua sitasi yang muncul ada di rancangan-daftar-pustaka-eews-observabilitas.md
       Bagian 1 atau Bagian 4/4A, ATAU terbukti sudah dikutip di file bab final yang
-      dilampirkan (mis. Sugiyono 2022, Sommerville 2016, Brown 2022, Newman 2021,
-      Kitchenham & Charters 2007, Kendall & Kendall 2011) — tidak ada pustaka dari
+      dilampirkan (mis. Sommerville 2016, Brown 2022, Newman 2021,
+      Kendall & Kendall 2011) — tidak ada pustaka dari
       Bagian 2 atau Bagian 3 rancangan-daftar-pustaka, dan tidak ada pustaka karangan.
 - [ ] Tidak ada angka kuantitatif hasil pengujian yang "terlihat nyata" tanpa ditandai
       [DATA HASIL PENGUJIAN] atau [SPESIFIKASI PERANGKAT].
@@ -799,3 +801,12 @@ berikut sebelum menerima hasilnya:
 - [ ] **[Khusus BAB III]** Definisi teori (jenis penelitian eksperimental, prinsip P95,
       notasi C4/DFD) TIDAK dijelaskan ulang dari nol — hanya dirujuk balik singkat ke
       BAB_II_Tinjauan_Pustaka.md.
+
+## 4. Cheat Sheet Pemetaan Skenario (S1-S5) ke Skrip CSV
+
+Saat menulis narasi atau merujuk hasil pengujian di Bab IV, HARUS selalu mengacu pada pemetaan aktual ini:
+- **S1 (Strategi Konkurensi Data Provider):** Merujuk pada output skrip `run_s1_dataprovider.ps1`
+- **S2 (Overhead Prometheus):** Merujuk pada output skrip `run_s2_overhead.ps1`
+- **S3 (Skalabilitas P-Wave & Archiver):** Merujuk pada output skrip `run_s3_scalability_pwave.ps1` & `run_s3_scalability_archiver.ps1`
+- **S4 (WebSocket Express vs FastAPI):** Merujuk pada output skrip `run_s4_websocket.ps1`
+- **S5 (Load Balancer Kafka vs NGINX):** Merujuk pada output skrip `run_s5_loadbalancer.ps1`

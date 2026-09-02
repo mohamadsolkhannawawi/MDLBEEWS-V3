@@ -46,6 +46,7 @@ Ruang lingkup dalam merancang dan mengimplementasikan lapisan observabilitas ber
 5. Evaluasi performa difokuskan pada empat metrik utama, yaitu latensi komunikasi antar-layanan (ms), penggunaan CPU (%), penggunaan memori (MB), dan *data delay end-to-end* (s), yang seluruhnya diambil melalui Prometheus.
 6. Model *deep learning* untuk deteksi gelombang-P serta estimasi lokasi dan magnitudo menggunakan model yang sudah tersedia dan terlatih sebelumnya, sehingga penelitian ini tidak difokuskan pada pengembangan model baru.
 7. Penelitian ini tidak mencakup *deployment* ke infrastruktur *cloud* skala produksi maupun pengujian pada jaringan sensor seismik fisik sesungguhnya.
+8. Skenario pengujian yang dilakukan mencakup evaluasi sistem secara *end-to-end*, diawali dengan evaluasi strategi konkurensi ingesti (Data Provider) di hulu untuk menentukan mekanisme terbaik yang akan diadaptasi sebagai dasar konfigurasi (*baseline*) pada pengujian-pengujian selanjutnya. Alur pengujian kemudian dilanjutkan dengan evaluasi *overhead* pengukuran metrik, pengujian skalabilitas layanan (P-Wave Detector dan Data Archiver), perbandingan teknologi diseminasi WebSocket, hingga pengujian mekanisme *load balancing* pada *broker*, sehingga keseluruhan sistem tervalidasi secara komprehensif.
 
 ## 1.5 Sistematika Penulisan
 
@@ -53,7 +54,7 @@ Untuk memberikan gambaran mengenai pembahasan pada masing-masing bab dari lapora
 
 Bab ini menguraikan landasan penyusunan laporan penelitian dengan memaparkan latar belakang masalah, rumusan masalah, tujuan dan manfaat penelitian, ruang lingkup kajian, serta sistematika penulisan dari penelitian mengenai Perancangan dan Implementasi Observabilitas Berbasis Prometheus dan Grafana pada Arsitektur *Microservices Earthquake Early Warning System*, dengan fokus pada ketiadaan mekanisme pemantauan operasional yang terstruktur pada arsitektur tersebut serta usulan integrasi Prometheus dan Grafana sebagai lapisan observabilitas untuk mengatasinya.
 
-Bab ini menyajikan penelitian terdahulu yang ditinjau menggunakan pendekatan *Systematic Literature Review* (SLR), serta dasar teori yang mendukung penelitian, meliputi teori mengenai *Earthquake Early Warning System*, arsitektur *microservices*, Apache Kafka, WebSocket, observabilitas berbasis Prometheus dan Grafana, teknologi pendukung implementasi, notasi pemodelan sistem, desain penelitian eksperimental kuantitatif, serta metodologi pengujian perangkat lunak yang menjadi landasan perancangan sistem.
+Bab ini menyajikan penelitian terdahulu yang ditinjau melalui penelusuran literatur, serta dasar teori yang mendukung penelitian, meliputi teori mengenai *Earthquake Early Warning System*, arsitektur *microservices*, Apache Kafka, WebSocket, observabilitas berbasis Prometheus dan Grafana, teknologi pendukung implementasi, notasi pemodelan sistem, desain penelitian eksperimental kuantitatif, serta metodologi pengujian perangkat lunak yang menjadi landasan perancangan sistem.
 
 Bab ini membahas jenis dan pendekatan penelitian, tahap perancangan arsitektur sistem, implementasi sistem, hingga perancangan skenario pengujian. Bab ini menjelaskan bagaimana lapisan observabilitas Prometheus dan Grafana dirancang dan diintegrasikan ke dalam *pipeline* EEWS, serta metode yang digunakan untuk mengukur performanya.
 

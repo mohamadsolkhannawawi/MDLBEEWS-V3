@@ -213,9 +213,17 @@ Struktur sub-sub-bab berikut wajib ada (urut dari konsep umum ke spesifik, sesua
 - **Grafana**: platform visualisasi, integrasi datasource Prometheus, dashboard interaktif.
 - Pustaka `prometheus_client` (Python) dan padanan untuk Node.js sebagai mekanisme instrumentasi aplikasi.
 
-#### 2.2.7 Benchmarking Sistem Terdistribusi
-- Definisi benchmarking, metrik umum (latensi, throughput, resource usage).
-- Prinsip reproducibility dalam pengujian (jumlah trial, kontrol variabel, statistik deskriptif — mean, median, P95).
+#### 2.2.7 Framework dan Teknologi Pendukung Implementasi
+- Pembahasan mengenai teknologi spesifik yang dipakai, seperti TensorFlow, ObsPy, FastAPI, Express.js, Socket.IO, dan MongoDB.
+
+#### 2.2.8 Notasi Pemodelan Sistem (UML, Diagram Arsitektur, dan Diagram Alir)
+- Penjelasan mengenai UML (Use Case, Activity, Sequence Diagram), Flowchart, Diagram Arsitektur (C4 Model), dan Data Flow Diagram (DFD).
+
+#### 2.2.9 Desain Penelitian Eksperimental Kuantitatif
+- Penjelasan metode eksperimental dengan variabel bebas dan variabel terikat, serta kerangka studi komparatif dan beban uji.
+
+#### 2.2.10 Pengujian Perangkat Lunak dan Benchmarking Sistem Terdistribusi
+- Konsep benchmarking, metrik umum (latensi, throughput, resource usage), dan prinsip reproducibility dalam pengujian (termasuk persentil 95/P95).
 - Justifikasi metodologis kenapa P95 lebih relevan daripada rata-rata untuk sistem time-critical seperti EEWS.
 
 ---
@@ -277,10 +285,11 @@ Tabel skenario pengujian (kode, deskripsi, variasi parameter, variabel yang diuk
 
 | Kode | Skenario | Variasi Parameter | Variabel Diukur |
 |---|---|---|---|
-| S1 | Overhead Instrumentasi Prometheus | Sistem dengan vs tanpa `prometheus_client` aktif | Selisih CPU (%), memori (MB), latensi (ms) |
-| S2 | Skalabilitas Multi-Container | Variasi jumlah instance P-Wave Detector/Data Archiver | Data delay end-to-end (s), throughput, CPU/memori agregat |
-| S3 | Perbandingan Implementasi WebSocket Server | Varian A vs varian B pada beban klien bertingkat | Data delay (s), CPU (%), memori (MB), jumlah klien aktif |
-| S4 | Observabilitas Kafka + NGINX Load Balancer | Konfigurasi load balancing berbeda | Data delay (s), CPU (%), memori (MB) |
+| S1 | Evaluasi Strategi Konkurensi Ingesti (Data Provider) | Jenis strategi konkurensi (Sequential, MT, MP, MP_MT) | Waktu eksekusi, CPU/memori agregat |
+| S2 | Overhead Instrumentasi Prometheus | Sistem dengan vs tanpa `prometheus_client` aktif | Selisih CPU (%), memori (MB), latensi (ms) |
+| S3 | Skalabilitas Multi-Container | Variasi jumlah instance P-Wave Detector/Data Archiver | Data delay end-to-end (s), CPU/memori agregat |
+| S4 | Perbandingan Implementasi WebSocket Server | Express.js/Socket.IO vs FastAPI | Data delay (s), CPU (%), memori (MB), jumlah klien aktif |
+| S5 | Observabilitas Kafka + NGINX Load Balancer | Konfigurasi load balancing berbeda | Data delay (s), CPU (%), memori (MB) |
 
 - Jumlah trial per skenario dan alasan (stabilitas statistik).
 - Prosedur restart sistem antar-skenario untuk menjaga kondisi awal konsisten.
@@ -326,7 +335,8 @@ Untuk tiap modul penting, sajikan **potongan kode representatif** (bukan seluruh
 
 ### 4.6 Hasil Pengujian per Skenario
 
-Untuk **setiap skenario (S1–S4)**, gunakan struktur pemaparan yang konsisten:
+Untuk **setiap skenario (S1–S5)**, gunakan struktur pemaparan yang konsisten:
+*(Penting: Skenario S1 berfungsi mencari mekanisme konkurensi terbaik, dan mekanisme pemenang tersebut—yaitu multiprocess—wajib disebutkan sebagai landasan/konfigurasi dasar untuk menjalankan skenario S2 hingga S5).*
 
 1. **Tujuan skenario** (1 kalimat, mengulang dari Bab III).
 2. **Prosedur pelaksanaan** (ringkas, merujuk Bab III).
@@ -334,10 +344,11 @@ Untuk **setiap skenario (S1–S4)**, gunakan struktur pemaparan yang konsisten:
 4. **Pembahasan hasil** — interpretasi kenapa hasil seperti itu terjadi, dikaitkan dengan teori Bab II (mis. jika CPU naik signifikan saat instrumentasi aktif, kaitkan dengan konsep overhead observabilitas dari Faseeha dkk. atau sejenis).
 
 Sub-sub-bab yang disarankan:
-- 4.6.1 Hasil Pengujian S1 — Overhead Instrumentasi Prometheus
-- 4.6.2 Hasil Pengujian S2 — Skalabilitas Multi-Container
-- 4.6.3 Hasil Pengujian S3 — Perbandingan Implementasi WebSocket Server
-- 4.6.4 Hasil Pengujian S4 — Observabilitas Kafka + NGINX Load Balancer
+- 4.6.1 Hasil Pengujian S1 — Evaluasi Strategi Konkurensi Ingesti (Data Provider)
+- 4.6.2 Hasil Pengujian S2 — Overhead Instrumentasi Prometheus
+- 4.6.3 Hasil Pengujian S3 — Skalabilitas Multi-Container
+- 4.6.4 Hasil Pengujian S4 — Perbandingan Implementasi WebSocket Server
+- 4.6.5 Hasil Pengujian S5 — Observabilitas Kafka + NGINX Load Balancer
 
 ### 4.7 Analisis dan Pembahasan Keseluruhan
 - Sintesis lintas-skenario: pola umum apa yang muncul (mis. trade-off overhead vs visibilitas performa).
@@ -378,7 +389,7 @@ Kalimat pembuka bab: satu paragraf yang menyatakan bab ini memuat kesimpulan dar
 
 Agar AI penulis lain tidak "mengarang" angka, seluruh bagian berikut **wajib ditandai eksplisit** sebagai placeholder dalam draf sampai data eksperimen tersedia:
 
-- `[DATA HASIL PENGUJIAN]` — seluruh angka pada Bab IV Sub-bab 4.6 (tabel/grafik hasil S1–S4).
+- `[DATA HASIL PENGUJIAN]` — seluruh angka pada Bab IV Sub-bab 4.6 (tabel/grafik hasil S1–S5).
 - `[SPESIFIKASI PERANGKAT]` — spesifikasi mesin implementasi & pengujian pada Sub-bab 4.1 dan 4.5.
 - `[JUDUL FINAL]`, `[NAMA PEMBIMBING]`, `[TANGGAL SIDANG]` — metadata halaman judul/pengesahan sesuai template resmi.
 - `[VERSI PUSTAKA/ENVIRONMENT]` — hanya diisi setelah versi final ditentukan, sesuai catatan pada Bagian 0 poin 7.
