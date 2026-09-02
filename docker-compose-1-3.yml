@@ -133,6 +133,8 @@ services:
       context: .
       dockerfile: data_provider-multithread/Dockerfile
     tty: true
+    env_file:
+      - .env
     depends_on:
       - kafka1
     restart: always

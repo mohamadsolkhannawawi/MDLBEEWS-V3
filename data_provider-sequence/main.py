@@ -47,7 +47,10 @@ if __name__ == '__main__':
         bootstrap_servers=KAFKA_BROKERS_PWAVE
     )
 
-    logger.info("Launching main data provider loop...")
-    main(server='geofon.gfz-potsdam.de:18000', station_path='./data/stations.json', num_processes=30, num_station_configs=50)
+    num_processes = int(os.getenv("DATA_PROVIDER_NUM_PROCESSES", "30"))
+    num_stations = int(os.getenv("DATA_PROVIDER_NUM_STATIONS", "6000"))
+
+    logger.info(f"Launching main data provider loop with {num_processes} processes and {num_stations} stations...")
+    main(server='geofon.gfz-potsdam.de:18000', station_path='./data/stations.json', num_processes=num_processes, num_station_configs=num_stations)
 
 
