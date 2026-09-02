@@ -9,10 +9,10 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="Sequential"; File="docker-compose-1-1.yml"; OutStats="tests/results/s1_sequential_stats.csv" },
-    @{ Name="Multithreading"; File="docker-compose-1-2.yml"; OutStats="tests/results/s1_multithread_stats.csv" },
-    @{ Name="Multiprocessing"; File="docker-compose-1-3.yml"; OutStats="tests/results/s1_multiprocess_stats.csv" },
-    @{ Name="MP_MT"; File="docker-compose-1-4.yml"; OutStats="tests/results/s1_mp_mt_stats.csv" }
+    @{ Name="Sequential"; File="docker-compose-1-1.yml"; OutStats="tests/results/s1_sequential_stats.csv"; OutMetrics="tests/results/s1_sequential_metrics.csv" },
+    @{ Name="Multithreading"; File="docker-compose-1-2.yml"; OutStats="tests/results/s1_multithread_stats.csv"; OutMetrics="tests/results/s1_multithread_metrics.csv" },
+    @{ Name="Multiprocessing"; File="docker-compose-1-3.yml"; OutStats="tests/results/s1_multiprocess_stats.csv"; OutMetrics="tests/results/s1_multiprocess_metrics.csv" },
+    @{ Name="MP_MT"; File="docker-compose-1-4.yml"; OutStats="tests/results/s1_mp_mt_stats.csv"; OutMetrics="tests/results/s1_mp_mt_metrics.csv" }
 )
 
 foreach ($s in $Scenarios) {
@@ -26,10 +26,18 @@ foreach ($s in $Scenarios) {
     Write-Host "Waiting 60s for stabilization..."
     Start-Sleep -Seconds 60
     
-    Write-Host "Collecting Docker Stats for Data Provider..."
-    # Compose 1-x tidak memiliki Prometheus, jadi kita hanya mengumpulkan Docker Stats
+    Write-Host "Collecting Metrics and Docker Stats for Data Provider..."
+    $JobMetrics = Start-Job -ScriptBlock {
+        param($Exe, $Dur, $Out)
+        Set-Location $using:RootDir
+        & $Exe tests/collect_metrics.py --duration $Dur --output $Out
+    } -ArgumentList $PythonExecutable, $DurationSec, $($s.OutMetrics)
+
     & $PythonExecutable tests/collect_docker_stats.py --duration $DurationSec --output $($s.OutStats) --target-substring "data_provider"
 
+    Wait-Job $JobMetrics | Out-Null
+    Receive-Job $JobMetrics
+    Remove-Job $JobMetrics
     Write-Host "Tearing down $($s.Name)..."
 docker compose -f $($s.File) down -v --remove-orphans
 }
