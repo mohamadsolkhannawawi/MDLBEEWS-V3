@@ -1,7 +1,7 @@
 # ==============================================================================
 # SKENARIO    : S3 — Skalabilitas Worker Node (P-Wave Detector)
-# KONFIGURASI : FastAPI HTTP Load Balanced - 3 Container P-Wave Detector
-# PERINTAH    : docker compose -f docker-compose-s3-pwave-fastapi-3c.yml up -d --build
+# KONFIGURASI : FastAPI HTTP Load Balanced - 2 Container P-Wave Detector
+# PERINTAH    : docker compose -f docker-compose-s3-pwave-kafka-nginx-2c.yml up -d --build
 # ==============================================================================
 
 services:
@@ -163,7 +163,7 @@ services:
     ports:
       - "8004"
     deploy:
-      replicas: 3
+      replicas: 2
     tty: true
     depends_on:
       - kafka1

@@ -257,12 +257,12 @@ cd tests
 **Compose file yang digunakan:**
 - Data Archiver (1–5 container): `docker-compose-s3-archiver-1c.yml` hingga `docker-compose-s3-archiver-5c.yml`
 - P-Wave Detector Kafka native (2–5 container): `docker-compose-s3-pwave-kafka-2c.yml` hingga `docker-compose-s3-pwave-kafka-5c.yml`
-- P-Wave Detector FastAPI (2–5 container): `docker-compose-s3-pwave-fastapi-2c.yml` hingga `docker-compose-s3-pwave-fastapi-5c.yml`
+- P-Wave Detector Kafka-NGINX (2–5 container): `docker-compose-s3-pwave-kafka-nginx-2c.yml` hingga `docker-compose-s3-pwave-kafka-nginx-5c.yml`
 
 **Output yang dihasilkan:**
 - Data Archiver: `tests/results/s3_archiver_1_container_stats.csv` hingga `s3_archiver_5_container_stats.csv` (serta file metrics)
 - P-Wave Kafka: `tests/results/s3_pwave_kafka_2c_stats.csv` hingga `s3_pwave_kafka_5c_stats.csv` (serta file metrics)
-- P-Wave FastAPI: `tests/results/s3_pwave_fastapi_2c_stats.csv` hingga `s3_pwave_fastapi_5c_stats.csv` (serta file metrics)
+- P-Wave Kafka-NGINX: `tests/results/s3_pwave_kafka_nginx_2c_stats.csv` hingga `s3_pwave_kafka_nginx_5c_stats.csv` (serta file metrics)
 
 ### Cara Menjalankan S3 (Otomatis)
 
@@ -289,11 +289,11 @@ cd tests
 .\run_s3_scalability_pwave.ps1 -ScenarioName Kafka4c
 .\run_s3_scalability_pwave.ps1 -ScenarioName Kafka5c
 
-# P-Wave FastAPI (Pilih salah satu)
-.\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI2c
-.\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI3c
-.\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI4c
-.\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI5c
+# P-Wave Kafka-NGINX (Pilih salah satu)
+.\run_s3_scalability_pwave.ps1 -ScenarioName KafkaNginx2c
+.\run_s3_scalability_pwave.ps1 -ScenarioName KafkaNginx3c
+.\run_s3_scalability_pwave.ps1 -ScenarioName KafkaNginx4c
+.\run_s3_scalability_pwave.ps1 -ScenarioName KafkaNginx5c
 ```
 
 *(Untuk eksekusi manual per skenario, silakan merujuk ke Bagian 17 - Sub S3).*
@@ -321,8 +321,8 @@ cd tests
 # Jalankan salah satu dari parameter berikut sesuai kebutuhan:
 .\run_s4_websocket.ps1 -ScenarioName Express1c
 .\run_s4_websocket.ps1 -ScenarioName Express5c
-.\run_s4_websocket.ps1 -ScenarioName FastAPI1c
-.\run_s4_websocket.ps1 -ScenarioName FastAPI5c
+.\run_s4_websocket.ps1 -ScenarioName KafkaNginx1c
+.\run_s4_websocket.ps1 -ScenarioName KafkaNginx5c
 ```
 
 *(Untuk eksekusi manual per skenario, silakan merujuk ke Bagian 17 - Sub S4).*
@@ -420,12 +420,12 @@ Tandai setiap item setelah berhasil dikumpulkan.
 - [ ] `tests/results/s3_pwave_kafka_4c_stats.csv`
 - [ ] `tests/results/s3_pwave_kafka_5c_stats.csv`
 
-**S3 — Skalabilitas P-Wave Detector FastAPI (2–5 container):**
+**S3 — Skalabilitas P-Wave Detector Kafka-NGINX (2–5 container):**
 
-- [ ] `tests/results/s3_pwave_fastapi_2c_stats.csv`
-- [ ] `tests/results/s3_pwave_fastapi_3c_stats.csv`
-- [ ] `tests/results/s3_pwave_fastapi_4c_stats.csv`
-- [ ] `tests/results/s3_pwave_fastapi_5c_stats.csv`
+- [ ] `tests/results/s3_pwave_kafka_nginx_2c_stats.csv`
+- [ ] `tests/results/s3_pwave_kafka_nginx_3c_stats.csv`
+- [ ] `tests/results/s3_pwave_kafka_nginx_4c_stats.csv`
+- [ ] `tests/results/s3_pwave_kafka_nginx_5c_stats.csv`
 
 **S4 — WebSocket Express vs FastAPI:**
 
@@ -649,7 +649,7 @@ docker volume prune -f
 | S2 — Dengan Prometheus      | `docker-compose-s2-with_metrics.yml`  | `run_s2_overhead.ps1`          |
 | S3 — Archiver (1-5 C)       | `docker-compose-s3-archiver-1c.yml`  | `run_s3_scalability_archiver.ps1`|
 | S3 — P-Wave Kafka (2-5 C)   | `docker-compose-s3-pwave-kafka-2c.yml`  | `run_s3_scalability_pwave.ps1` |
-| S3 — P-Wave FastAPI (2-5 C) | `docker-compose-s3-pwave-fastapi-2c.yml` | `run_s3_scalability_pwave.ps1` |
+| S3 — P-Wave Kafka-NGINX (2-5 C) | `docker-compose-s3-pwave-kafka-nginx-2c.yml` | `run_s3_scalability_pwave.ps1` |
 | S4 — Express (1, 5 Client)  | `docker-compose-s4-express.yml`  | `run_s4_websocket.ps1`         |
 | S4 — FastAPI (1, 5 Client)  | `docker-compose-s4-fastapi.yml`  | `run_s4_websocket.ps1`         |
 | S5 — Kafka 3 Broker         | `docker-compose-s5-kafka.yml`  | `run_s5_loadbalancer.ps1`      |
@@ -742,12 +742,12 @@ Berikut adalah kumpulan perintah lengkap (*copy-paste*) untuk menghidupkan dan m
   .\run_s3_scalability_pwave.ps1 -ScenarioName Kafka4c
   .\run_s3_scalability_pwave.ps1 -ScenarioName Kafka5c
   ```
-* **FastAPI HTTP Load Balanced (2 hingga 5 Container)**
+* **Kafka-NGINX Load Balanced (2 hingga 5 Container)**
   ```powershell
-  .\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI2c
-  .\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI3c
-  .\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI4c
-  .\run_s3_scalability_pwave.ps1 -ScenarioName FastAPI5c
+  .\run_s3_scalability_pwave.ps1 -ScenarioName KafkaNginx2c
+  .\run_s3_scalability_pwave.ps1 -ScenarioName KafkaNginx3c
+  .\run_s3_scalability_pwave.ps1 -ScenarioName KafkaNginx4c
+  .\run_s3_scalability_pwave.ps1 -ScenarioName KafkaNginx5c
   ```
 
 ### S4. WebSocket Server (`run_s4_websocket.ps1`)
@@ -762,11 +762,11 @@ Berikut adalah kumpulan perintah lengkap (*copy-paste*) untuk menghidupkan dan m
   ```
 * **FastAPI WebSocket (1 Klien)**
   ```powershell
-  .\run_s4_websocket.ps1 -ScenarioName FastAPI1c
+  .\run_s4_websocket.ps1 -ScenarioName KafkaNginx1c
   ```
 * **FastAPI WebSocket (5 Klien)**
   ```powershell
-  .\run_s4_websocket.ps1 -ScenarioName FastAPI5c
+  .\run_s4_websocket.ps1 -ScenarioName KafkaNginx5c
   ```
 
 ### S5. Load Balancer Message Broker (`run_s5_loadbalancer.ps1`)
