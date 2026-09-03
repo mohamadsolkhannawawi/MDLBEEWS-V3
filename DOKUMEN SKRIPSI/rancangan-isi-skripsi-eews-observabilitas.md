@@ -336,7 +336,7 @@ Untuk tiap modul penting, sajikan **potongan kode representatif** (bukan seluruh
 ### 4.6 Hasil Pengujian per Skenario
 
 Untuk **setiap skenario (S1–S5)**, gunakan struktur pemaparan yang konsisten:
-*(Penting: Skenario S1 berfungsi mencari mekanisme konkurensi terbaik, dan mekanisme pemenang tersebut—yaitu multiprocess—wajib disebutkan sebagai landasan/konfigurasi dasar untuk menjalankan skenario S2 hingga S5).*
+*(Penting: Skenario S1 berfungsi mencari mekanisme konkurensi terbaik, dan mekanisme pemenang tersebut—yaitu multithread—wajib disebutkan sebagai landasan/konfigurasi dasar untuk menjalankan skenario S2 hingga S5).*
 
 1. **Tujuan skenario** (1 kalimat, mengulang dari Bab III).
 2. **Prosedur pelaksanaan** (ringkas, merujuk Bab III).

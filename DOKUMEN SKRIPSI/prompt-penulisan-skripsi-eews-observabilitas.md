@@ -649,7 +649,7 @@ seismik ([SPESIFIKASI PERANGKAT]); prosedur eksekusi pengujian (skrip otomatis, 
 trial, cara reset sistem) konsisten dengan Bagian 5 rancangan-isi-skripsi (3.5).
 
 4.6 HASIL PENGUJIAN PER SKENARIO — untuk S1–S5, gunakan struktur konsisten per skenario:
-  *(PENTING: Jelaskan secara eksplisit bahwa S1 bertujuan mencari strategi konkurensi terbaik (yaitu multiprocess), dan strategi pemenang ini kemudian wajib dinyatakan sebagai landasan konfigurasi untuk menjalankan S2 hingga S5).*
+  *(PENTING: Jelaskan secara eksplisit bahwa S1 bertujuan mencari strategi konkurensi terbaik (yaitu multithread), dan strategi pemenang ini kemudian wajib dinyatakan sebagai landasan konfigurasi untuk menjalankan S2 hingga S5).*
   1. Tujuan skenario (1 kalimat, mengulang Bab III).
   2. Prosedur pelaksanaan (ringkas, merujuk Bab III).
   3. Tabel/grafik hasil — WAJIB [DATA HASIL PENGUJIAN], bukan angka karangan.

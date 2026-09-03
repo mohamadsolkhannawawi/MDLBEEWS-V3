@@ -43,7 +43,7 @@ if (ENABLE_METRICS) {
   wsBroadcastLatency = new promClient.Histogram({
     name: 'ws_broadcast_latency_seconds',
     help: 'Latency of broadcasting a message to all clients',
-    buckets: [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5]
+    buckets: [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 30.0, 60.0]
   });
 }
 

@@ -102,10 +102,23 @@ if __name__ == '__main__':
         bootstrap_servers=KAFKA_BROKERS_PWAVE
     )
 
-    num_processes = int(os.getenv("DATA_PROVIDER_NUM_PROCESSES", "30"))
-    num_stations = int(os.getenv("DATA_PROVIDER_NUM_STATIONS", "6000"))
+    raw_num_proc = os.getenv("DATA_PROVIDER_NUM_PROCESSES")
+    if raw_num_proc is not None:
+        num_processes = int(raw_num_proc)
+        logger.info(f"DATA_PROVIDER_NUM_PROCESSES loaded from ENV: {num_processes}")
+    else:
+        num_processes = 32
+        logger.info(f"DATA_PROVIDER_NUM_PROCESSES not set in ENV, using fallback default: {num_processes}")
 
-    mode = os.getenv("DATA_PROVIDER_MODE", "multiprocess")
+    raw_num_stat = os.getenv("DATA_PROVIDER_NUM_STATIONS")
+    if raw_num_stat is not None:
+        num_stations = int(raw_num_stat)
+        logger.info(f"DATA_PROVIDER_NUM_STATIONS loaded from ENV: {num_stations}")
+    else:
+        num_stations = 6000
+        logger.info(f"DATA_PROVIDER_NUM_STATIONS not set in ENV, using fallback default: {num_stations}")
+
+    mode = os.getenv("DATA_PROVIDER_MODE", "multithread")
     logger.info(f"Launching in mode: {mode} with {num_processes} processes and {num_stations} stations")
     
     if mode == "multiprocess":

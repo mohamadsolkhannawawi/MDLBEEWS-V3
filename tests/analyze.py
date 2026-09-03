@@ -1,4 +1,4 @@
-﻿import argparse
+import argparse
 import csv
 import math
 import os
@@ -35,6 +35,28 @@ def calc_stats(values):
     valid_values = [v for v in values if v is not None]
     if not valid_values:
         return {'mean': 'N/A', 'p95': 'N/A', 'max': 'N/A'}
+    
+    mean_val = statistics.mean(valid_values)
+    max_val = max(valid_values)
+    
+    ordered = sorted(valid_values)
+    idx = int(0.95 * len(ordered))
+    p95_val = ordered[idx] if idx < len(ordered) else ordered[-1]
+    
+    return {
+        'mean': round(mean_val, 2),
+        'p95': round(p95_val, 2),
+        'max': round(max_val, 2)
+    }
+
+def calc_latency_stats(values):
+    if not values:
+        return {'mean': 'N/A', 'p95': 'N/A', 'max': 'N/A'}
+    valid_values = [v for v in values if v is not None]
+    if not valid_values:
+        return {'mean': 'N/A', 'p95': 'N/A', 'max': 'N/A'}
+    
+    valid_values = [v * 1000 for v in valid_values]
     
     mean_val = statistics.mean(valid_values)
     max_val = max(valid_values)
@@ -136,7 +158,7 @@ def analyze_s3():
             if not metrics or not stats:
                 table_data_b.append([mode[0], f"{i}c", "N/A (MISSING)", "N/A", "N/A"])
                 continue
-            lat = calc_stats(metrics.get("e2e_delay_pwave_p95", []))
+            lat = calc_latency_stats(metrics.get("e2e_delay_pwave_p95", []))
             cpu = calc_stats(stats.get("aggregate_cpu_percent", []))
             mem = calc_stats(stats.get("aggregate_mem_mb", []))
             table_data_b.append([mode[0], f"{i}c", lat['p95'], cpu['mean'], mem['mean']])
@@ -153,7 +175,10 @@ def analyze_s4():
                 table_data.append([mode[0], f"{c} Klien", "N/A (MISSING)", "N/A", "N/A"])
                 continue
             
-            lat = calc_stats(metrics.get("e2e_delay_locmag_p95", metrics.get("e2e_delay_pwave_p95", [])))
+            if "fastapi" in mode[1]:
+                lat = calc_latency_stats(metrics.get("fastapi_ws_broadcast_latency_p95", []))
+            else:
+                lat = calc_latency_stats(metrics.get("ws_broadcast_latency_p95", []))
             cpu = calc_stats(stats.get("aggregate_cpu_percent", []))
             mem = calc_stats(stats.get("aggregate_mem_mb", []))
             table_data.append([mode[0], f"{c} Klien", lat['p95'], cpu['mean'], mem['mean']])
@@ -169,7 +194,7 @@ def analyze_s5():
             table_data.append([mode[0], "N/A", "N/A", "N/A", "N/A"])
             continue
             
-        lat = calc_stats(metrics.get("e2e_delay_pwave_p95", []))
+        lat = calc_latency_stats(metrics.get("e2e_delay_pwave_p95", []))
         cpu = calc_stats(stats.get("aggregate_cpu_percent", []))
         mem = calc_stats(stats.get("aggregate_mem_mb", []))
         table_data.append([mode[0], lat['mean'], lat['p95'], cpu['mean'], mem['mean']])

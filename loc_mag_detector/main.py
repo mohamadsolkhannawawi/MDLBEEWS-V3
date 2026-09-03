@@ -46,12 +46,12 @@ if ENABLE_METRICS:
     LOCMAG_INFERENCE_LATENCY = Histogram(
         'locmag_inference_latency_seconds',
         'Latency of location-magnitude model inference',
-        buckets=[0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
+        buckets=[0.01, 0.05, 0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0, 120.0]
     )
     LOCMAG_E2E_LATENCY = Histogram(
         'locmag_end_to_end_latency_seconds',
         'End-to-end latency from data provider to loc-mag estimation',
-        buckets=[0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
+        buckets=[0.01, 0.05, 0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0, 120.0]
     )
 else:
     LOCMAG_ESTIMATIONS = None

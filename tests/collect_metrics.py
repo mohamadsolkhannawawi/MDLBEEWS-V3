@@ -15,6 +15,8 @@ QUERIES = {
     "locmag_inference_latency_p95": 'histogram_quantile(0.95, rate(locmag_inference_latency_seconds_bucket[1m]))',
     "e2e_delay_pwave_p95": 'histogram_quantile(0.95, rate(pwave_end_to_end_latency_seconds_bucket[1m]))',
     "e2e_delay_locmag_p95": 'histogram_quantile(0.95, rate(locmag_end_to_end_latency_seconds_bucket[1m]))',
+    "ws_broadcast_latency_p95": 'histogram_quantile(0.95, rate(ws_broadcast_latency_seconds_bucket[1m]))',
+    "fastapi_ws_broadcast_latency_p95": 'histogram_quantile(0.95, rate(fastapi_ws_broadcast_latency_seconds_bucket[1m]))',
     "active_ws_clients_express": 'ws_active_clients',
     "active_ws_clients_fastapi": 'fastapi_ws_active_clients',
     "dp_throughput_traces_per_sec": 'sum(rate(data_provider_traces_sent_total[1m]))'
