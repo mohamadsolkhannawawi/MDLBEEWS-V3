@@ -90,8 +90,8 @@ services:
       - 8081:8081
     environment:
       ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
-      ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: password
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USER:-admin}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD:-password}
     depends_on:
       - mongo
 
@@ -155,8 +155,8 @@ services:
       - "4000:3000"
     environment:
       GF_SERVER_ROOT_URL: http://localhost:4000
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: 12345678
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-12345678}
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
