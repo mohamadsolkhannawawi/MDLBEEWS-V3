@@ -261,3 +261,13 @@ ginx/nginx.conf telah diverifikasi. Blok upstream dan proxy_pass sudah terkonfig
   3. **Observabilitas**: Modul load_balancer mengimplementasikan metrik historgram lb_forward_latency_seconds yang sangat krusial untuk membedah perbedaan latensi rute langsung versus rute melalui NGINX.
 - **Kesimpulan**: Modul load_balancer & 
 ginx **Valid (Telah Ditambal/Diperbaiki)**. Dengan perbaikan rute ini, pengujian Skenario 3 Anda (Native Kafka vs Nginx) kini sah secara arsitektural dan ilmiah.
+
+### Modul: p_wave_detector & p_wave_detector_load_balance (Algoritma Deteksi Deep Learning)
+- **Lokasi Folder**: e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\p_wave_detector & p_wave_detector_load_balance
+- **Tumpukan Teknologi (Tech Stack)**: Python, TensorFlow/Keras (Model H5), ObsPy (Seismology), FastAPI (HTTP), Kafka-Python.
+- **Hasil Verifikasi Fungsi**:
+  1. **Dualisme Mode Skenario 3**: Kedua modul merepresentasikan dua aliran komputasi yang valid. Modul p_wave_detector bertindak murni sebagai konsumen Kafka (mengandalkan penyeimbang beban bawaan Kafka *Consumer Group*). Modul p_wave_detector_load_balance dibungkus dengan FastAPI sehingga bisa diumpan via HTTP dari NGINX. Ini adalah desain eksperimen Skenario 3 yang sangat jenius.
+  2. **Manajemen Memori**: Pada mode *load_balance*, Anda dengan cerdas menggunakan LRUCache(maxsize=6000) dari pustaka cachetools untuk menghindari kebocoran memori (OOM) saat menyimpan gelombang seismik terakhir.
+  3. **Pengukuran Waktu (*Latency Profiling*)**: Kedua modul melampirkan *Histogram* latensi pwave_inference_latency_seconds ke Prometheus yang membungkus pemanggilan model TensorFlow. Ini krusial untuk bab pembahasan skripsi Anda.
+  4. **Standar 12-Factor App**: Memanggil nama broker, topik Kafka, dan pengaturan metrik langsung dari pusat konfigurasi (config/settings.py).
+- **Kesimpulan**: Kedua varian modul detektor ini **100% Valid**. Keduanya sanggup diuji coba baik untuk komputasi terdistribusi via Kafka maupun via Web Server (NGINX).
