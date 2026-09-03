@@ -169,6 +169,8 @@ services:
     deploy:
       replicas: 4
     tty: true
+    env_file:
+      - .env
     depends_on:
       - kafka1
     restart: always
@@ -180,6 +182,8 @@ services:
     deploy:
       replicas: 1
     tty: true
+    env_file:
+      - .env
     depends_on:
       - kafka1
     restart: always
@@ -191,6 +195,8 @@ services:
     deploy:
       replicas: 1
     tty: true
+    env_file:
+      - .env
     depends_on:
       - kafka1
     restart: always
@@ -258,6 +264,8 @@ services:
     volumes:
       - ./data_archiver/data_archive:/mnt/data
     tty: true
+    env_file:
+      - .env
     depends_on:
       - kafka1
       - influxdb
@@ -273,6 +281,8 @@ services:
     ports:
       - "3333:3333"
     tty: true
+    env_file:
+      - .env
     depends_on:
       - kafka1
     restart: always
