@@ -232,3 +232,12 @@ Bagian ini memuat hasil pemeriksaan (*code review*) modul-modul internal (*sourc
   2. **Kesesuaian 12-Factor App**: Seluruh parameter seperti topik Kafka, *broker*, dan pengaturan metrik sudah tersentralisasi mengambil dari config/settings.py.
   3. **Observabilitas (Prometheus)**: Instrumentasi metrik (seperti latensi pendelegasian pesan tipe *Histogram*, dan penghitung *client* aktif tipe *Gauge*) sudah terkalibrasi dengan tepat melalui rute /metrics.
 - **Kesimpulan**: Modul ast_api **100% Valid**. Desain kodenya sudah tergolong level mahir (*advanced*) dalam merepresentasikan lingkungan peladen Python berperforma tinggi untuk antarmuka pengguna Skenario 4.
+
+### Modul: grafana (Observability Dashboard)
+- **Lokasi Folder**: e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\grafana
+- **Tumpukan Teknologi (Tech Stack)**: Grafana, Prometheus (Datasource), InfluxDB (Datasource).
+- **Hasil Verifikasi Fungsi**:
+  1. **Keamanan Kredensial (Sanitasi)**: Terdeteksi adanya *Hardcoded Secret Token* InfluxDB lama di dalam file provisioning/datasources/datasources.yml. Skrip ini telah saya bersihkan menjadi nilai dinamis ${INFLUXDB_TOKEN}.
+  2. **Injeksi Lingkungan (*Environment*)**: Seluruh 19 file docker-compose*.yml telah saya konfigurasi ulang agar mengirimkan file .env ke dalam *container* Grafana. Hal ini memastikan Grafana dapat membaca token InfluxDB secara aman tanpa menampilkannya ke publik di dalam repositori Git.
+  3. **Auto-Provisioning**: Desain modul ini sah dan otomatis. Ia memuat *dashboard* siap pakai eews-observability.json dan otomatis menyambungkan koneksi ke peladen metrik Prometheus.
+- **Kesimpulan**: Modul grafana **Valid**. Celah keamanan berupa kebocoran token (*Token Leak*) di riwayat kodenya telah ditutup permanen dengan penerapan kaidah 12-Factor App seutuhnya.

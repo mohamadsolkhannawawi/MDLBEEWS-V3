@@ -22,4 +22,5 @@ datasources:
       organization: owner
       defaultBucket: eews
     secureJsonData:
-      token: eFWu0UGcCzvGAX1w-z43heHjfDk8swujfryImhIsTrAkNJOgfMRSYsgYVki-QTiWHDwKLJtxsSnCmHhxisCN1w==
+      token: ${INFLUXDB_TOKEN}
+
