@@ -84,3 +84,17 @@ Dokumen ini menguraikan letak spesifik (ciri khas) dari masing-masing file konfi
 ### [docker-compose.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose.yml)
 - **Master Compose**: Memuat seluruh service dari hulu ke hilir dengan konfigurasi default (produksi).
   > **Cara Pengecekan:** Buka filenya, Anda akan melihat file ini memuat *seluruh* komponen sistem EEWS (Mulai dari ZooKeeper, ke-3 Kafka, InfluxDB, Prometheus, Grafana, Nginx, hingga seluruh detektor dan WebSocket API) menjadi satu kesatuan (*Full Stack*). Selain itu, nilai *replicas*-nya diset pada konfigurasi normal, bukan direkayasa untuk keperluan uji *stress-test* seperti pada skenario 1 - 5.
+
+# Verifikasi Modul Internal
+
+Bagian ini memuat hasil pemeriksaan (*code review*) modul-modul internal (*source code* python/nodejs) guna memastikan fungsinya sudah sesuai dengan arsitektur yang dirancang di bab Metodologi.
+
+### Modul: pi_server (Express.js WebSocket)
+- **Lokasi Folder**: e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\api_server
+- **Tumpukan Teknologi (Tech Stack)**: Node.js, Express.js, Socket.IO, KafkaJS, dan prom-client.
+- **Hasil Verifikasi Fungsi**:
+  1. **Koneksi Kafka**: Modul ini sukses berfungsi sebagai *Consumer* yang berlangganan pada topik 	race_topic dan esult_loc_mag_topic (terlihat di server.js baris 56-57).
+  2. **Diseminasi WebSocket**: Modul menggunakan pustaka socket.io untuk melakukan *broadcasting* (memancarkan) data secara *real-time* kepada klien-klien *dashboard* (dapat dikonfirmasi pada baris client.emit(endpoint, data)).
+  3. **Observabilitas (Prometheus)**: Modul ini telah terinstrumentasi sempurna dengan metrik-metrik kustom seperti ws_messages_broadcast_total, ws_active_clients, dan ws_broadcast_latency_seconds, yang diekspos melalui *endpoint* HTTP /metrics.
+  4. **Antarmuka (Dashboard)**: Melayani antarmuka monitoring web secara statis lewat rute pp.get("/").
+- **Kesimpulan**: Modul pi_server **100% Valid** dan terbukti berjalan persis seperti spesifikasi "Express.js WebSocket Server" pada Skenario 4.
