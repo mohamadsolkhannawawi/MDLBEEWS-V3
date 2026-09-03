@@ -105,7 +105,20 @@ if __name__ == '__main__':
     num_processes = int(os.getenv("DATA_PROVIDER_NUM_PROCESSES", "30"))
     num_stations = int(os.getenv("DATA_PROVIDER_NUM_STATIONS", "6000"))
 
-    logger.info(f"Launching multi_process with {num_processes} processes and {num_stations} stations")
-    from multi_process import main
-    main(server='geofon.gfz-potsdam.de:18000', station_path='./data/stations.json', num_processes=num_processes, num_station_configs=num_stations)
-
+    mode = os.getenv("DATA_PROVIDER_MODE", "multiprocess")
+    logger.info(f"Launching in mode: {mode} with {num_processes} processes and {num_stations} stations")
+    
+    if mode == "multiprocess":
+        from multi_process import main
+        main(server='geofon.gfz-potsdam.de:18000', station_path='./data/stations.json', num_processes=num_processes, num_station_configs=num_stations)
+    elif mode == "multithread":
+        from multi_thread import main
+        main(server='geofon.gfz-potsdam.de:18000', station_path='./data/stations.json', num_processes=num_processes, num_station_configs=num_stations)
+    elif mode == "sequence":
+        from sequence import main
+        main(server='geofon.gfz-potsdam.de:18000', station_path='./data/stations.json', num_processes=num_processes, num_station_configs=num_stations)
+    elif mode == "mp_mt":
+        from multi_process_thread import main
+        main(server='geofon.gfz-potsdam.de:18000', station_path='./data/stations.json', num_processes=num_processes, num_station_configs=num_stations)
+    else:
+        logger.error(f"Unknown DATA_PROVIDER_MODE: {mode}")

@@ -150,8 +150,10 @@ services:
     container_name: data_provider
     build:
       context: .
-      dockerfile: data_provider-multithread/Dockerfile
+      dockerfile: data_provider/Dockerfile
     tty: true
+    environment:
+      DATA_PROVIDER_MODE: "multithread"
     depends_on:
       - kafka1
     restart: always

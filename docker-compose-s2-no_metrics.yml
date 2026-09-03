@@ -224,3 +224,4 @@ services:
     depends_on:
       - kafka1
     restart: always
+

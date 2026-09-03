@@ -150,8 +150,10 @@ services:
     container_name: data_provider
     build:
       context: .
-      dockerfile: data_provider-multiprocess/Dockerfile
+      dockerfile: data_provider/Dockerfile
     tty: true
+    environment:
+      DATA_PROVIDER_MODE: "multiprocess"
     depends_on:
       - kafka1
     restart: always

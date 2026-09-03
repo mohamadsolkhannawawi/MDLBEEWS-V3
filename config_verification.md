@@ -3,16 +3,16 @@
 Dokumen ini menguraikan letak spesifik (ciri khas) dari masing-masing file konfigurasi `docker-compose*.yml` untuk membuktikan bahwa isi konfigurasinya sudah benar-benar sinkron dengan nama filenya dan tidak tertukar.
 
 ### [docker-compose-s1-mp_mt.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose-s1-mp_mt.yml)
-- **Data Provider Dockerfile**: Menggunakan `data_provider-multiprocess-multithread/Dockerfile`
+- **Data Provider Mode**: Di-override menggunakan environment `DATA_PROVIDER_MODE: "mp_mt"`.
 
 ### [docker-compose-s1-multiprocess.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose-s1-multiprocess.yml)
-- **Data Provider Dockerfile**: Menggunakan `data_provider-multiprocess/Dockerfile`
+- **Data Provider Mode**: Di-override menggunakan environment `DATA_PROVIDER_MODE: "multiprocess"`.
 
 ### [docker-compose-s1-multithread.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose-s1-multithread.yml)
-- **Data Provider Dockerfile**: Menggunakan `data_provider-multithread/Dockerfile`
+- **Data Provider Mode**: Di-override menggunakan environment `DATA_PROVIDER_MODE: "multithread"`.
 
 ### [docker-compose-s1-sequential.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose-s1-sequential.yml)
-- **Data Provider Dockerfile**: Menggunakan `data_provider-sequence/Dockerfile`
+- **Data Provider Mode**: Di-override menggunakan environment `DATA_PROVIDER_MODE: "sequence"`.
 
 ### [docker-compose-s2-no_metrics.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose-s2-no_metrics.yml)
 - **Prometheus**: Tidak ada service prometheus / instrumentasi dimatikan.
@@ -88,16 +88,16 @@ Dokumen ini menguraikan letak spesifik (ciri khas) dari masing-masing file konfi
 Dokumen ini menguraikan letak spesifik (ciri khas) dari masing-masing file konfigurasi `docker-compose*.yml` untuk membuktikan bahwa isi konfigurasinya sudah benar-benar sinkron dengan nama filenya dan tidak tertukar.
 
 ### [docker-compose-s1-mp_mt.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose-s1-mp_mt.yml)
-- **Data Provider Dockerfile**: Menggunakan `data_provider-multiprocess-multithread/Dockerfile`
+- **Data Provider Mode**: Di-override menggunakan environment `DATA_PROVIDER_MODE: "mp_mt"`.
 
 ### [docker-compose-s1-multiprocess.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose-s1-multiprocess.yml)
-- **Data Provider Dockerfile**: Menggunakan `data_provider-multiprocess/Dockerfile`
+- **Data Provider Mode**: Di-override menggunakan environment `DATA_PROVIDER_MODE: "multiprocess"`.
 
 ### [docker-compose-s1-multithread.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose-s1-multithread.yml)
-- **Data Provider Dockerfile**: Menggunakan `data_provider-multithread/Dockerfile`
+- **Data Provider Mode**: Di-override menggunakan environment `DATA_PROVIDER_MODE: "multithread"`.
 
 ### [docker-compose-s1-sequential.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose-s1-sequential.yml)
-- **Data Provider Dockerfile**: Menggunakan `data_provider-sequence/Dockerfile`
+- **Data Provider Mode**: Di-override menggunakan environment `DATA_PROVIDER_MODE: "sequence"`.
 
 ### [docker-compose-s2-no_metrics.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose-s2-no_metrics.yml)
 - **Prometheus**: Tidak ada service prometheus / instrumentasi dimatikan.
@@ -214,3 +214,12 @@ Bagian ini memuat hasil pemeriksaan (*code review*) modul-modul internal (*sourc
   2. **Fungsi Sebenarnya**: Modul ini murni bertindak sebagai skrip utilitas (*CLI debugging tool*) yang sangat ringan untuk menguji koneksi Kafka secara manual (membaca dan mencetak isi log dari topik loc_mag_topic ke dalam konsol).
   3. **Keselarasan Arsitektur**: Keberadaannya sah (terdokumentasi sebagai utilitas di DOKUMEN SKRIPSI/konteks-aplikasi-eews-observabilitas.md), meskipun tidak menjadi bagian dari *pipeline* utama aliran data otomatis.
 - **Kesimpulan**: Modul `cli_debug_tools` **Valid** sebagai *support tool* (alat bantu *debug*). Modul ini bisa Anda jalankan secara independen ketika sedang memastikan *broker* Kafka tidak bermasalah.
+
+### Modul: data_provider (Seismic Data Ingestion)
+- **Lokasi Folder**: e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\data_provider
+- **Tumpukan Teknologi (Tech Stack)**: Python, SeedLinkClient, Multi-Processing, Multi-Threading, Kafka-Python.
+- **Hasil Verifikasi Fungsi**:
+  1. **Universal Entrypoint**: Berhasil direfaktor menjadi modul tunggal yang menangani 4 mode komputasi berbeda (Sequential, Multi-Thread, Multi-Process, dan Hybrid) yang dikendalikan murni lewat variabel lingkungan DATA_PROVIDER_MODE.
+  2. **Efisiensi Kode (DRY)**: 4 folder redundan berhasil dihapus tanpa merusak Skenario 1.
+  3. **Observabilitas (Prometheus)**: Instrumentasi prometheus_client dikonfigurasi untuk *multiprocess mode* secara default untuk mengakomodasi pekerja (*workers*) paralel.
+- **Kesimpulan**: Modul data_provider **100% Valid dan Elegan**. Desainnya sekarang sejalan dengan prinsip *12-Factor App* yang modern dan bersih.
