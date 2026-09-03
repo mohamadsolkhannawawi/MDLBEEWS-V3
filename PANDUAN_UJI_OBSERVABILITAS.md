@@ -18,6 +18,7 @@ Dokumen ini adalah panduan langkah-demi-langkah untuk melaksanakan seluruh pengu
 10. [Menjalankan Semua Skenario Sekaligus](#10-menjalankan-semua-skenario-sekaligus)
 11. [Checklist Output yang Harus Dikumpulkan](#11-checklist-output-yang-harus-dikumpulkan)
 12. [Troubleshooting](#12-troubleshooting)
+13. [Analisis Hasil Pengujian (Otomatis)](#13-analisis-hasil-pengujian-otomatis)
 
 ---
 
@@ -779,3 +780,33 @@ Berikut adalah kumpulan perintah lengkap (*copy-paste*) untuk menghidupkan dan m
   ```powershell
   .\run_s5_loadbalancer.ps1 -ScenarioName NGINX
   ```
+
+---
+
+## 13. Analisis Hasil Pengujian (Otomatis)
+
+Setelah Anda selesai menjalankan semua skenario dan file `.csv` terkumpul di dalam folder `tests/results/`, Anda dapat mengolah seluruh data tersebut secara instan menggunakan Skrip Analis Terpusat.
+
+### Perintah Penggunaan
+
+Buka terminal di root folder `MDLBEEWS` dan jalankan:
+
+```powershell
+# Untuk menganalisis Skenario 1 (Konkurensi)
+python tests/analyze.py --scenario 1
+
+# Untuk menganalisis Skenario 2 (Overhead)
+python tests/analyze.py --scenario 2
+
+# Untuk menganalisis Skenario 3 (Load Balancer)
+python tests/analyze.py --scenario 3
+
+# Untuk menganalisis Skenario 4 (WebSocket)
+python tests/analyze.py --scenario 4
+
+# Untuk memproses dan menampilkan SEMUA skenario sekaligus
+python tests/analyze.py --scenario all
+```
+
+**Output**:
+Skrip akan mencetak tabel format Markdown yang berisi rangkuman Rata-rata (*Mean*), Nilai Maksimal (*Max*), dan P95 untuk Konsumsi CPU, RAM, dan Latensi (*Delay*). Tabel ini sudah diformat sedemikian rupa sehingga **langsung siap disalin (copy-paste)** ke dalam Dokumen Skripsi Bab 4 Anda.
