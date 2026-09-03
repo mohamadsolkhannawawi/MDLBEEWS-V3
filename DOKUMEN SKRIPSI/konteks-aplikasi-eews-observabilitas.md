@@ -162,7 +162,7 @@ project-root/
 ├── docker-compose-2-x.yml              # skenario Kafka vs Kafka+NGINX load balancer
 ├── docker-compose-3-x.yml              # skenario jumlah container Archiver/P-Wave Detector
 ├── docker-compose-4-x.yml              # skenario Express.js vs FastAPI WebSocket
-├── data_consumer/                      # utilitas debug/consume Kafka
+├── cli_debug_tools/                      # utilitas debug/consume Kafka
 ├── data_provider_generator/            # generator data sintetis untuk uji beban
 ├── *.ps1                               # skrip pengumpulan metrik manual (sementara, sebelum ada Prometheus)
 └── README.md / README_ID.md
