@@ -1,9 +1,9 @@
 Arsitektur,Replika,E2E P-Wave P95 (ms),CPU Mean (%),RAM Mean (MB)
-Native Kafka,2c,4.67,191.09,4767.34
-Native Kafka,3c,0.87,87.06,2243.87
-Native Kafka,4c,0.72,86.44,2340.53
-Native Kafka,5c,0.56,117.97,2668.78
-Kafka+NGINX,2c,10.0,350.5,3326.96
-Kafka+NGINX,3c,10.0,457.96,4247.02
-Kafka+NGINX,4c,10.0,518.42,5351.91
-Kafka+NGINX,5c,10.0,581.91,6199.24
+Native Kafka,2c,10.0,340.32,7920.44
+Native Kafka,3c,10.0,408.2,9194.68
+Native Kafka,4c,10.0,478.8,10288.69
+Native Kafka,5c,10.0,478.39,9604.6
+Kafka+NGINX,2c,10.0,316.4,3175.65
+Kafka+NGINX,3c,10.0,412.71,4112.14
+Kafka+NGINX,4c,10.0,487.33,4812.41
+Kafka+NGINX,5c,9.02,511.6,6221.14
