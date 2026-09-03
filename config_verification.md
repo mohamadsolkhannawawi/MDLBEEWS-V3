@@ -223,3 +223,12 @@ Bagian ini memuat hasil pemeriksaan (*code review*) modul-modul internal (*sourc
   2. **Efisiensi Kode (DRY)**: 4 folder redundan berhasil dihapus tanpa merusak Skenario 1.
   3. **Observabilitas (Prometheus)**: Instrumentasi prometheus_client dikonfigurasi untuk *multiprocess mode* secara default untuk mengakomodasi pekerja (*workers*) paralel.
 - **Kesimpulan**: Modul data_provider **100% Valid dan Elegan**. Desainnya sekarang sejalan dengan prinsip *12-Factor App* yang modern dan bersih.
+
+### Modul: ast_api (WebSocket Dashboard Backend)
+- **Lokasi Folder**: e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\fast_api
+- **Tumpukan Teknologi (Tech Stack)**: Python, FastAPI, Uvicorn, WebSockets, Kafka-Python, asyncio.
+- **Hasil Verifikasi Fungsi**:
+  1. **Konkurensi Asynchronous**: Modul ini sukses memanfaatkan *Thread* paralel (consume_trace, consume_loc_mag) untuk menarik pesan Kafka, lalu mengalirkannya secara *real-time* ke *client* UI melalui blok *asyncio.run_coroutine_threadsafe*. Desain ini krusial untuk Skenario 4 (menguji performa peladen *Native* Python *Websocket* vs Express.js Node.js).
+  2. **Kesesuaian 12-Factor App**: Seluruh parameter seperti topik Kafka, *broker*, dan pengaturan metrik sudah tersentralisasi mengambil dari config/settings.py.
+  3. **Observabilitas (Prometheus)**: Instrumentasi metrik (seperti latensi pendelegasian pesan tipe *Histogram*, dan penghitung *client* aktif tipe *Gauge*) sudah terkalibrasi dengan tepat melalui rute /metrics.
+- **Kesimpulan**: Modul ast_api **100% Valid**. Desain kodenya sudah tergolong level mahir (*advanced*) dalam merepresentasikan lingkungan peladen Python berperforma tinggi untuk antarmuka pengguna Skenario 4.
