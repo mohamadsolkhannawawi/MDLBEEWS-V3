@@ -1,66 +1,397 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>WebSocket Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EEWS Dashboard | FastAPI Server</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #020617;
+            --panel-bg: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.05);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #10b981; /* Emerald green for FastAPI to differentiate */
+            --accent-glow: rgba(16, 185, 129, 0.2);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top right, #022c22, var(--bg-color)); /* Subtle emerald tint */
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Header & Status */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header h1 span {
+            color: var(--accent);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--panel-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            border: 1px solid var(--border);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--danger);
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            animation: pulse-danger 2s infinite;
+        }
+
+        .connected .pulse {
+            background: var(--success);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+            animation: pulse-success 2s infinite;
+        }
+
+        @keyframes pulse-success {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes pulse-danger {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        @media (min-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Glassmorphism Panel */
+        .panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow: hidden;
+            max-height: 600px;
+        }
+
+        .panel h2 {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .count-badge {
+            background: var(--accent-glow);
+            color: var(--accent);
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .table-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            z-index: 10;
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            font-variant-numeric: tabular-nums;
+        }
+
+        tr {
+            transition: background-color 0.2s;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .highlight {
+            animation: highlight-row 1s ease-out;
+        }
+
+        @keyframes highlight-row {
+            0% { background-color: var(--accent-glow); }
+            100% { background-color: transparent; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .delay-good { color: var(--success); }
+        .delay-warn { color: var(--warning); }
+        .delay-bad { color: var(--danger); }
+    </style>
 </head>
 <body>
-    <h1>WebSocket Client</h1>
-    <table id="dataTable">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <!-- Add more headers for your data fields -->
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Table rows will be dynamically added here -->
-        </tbody>
-      </table>
+    <div class="header">
+        <h1>EEWS <span>FastAPI Dashboard</span></h1>
+        <div id="statusBadge" class="status-badge">
+            <div class="pulse"></div>
+            <span id="statusText">Connecting...</span>
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- Trace Panel -->
+        <div class="panel">
+            <h2>P-Wave Trace Data <span class="count-badge" id="traceCount">0 msg</span></h2>
+            <div class="table-container">
+                <table id="traceTable">
+                    <thead>
+                        <tr>
+                            <th>Station</th>
+                            <th>Network</th>
+                            <th>Trigger Time</th>
+                            <th>Network Delay</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" class="empty-state">Waiting for trace events...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Loc-Mag Panel -->
+        <div class="panel">
+            <h2>Location & Magnitude <span class="count-badge" id="locMagCount">0 msg</span></h2>
+            <div class="table-container">
+                <table id="locMagTable">
+                    <thead>
+                        <tr>
+                            <th>Station</th>
+                            <th>Lat, Long</th>
+                            <th>Depth</th>
+                            <th>Magnitude</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" class="empty-state">Waiting for prediction events...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <script>
-        const ws = new WebSocket('ws://10.66.21.146:3334/ws');
-        // const messagesDiv = document.getElementById('messages');
-        const dataTable = document.getElementById('dataTable').querySelector('tbody');
-        const messageElement = document.createElement('p');
-        const row = document.createElement('tr');
-        const idCell = document.createElement('td');
-        const nameCell = document.createElement('td');
+        const statusBadge = document.getElementById('statusBadge');
+        const statusText = document.getElementById('statusText');
+        
+        const traceTable = document.getElementById('traceTable').querySelector('tbody');
+        const locMagTable = document.getElementById('locMagTable').querySelector('tbody');
+        
+        const traceCountEl = document.getElementById('traceCount');
+        const locMagCountEl = document.getElementById('locMagCount');
 
-        ws.onopen = () => {
-            console.log('Connected to WebSocket server');
-        };
+        let traceCount = 0;
+        let locMagCount = 0;
+        const MAX_ROWS = 15;
 
-        ws.onmessage = (event) => {
-            // messageElement.textContent = event.data;
-            // messagesDiv.innerHTML = '';
-            // messagesDiv.appendChild(messageElement);
-            dataTable.innerHTML = '';
-            const data = JSON.parse(event.data)['waves-data'];
-            data['delay_time'] = (new Date().getTime() - data['api_time']) / 1000;
-            Object.keys(data).forEach((key) => {
-                const value = data[key];
+        // Native WebSocket Connection Logic
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//${window.location.host}/ws`;
+        
+        let ws;
+        let reconnectInterval = 2000;
 
-                const row = document.createElement('tr');
-                const idCell = document.createElement('td');
-                const nameCell = document.createElement('td');
+        function connectWebSocket() {
+            ws = new WebSocket(wsUrl);
 
-                idCell.textContent = key.toString();
-                nameCell.textContent = value.toString();
+            ws.onopen = () => {
+                statusBadge.classList.add('connected');
+                statusText.textContent = 'Live (Native WS)';
+            };
 
-                row.appendChild(idCell);
-                row.appendChild(nameCell);
+            ws.onclose = () => {
+                statusBadge.classList.remove('connected');
+                statusText.textContent = 'Disconnected...';
+                // Attempt to reconnect
+                setTimeout(connectWebSocket, reconnectInterval);
+            };
 
-                dataTable.appendChild(row);
-            });
-        };
+            ws.onerror = (error) => {
+                console.error('WebSocket Error: ', error);
+                ws.close();
+            };
 
-        ws.onclose = () => {
-            console.log('Disconnected from WebSocket server');
-        };
+            ws.onmessage = (event) => {
+                try {
+                    const payload = JSON.parse(event.data);
+                    
+                    if (payload['waves-data']) {
+                        handleWavesData(payload['waves-data']);
+                    } else if (payload['loc-mag-data']) {
+                        handleLocMagData(payload['loc-mag-data']);
+                    }
+                } catch (e) {
+                    console.error("Error parsing message", e);
+                }
+            };
+        }
 
-        ws.onerror = (error) => {
-            console.log('WebSocket error:', error);
-        };
+        // Helper function to format delay
+        function formatDelay(apiTime) {
+            if (!apiTime) return { text: '-', class: '' };
+            const delayMs = new Date().getTime() - apiTime;
+            let className = 'delay-good';
+            if (delayMs > 500) className = 'delay-warn';
+            if (delayMs > 2000) className = 'delay-bad';
+            return { text: `${delayMs} ms`, class: className };
+        }
+
+        // Helper function to append row with rolling window
+        function appendRow(tableBody, htmlString) {
+            // Remove empty state if exists
+            if (tableBody.querySelector('.empty-state')) {
+                tableBody.innerHTML = '';
+            }
+            
+            const tr = document.createElement('tr');
+            tr.className = 'highlight';
+            tr.innerHTML = htmlString;
+            
+            tableBody.prepend(tr);
+            
+            // Limit rows to save memory
+            if (tableBody.children.length > MAX_ROWS) {
+                tableBody.removeChild(tableBody.lastChild);
+            }
+        }
+
+        // Event Handlers
+        function handleWavesData(data) {
+            traceCount++;
+            traceCountEl.textContent = `${traceCount} msg`;
+
+            const delay = formatDelay(data.api_time);
+            const triggerTime = data.timestamp ? new Date(data.timestamp * 1000).toLocaleTimeString() : new Date().toLocaleTimeString();
+            
+            const rowHtml = `
+                <td><strong>${data.station || '-'}</strong></td>
+                <td>${data.network || '-'}</td>
+                <td>${triggerTime}</td>
+                <td class="${delay.class}">${delay.text}</td>
+            `;
+            appendRow(traceTable, rowHtml);
+        }
+
+        function handleLocMagData(data) {
+            locMagCount++;
+            locMagCountEl.textContent = `${locMagCount} msg`;
+
+            let latLong = '-';
+            let depth = '-';
+            let mag = '-';
+            
+            if (data.predictions_loc_mag && data.predictions_loc_mag.length >= 4) {
+                const preds = data.predictions_loc_mag;
+                latLong = `${preds[0].toFixed(3)}, ${preds[1].toFixed(3)}`;
+                depth = `${preds[2].toFixed(1)} km`;
+                mag = `M ${preds[3].toFixed(1)}`;
+            }
+
+            const rowHtml = `
+                <td><strong>${data.station || '-'}</strong></td>
+                <td>${latLong}</td>
+                <td>${depth}</td>
+                <td style="color: var(--warning); font-weight: bold;">${mag}</td>
+            `;
+            appendRow(locMagTable, rowHtml);
+        }
+
+        // Initial Connection
+        connectWebSocket();
     </script>
 </body>
 </html>
