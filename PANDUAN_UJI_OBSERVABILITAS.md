@@ -819,21 +819,28 @@ Skrip akan mencetak tabel format Markdown yang berisi rangkuman Rata-rata (*Mean
 `seismic_app` adalah aplikasi GUI Desktop berbasis PyQt5 & PyQtGraph dengan tema futuristik (*qdarktheme*) yang bertugas memvisualisasikan sinyal gelombang gempa (*waveform*) secara *real-time* serta menampilkan spanduk **🚨 PERINGATAN GEMPA** saat AI memprediksi gempa.
 
 ### Prasyarat
-1. Server Backend WebSocket (`api_server` Node.js atau `fast_api` Python) dalam keadaan berjalan pada `http://localhost:3333`.
+1. Stack infrastruktur EEWS (Kafka, Data Provider, AI Detector, dan WebSocket Server/`api_server` pada port `3333`) harus sudah menyala menggunakan Docker Compose.
 2. Dependensi GUI terpasang di lingkungan Python lokal.
 
 ### Langkah Menjalankan
 
-Buka terminal PowerShell baru dan jalankan:
+#### Langkah 1: Jalankan Infrastruktur Backend (Docker Compose)
+Buka terminal PowerShell dan jalankan stack backend (contoh untuk Skenario WebSocket Express):
+```powershell
+docker compose -f docker-compose-s4-express.yml up -d
+```
+*(Atau jalankan file `docker-compose.yml` utama / skrip pengujian skenario yang Anda inginkan).*
 
+#### Langkah 2: Jalankan Aplikasi Dasbor Desktop (`seismic_app`)
+Buka terminal PowerShell **baru** dan jalankan:
 ```powershell
 # 1. Masuk ke folder seismic_app
 cd seismic_app
 
-# 2. Pasang dependensi GUI
+# 2. Pasang dependensi GUI (cukup sekali saja)
 pip install -r requirements.txt
 
-# 3. Jalankan aplikasi
+# 3. Jalankan aplikasi Dasbor Desktop
 python main.py
 ```
 
