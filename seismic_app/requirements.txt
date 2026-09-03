@@ -1,6 +1,6 @@
-PyQt5
-pyqtgraph
-numpy
-obspy
-python-socketio[client]
-qdarktheme
+PyQt5==5.15.9
+pyqtgraph==0.13.3
+numpy==1.24.3
+obspy==1.4.0
+python-socketio[client]==5.10.0
+pyqtdarktheme==2.1.0
