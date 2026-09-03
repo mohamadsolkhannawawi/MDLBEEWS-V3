@@ -19,6 +19,7 @@ Dokumen ini adalah panduan langkah-demi-langkah untuk melaksanakan seluruh pengu
 11. [Checklist Output yang Harus Dikumpulkan](#11-checklist-output-yang-harus-dikumpulkan)
 12. [Troubleshooting](#12-troubleshooting)
 13. [Analisis Hasil Pengujian (Otomatis)](#13-analisis-hasil-pengujian-otomatis)
+14. [Menjalankan Aplikasi Dasbor Desktop Seismik (seismic_app)](#14-menjalankan-aplikasi-dasbor-desktop-seismik-seismic_app)
 
 ---
 
@@ -810,3 +811,32 @@ python tests/analyze.py --scenario all
 
 **Output**:
 Skrip akan mencetak tabel format Markdown yang berisi rangkuman Rata-rata (*Mean*), Nilai Maksimal (*Max*), dan P95 untuk Konsumsi CPU, RAM, dan Latensi (*Delay*). Tabel ini sudah diformat sedemikian rupa sehingga **langsung siap disalin (copy-paste)** ke dalam Dokumen Skripsi Bab 4 Anda.
+
+---
+
+## 14. Menjalankan Aplikasi Dasbor Desktop Seismik (`seismic_app`)
+
+`seismic_app` adalah aplikasi GUI Desktop berbasis PyQt5 & PyQtGraph dengan tema futuristik (*qdarktheme*) yang bertugas memvisualisasikan sinyal gelombang gempa (*waveform*) secara *real-time* serta menampilkan spanduk **🚨 PERINGATAN GEMPA** saat AI memprediksi gempa.
+
+### Prasyarat
+1. Server Backend WebSocket (`api_server` Node.js atau `fast_api` Python) dalam keadaan berjalan pada `http://localhost:3333`.
+2. Dependensi GUI terpasang di lingkungan Python lokal.
+
+### Langkah Menjalankan
+
+Buka terminal PowerShell baru dan jalankan:
+
+```powershell
+# 1. Masuk ke folder seismic_app
+cd seismic_app
+
+# 2. Pasang dependensi GUI
+pip install -r requirements.txt
+
+# 3. Jalankan aplikasi
+python main.py
+```
+
+### Fitur Utama Dasbor
+- **Visualisasi Waveform 20Hz**: Plotting grafik sinyal gempa *real-time* berkecepatan tinggi dengan skema warna *cyan/dark mode*.
+- **Sistem Peringatan Bencana (EEWS Alert)**: Spanduk status atas akan berubah dari `🟢 STATUS: AMAN` menjadi `🚨 PERINGATAN GEMPA` berwarna merah terang secara otomatis jika Magnitudo > 3.0 terdeteksi.
