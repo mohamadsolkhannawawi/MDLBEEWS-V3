@@ -154,6 +154,8 @@ services:
       context: .
       dockerfile: data_provider/Dockerfile
     tty: true
+    env_file:
+      - .env
     environment:
       DATA_PROVIDER_MODE: "sequence"
     depends_on:
