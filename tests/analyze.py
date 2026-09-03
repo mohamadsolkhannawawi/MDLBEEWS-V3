@@ -49,11 +49,13 @@ def calc_stats(values):
         'max': round(max_val, 2)
     }
 
-def print_table(headers, data_rows):
+def save_and_print_table(title, headers, data_rows, csv_filename):
+    print(f"=== {title} ===")
     if not data_rows:
         print("Data tidak tersedia.\n")
         return
 
+    # 1. Print formatted markdown-like table to console
     col_widths = [max(len(str(item)) for item in col) for col in zip(*([headers] + data_rows))]
     format_row = " | ".join(["{:<" + str(width) + "}" for width in col_widths])
     
@@ -63,8 +65,16 @@ def print_table(headers, data_rows):
         print(format_row.format(*row))
     print("\n")
 
+    # 2. Save summary to CSV file
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+    csv_path = os.path.join(RESULTS_DIR, csv_filename)
+    with open(csv_path, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(headers)
+        writer.writerows(data_rows)
+    print(f"[SAVED] Summary tersimpan di: {csv_path}\n")
+
 def analyze_s1():
-    print("=== ANALISIS SKENARIO 1 (Konkurensi Data Provider) ===")
     scenarios = ["s1_sequential", "s1_multithread", "s1_multiprocess", "s1_mp_mt"]
     headers = ["Arsitektur", "Throughput (Trace/s)", "CPU Mean (%)", "CPU Max (%)", "RAM Mean (MB)"]
     table_data = []
@@ -83,10 +93,10 @@ def analyze_s1():
         tp = calc_stats(metrics.get("dp_throughput_traces_per_sec", [])) if metrics else {'mean': 'N/A'}
         
         table_data.append([mode_name, tp['mean'], cpu['mean'], cpu['max'], mem['mean']])
-    print_table(headers, table_data)
+    
+    save_and_print_table("ANALISIS SKENARIO 1 (Konkurensi Data Provider)", headers, table_data, "summary_s1_concurrency.csv")
 
 def analyze_s2():
-    print("=== ANALISIS SKENARIO 2 (Overhead Observabilitas) ===")
     scenarios = [("Tanpa Metrics", "s2_overhead_no_metrics"), ("Dengan Metrics", "s2_overhead_with_metrics")]
     headers = ["Kondisi", "CPU Mean (%)", "CPU P95 (%)", "RAM Mean (MB)", "RAM Max (MB)"]
     table_data = []
@@ -99,41 +109,40 @@ def analyze_s2():
         cpu = calc_stats(stats.get("aggregate_cpu_percent", []))
         mem = calc_stats(stats.get("aggregate_mem_mb", []))
         table_data.append([label, cpu['mean'], cpu['p95'], mem['mean'], mem['max']])
-    print_table(headers, table_data)
+    
+    save_and_print_table("ANALISIS SKENARIO 2 (Overhead Observabilitas)", headers, table_data, "summary_s2_overhead.csv")
 
 def analyze_s3():
-    print("=== ANALISIS SKENARIO 3 (Skalabilitas Container) ===")
-    print("A. Data Archiver")
-    headers = ["Replika", "CPU Mean (%)", "CPU Max (%)", "RAM Mean (MB)"]
-    table_data = []
+    # Part A: Archiver
+    headers_a = ["Replika", "CPU Mean (%)", "CPU Max (%)", "RAM Mean (MB)"]
+    table_data_a = []
     for i in range(1, 6):
         stats = read_csv(os.path.join(RESULTS_DIR, f"s3_archiver_{i}_container_stats.csv"))
         if stats:
             cpu = calc_stats(stats.get("aggregate_cpu_percent", []))
             mem = calc_stats(stats.get("aggregate_mem_mb", []))
-            table_data.append([f"{i} Container", cpu['mean'], cpu['max'], mem['mean']])
+            table_data_a.append([f"{i} Container", cpu['mean'], cpu['max'], mem['mean']])
         else:
-            table_data.append([f"{i} Container", "N/A", "N/A", "N/A"])
-    print_table(headers, table_data)
+            table_data_a.append([f"{i} Container", "N/A", "N/A", "N/A"])
+    save_and_print_table("ANALISIS SKENARIO 3A (Skalabilitas Data Archiver)", headers_a, table_data_a, "summary_s3a_archiver.csv")
 
-    print("B. P-Wave Detector (Native Kafka vs Kafka+NGINX)")
-    headers2 = ["Arsitektur", "Replika", "E2E P-Wave P95 (ms)", "CPU Mean (%)", "RAM Mean (MB)"]
-    table_data2 = []
+    # Part B: P-Wave Detector
+    headers_b = ["Arsitektur", "Replika", "E2E P-Wave P95 (ms)", "CPU Mean (%)", "RAM Mean (MB)"]
+    table_data_b = []
     for mode in [("Native Kafka", "s3_pwave_kafka"), ("Kafka+NGINX", "s3_pwave_kafka_nginx")]:
         for i in range(2, 6):
             metrics = read_csv(os.path.join(RESULTS_DIR, f"{mode[1]}_{i}c_metrics.csv"))
             stats = read_csv(os.path.join(RESULTS_DIR, f"{mode[1]}_{i}c_stats.csv"))
             if not metrics or not stats:
-                table_data2.append([mode[0], f"{i}c", "N/A (MISSING)", "N/A", "N/A"])
+                table_data_b.append([mode[0], f"{i}c", "N/A (MISSING)", "N/A", "N/A"])
                 continue
             lat = calc_stats(metrics.get("e2e_delay_pwave_p95", []))
             cpu = calc_stats(stats.get("aggregate_cpu_percent", []))
             mem = calc_stats(stats.get("aggregate_mem_mb", []))
-            table_data2.append([mode[0], f"{i}c", lat['p95'], cpu['mean'], mem['mean']])
-    print_table(headers2, table_data2)
+            table_data_b.append([mode[0], f"{i}c", lat['p95'], cpu['mean'], mem['mean']])
+    save_and_print_table("ANALISIS SKENARIO 3B (Skalabilitas P-Wave Detector)", headers_b, table_data_b, "summary_s3b_pwave.csv")
 
 def analyze_s4():
-    print("=== ANALISIS SKENARIO 4 (WebSocket Server) ===")
     headers = ["Server", "Klien Aktif", "Broadcast P95 (ms)", "CPU Mean (%)", "RAM Mean (MB)"]
     table_data = []
     for mode in [("FastAPI", "s4_websocket_fastapi"), ("Express.js", "s4_websocket_express")]:
@@ -148,10 +157,9 @@ def analyze_s4():
             cpu = calc_stats(stats.get("aggregate_cpu_percent", []))
             mem = calc_stats(stats.get("aggregate_mem_mb", []))
             table_data.append([mode[0], f"{c} Klien", lat['p95'], cpu['mean'], mem['mean']])
-    print_table(headers, table_data)
+    save_and_print_table("ANALISIS SKENARIO 4 (WebSocket Server)", headers, table_data, "summary_s4_websocket.csv")
 
 def analyze_s5():
-    print("=== ANALISIS SKENARIO 5 (Message Broker Load Balancer) ===")
     headers = ["Broker", "E2E P-Wave Mean (ms)", "E2E P-Wave P95 (ms)", "CPU Mean (%)", "RAM Mean (MB)"]
     table_data = []
     for mode in [("Kafka Native", "s5_broker_kafka"), ("Kafka + NGINX", "s5_broker_nginx")]:
@@ -165,7 +173,7 @@ def analyze_s5():
         cpu = calc_stats(stats.get("aggregate_cpu_percent", []))
         mem = calc_stats(stats.get("aggregate_mem_mb", []))
         table_data.append([mode[0], lat['mean'], lat['p95'], cpu['mean'], mem['mean']])
-    print_table(headers, table_data)
+    save_and_print_table("ANALISIS SKENARIO 5 (Message Broker Load Balancer)", headers, table_data, "summary_s5_broker.csv")
 
 def analyze_all():
     analyze_s1()
@@ -173,7 +181,7 @@ def analyze_all():
     analyze_s3()
     analyze_s4()
     analyze_s5()
-    print("Semua skenario berhasil dianalisis!")
+    print("Semua skenario berhasil dianalisis dan disimpan ke CSV!")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="EEWS Test Result Analyzer")
