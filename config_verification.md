@@ -205,3 +205,12 @@ Bagian ini memuat hasil pemeriksaan (*code review*) modul-modul internal (*sourc
   3. **Toleransi Kesalahan (*Fault Tolerance*)**: Menggunakan fitur *retry logic* saat inisialisasi koneksi MongoDB (baris init_mongodb(max_retries=5)).
   4. **Observabilitas (Prometheus)**: Termonitor dengan cermat menggunakan metrik tipe Counter (rchiver_records_saved_total, rchiver_save_errors_total) dan Histogram (rchiver_write_latency_seconds) untuk melacak waktu latensi penyimpanan IOPS ke masing-masing *database*.
 - **Kesimpulan**: Modul data_archiver **100% Valid**. Desain pipa datanya (*data pipeline*) membuktikan kapabilitas sistem dalam menangani aliran data yang sangat masif (*high throughput*) khas pengolahan sinyal kegempaan (Skenario 3 Skalabilitas).
+
+### Modul: data_consumer (Debug Utility)
+- **Lokasi Folder**: e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\data_consumer
+- **Tumpukan Teknologi (Tech Stack)**: Python, Kafka-Python.
+- **Hasil Verifikasi Fungsi**:
+  1. **Status Penggunaan**: Berdasarkan penyisiran di seluruh file *docker-compose*, modul ini **tidak di-deploy secara aktif** dalam skenario pengujian mana pun (S1 hingga S5) maupun di dalam *Master Compose*.
+  2. **Fungsi Sebenarnya**: Modul ini murni bertindak sebagai skrip utilitas (*CLI debugging tool*) yang sangat ringan untuk menguji koneksi Kafka secara manual (membaca dan mencetak isi log dari topik loc_mag_topic ke dalam konsol).
+  3. **Keselarasan Arsitektur**: Keberadaannya sah (terdokumentasi sebagai utilitas di DOKUMEN SKRIPSI/konteks-aplikasi-eews-observabilitas.md), meskipun tidak menjadi bagian dari *pipeline* utama aliran data otomatis.
+- **Kesimpulan**: Modul data_consumer **Valid** sebagai *support tool* (alat bantu *debug*). Modul ini bisa Anda jalankan secara independen ketika sedang memastikan *broker* Kafka tidak bermasalah.
