@@ -192,3 +192,16 @@ Bagian ini memuat hasil pemeriksaan (*code review*) modul-modul internal (*sourc
   2. **Standardisasi Nama Topik**: Penamaan topik Kafka (seperti 	race_topic, p_wave_topic, loc_mag_topic) ditetapkan secara konstan agar tidak ada deviasi nama (*typo*) antar *microservice* yang memanggilnya.
   3. **Konfigurasi Metrik Observabilitas**: Variabel ENABLE_METRICS memastikan fitur instrumentasi Prometheus dapat dimatikan sepenuhnya secara global dari satu tempat, sesuai dengan kebutuhan Skenario 2 (Uji Overhead).
 - **Kesimpulan**: Modul config **100% Valid**. Desain ini mengonfirmasi penerapan *Best Practice* arsitektur mikroservis 12-Factor App (konfigurasi dipisahkan dari kode).
+
+### Modul: data_archiver (Seismic Data Storage Sink)
+- **Lokasi Folder**: e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\data_archiver
+- **Tumpukan Teknologi (Tech Stack)**: Python, Kafka-Python, PyMongo, InfluxDB-Client, ObsPy (untuk pengolahan format seismik MiniSEED).
+- **Hasil Verifikasi Fungsi**:
+  1. **Koneksi Kafka**: Modul ini sukses berfungsi sebagai *Consumer* yang berlangganan pada 	race_topic (mengambil gelombang seismik mentah).
+  2. ***Polyglot Persistence* (Penyimpanan Multipangkalan Data)**: Modul mem-parsing data yang ditarik dari Kafka dan menyimpannya sekaligus ke tiga wadah penyimpanan berbeda:
+     - **InfluxDB** (lewat save_data_to_influxdb) sebagai Time-Series Database untuk divisualisasikan oleh Grafana.
+     - **MongoDB** (lewat save_data_to_mongodb) pada koleksi 	imeseries_collection sebagai data arsip *schema-less*.
+     - **Sistem Berkas Lokal / Disk** (lewat save_data_to_mseed) dalam format standar internasional seismologi, yaitu **MiniSEED** (.mseed).
+  3. **Toleransi Kesalahan (*Fault Tolerance*)**: Menggunakan fitur *retry logic* saat inisialisasi koneksi MongoDB (baris init_mongodb(max_retries=5)).
+  4. **Observabilitas (Prometheus)**: Termonitor dengan cermat menggunakan metrik tipe Counter (rchiver_records_saved_total, rchiver_save_errors_total) dan Histogram (rchiver_write_latency_seconds) untuk melacak waktu latensi penyimpanan IOPS ke masing-masing *database*.
+- **Kesimpulan**: Modul data_archiver **100% Valid**. Desain pipa datanya (*data pipeline*) membuktikan kapabilitas sistem dalam menangani aliran data yang sangat masif (*high throughput*) khas pengolahan sinyal kegempaan (Skenario 3 Skalabilitas).
