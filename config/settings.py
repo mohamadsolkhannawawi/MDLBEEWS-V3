@@ -32,10 +32,7 @@ METRICS_PORT_FASTAPI = int(os.getenv("METRICS_PORT_FASTAPI", "8108"))
 # InfluxDB Configuration
 # ==============================================================================
 INFLUXDB_URL = os.getenv("INFLUXDB_URL", "http://influxdb:8086")
-INFLUXDB_TOKEN = os.getenv(
-    "INFLUXDB_TOKEN",
-    "eFWu0UGcCzvGAX1w-z43heHjfDk8swujfryImhIsTrAkNJOgfMRSYsgYVki-QTiWHDwKLJtxsSnCmHhxisCN1w=="
-)
+INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN")
 INFLUXDB_ORG = os.getenv("INFLUXDB_ORG", "owner")
 INFLUXDB_BUCKET_TRACE = os.getenv("INFLUXDB_BUCKET_TRACE", os.getenv("INFLUXDB_BUCKET", "eews"))
 INFLUXDB_BUCKET_RESULT = os.getenv("INFLUXDB_BUCKET_RESULT", os.getenv("INFLUXDB_BUCKET", "eews"))
