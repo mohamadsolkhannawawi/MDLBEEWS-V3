@@ -20,6 +20,7 @@ Dokumen ini adalah panduan langkah-demi-langkah untuk melaksanakan seluruh pengu
 12. [Troubleshooting](#12-troubleshooting)
 13. [Analisis Hasil Pengujian (Otomatis)](#13-analisis-hasil-pengujian-otomatis)
 14. [Menjalankan Aplikasi Dasbor Desktop Seismik (seismic_app)](#14-menjalankan-aplikasi-dasbor-desktop-seismik-seismic_app)
+15. [Verifikasi dan Pengecekan Environment Variables Container](#15-verifikasi-dan-pengecekan-environment-variables-container)
 
 ---
 
@@ -847,3 +848,46 @@ python main.py
 ### Fitur Utama Dasbor
 - **Visualisasi Waveform 20Hz**: Plotting grafik sinyal gempa *real-time* berkecepatan tinggi dengan skema warna *cyan/dark mode*.
 - **Sistem Peringatan Bencana (EEWS Alert)**: Spanduk status atas akan berubah dari `🟢 STATUS: AMAN` menjadi `🚨 PERINGATAN GEMPA` berwarna merah terang secara otomatis jika Magnitudo > 3.0 terdeteksi.
+
+---
+
+## 15. Verifikasi dan Pengecekan Environment Variables Container
+
+Seluruh *microservice* pada sistem EEWS menerapkan prinsip **12-Factor App**, di mana konfigurasi sistem diinjeksikan secara terpusat melalui file `.env` menggunakan deklarasi `env_file: - .env` pada seluruh berkas `docker-compose-s*.yml`.
+
+Untuk memverifikasi bahwa container benar-benar membaca nilai dari `.env` dan tidak menggunakan *fallback default*, gunakan perintah-perintah verifikasi berikut di PowerShell:
+
+### A. Verifikasi Pembacaan `.env` pada Data Provider
+```powershell
+# 1. Cek konfigurasi gabungan Docker Compose sebelum container dinyalakan
+docker compose config | Select-String "DATA_PROVIDER"
+
+# 2. Cek variabel lingkungan aktif di dalam container hidup
+docker exec data_provider env | Select-String "DATA_PROVIDER"
+
+# 3. Cek log startup aplikasi (memastikan "loaded from ENV" tercetak)
+docker compose logs data_provider | Select-String "DATA_PROVIDER_NUM"
+```
+
+*Ekspektasi Output Log*:
+```text
+data_provider  | INFO | DataProvider | DATA_PROVIDER_NUM_PROCESSES loaded from ENV: 32
+data_provider  | INFO | DataProvider | DATA_PROVIDER_NUM_STATIONS loaded from ENV: 6000
+```
+
+### B. Verifikasi Environment Variable pada Service Lainnya
+
+```powershell
+# Cek variabel Kafka & Observabilitas pada P-Wave Detector
+docker exec p_wave_detector env | Select-String -Pattern "KAFKA","METRICS"
+
+# Cek variabel database InfluxDB & Mongo pada Data Archiver
+docker exec eews-data_archiver-1 env | Select-String -Pattern "INFLUX","MONGO"
+
+# Cek port observabilitas pada FastAPI WebSocket Server
+docker exec fast_api env | Select-String -Pattern "FASTAPI","METRICS"
+
+# Cek status aktifnya instrumentasi metrik di seluruh container
+docker compose exec data_provider env | Select-String "ENABLE_METRICS"
+```
+
