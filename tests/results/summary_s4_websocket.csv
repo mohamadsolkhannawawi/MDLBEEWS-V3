@@ -1,0 +1,5 @@
+Server,Klien Aktif,Broadcast P95 (ms),CPU Mean (%),RAM Mean (MB)
+FastAPI,1 Klien,0.62,3.43,38.8
+FastAPI,5 Klien,4.38,9.72,39.82
+Express.js,1 Klien,3.88,5.06,38.86
+Express.js,5 Klien,0.8,5.9,38.79
