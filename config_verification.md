@@ -280,3 +280,12 @@ ginx **Valid (Telah Ditambal/Diperbaiki)**. Dengan perbaikan rute ini, pengujian
   2. **Pembersihan Berkas Sampah**: Ditemukan file model AI yang salah tempat, yaitu model_p_wave.h5 di dalam folder ini. Model ini ukurannya mencapai 6.4 MB dan sama sekali tidak digunakan oleh main.py di modul ini (sebagai sampah bawaan *copy-paste*). Saya telah **menghapusnya** dari repositori agar Docker Image Anda kelak tidak kelebihan beban kompilasi.
   3. **Pemantauan Latensi Cerdas**: Adanya metrik LOCMAG_E2E_LATENCY sangat berguna karena menghitung selisih *Timestamp* awal (data_provider_time) dengan *Timestamp* saat prediksi (*End-to-End*).
 - **Kesimpulan**: Modul loc_mag_detector **Valid dan Bersih**. Algoritma multi-*threading*-nya sanggup menangani ledakan deteksi P-Wave dari ratusan stasiun secara simultan.
+
+### Modul: pi_server & seismic_app (Antarmuka Pengguna & Dasbor)
+- **Lokasi Folder**: e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\api_server & seismic_app
+- **Tumpukan Teknologi (Tech Stack)**: Node.js, Express.js, Socket.IO, KafkaJS (Backend) | HTML, PyQt5 (Frontend).
+- **Hasil Verifikasi Fungsi**:
+  1. **Komparasi WebSocket**: Modul pi_server berfungsi penuh sebagai *backend* berbasis Node.js yang ditandingkan dengan ast_api (Python) pada Skenario 4. Ia memanfaatkan Socket.IO dan berhasil menyiarkan data dari dua topik Kafka secara simultan tanpa *blocking*.
+  2. **Instrumentasi Tingkat Tinggi**: Modul ini tidak melupakan metrik; prom-client berhasil diintegrasikan dengan anggun untuk memantau waktu tunda siaran WebSocket (*Broadcast Latency*).
+  3. **Visualisasi Waktu Nyata**: seismic_app (berbasis PyQt5) dan pi_server/public (berbasis Web) berfungsi sebagai klien grafis (*GUI client*) untuk merender gelombang gempa (*seismogram*) di layar, bukan metrik infrastruktur (yang diurus Grafana).
+- **Kesimpulan**: Kedua modul ini **Valid**. Kodenya solid dan sangat representatif untuk menguji beban maksimal koneksi WebSocket dari ribuan pengguna sekaligus.
