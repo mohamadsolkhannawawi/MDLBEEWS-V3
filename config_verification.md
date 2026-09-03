@@ -241,3 +241,11 @@ Bagian ini memuat hasil pemeriksaan (*code review*) modul-modul internal (*sourc
   2. **Injeksi Lingkungan (*Environment*)**: Seluruh 19 file docker-compose*.yml telah saya konfigurasi ulang agar mengirimkan file .env ke dalam *container* Grafana. Hal ini memastikan Grafana dapat membaca token InfluxDB secara aman tanpa menampilkannya ke publik di dalam repositori Git.
   3. **Auto-Provisioning**: Desain modul ini sah dan otomatis. Ia memuat *dashboard* siap pakai eews-observability.json dan otomatis menyambungkan koneksi ke peladen metrik Prometheus.
 - **Kesimpulan**: Modul grafana **Valid**. Celah keamanan berupa kebocoran token (*Token Leak*) di riwayat kodenya telah ditutup permanen dengan penerapan kaidah 12-Factor App seutuhnya.
+
+### Modul: influxDB (Time-Series Database)
+- **Lokasi Folder**: e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\influxDB
+- **Tumpukan Teknologi (Tech Stack)**: InfluxDB v2.7, Docker Auto-Provisioning.
+- **Hasil Verifikasi Fungsi**:
+  1. **Inisialisasi Otomatis**: Modul ini sukses memanfaatkan fitur *Auto-Provisioning* murni bawaan Docker *image* InfluxDB (menggunakan variabel seperti DOCKER_INFLUXDB_INIT_MODE=setup). Ini memastikan basis data *bucket* eews langsung tercipta tanpa perlu eksekusi *script* atau intervensi manual setelah *container* hidup.
+  2. **Keamanan Kredensial**: File .env dan .env.example sudah saya pisahkan dan sanitasi sebelumnya (pada pemeriksaan berkas akar proyek). Token yang digunakan sekarang adalah token 88-karakter yang valid, aman, dan selaras dengan konfigurasi grafana dan data_archiver.
+- **Kesimpulan**: Modul influxDB **100% Valid**. Desain *container* ini sangat *stateless* pada level konfigurasi (karena bergantung penuh pada .env) namun sangat *stateful* pada level penyimpanan (karena volumenya di-*mount* ke folder influxDB utama).
