@@ -75,9 +75,12 @@ Dokumen ini menguraikan letak spesifik (ciri khas) dari masing-masing file konfi
 
 ### [docker-compose-s5-kafka.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose-s5-kafka.yml)
 - **Load Balancer**: Tidak menggunakan NGINX, murni Kafka native.
+  > **Cara Pengecekan:** Silakan buka filenya dan cari kata `nginx`. Anda tidak akan menemukannya. Selain itu, service P-Wave memanggil `dockerfile: p_wave_detector/Dockerfile` (versi aslinya yang menarik data langsung dari Kafka).
 
 ### [docker-compose-s5-nginx.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose-s5-nginx.yml)
 - **Load Balancer**: Menggunakan service `nginx` untuk load balancing Kafka.
+  > **Cara Pengecekan:** Cek baris paling bawah di dalam filenya, Anda akan melihat *service block* `nginx_load_balancer` (port 8004:80). Selain itu, service P-Wave memanggil `dockerfile: p_wave_detector_load_balance/Dockerfile` (versi HTTP yang menerima request distribusi trafik dari NGINX).
 
 ### [docker-compose.yml](file:///e:/Documents/Bahan Skripsi/Program EEWS/MDLBEEWS/docker-compose.yml)
 - **Master Compose**: Memuat seluruh service dari hulu ke hilir dengan konfigurasi default (produksi).
+  > **Cara Pengecekan:** Buka filenya, Anda akan melihat file ini memuat *seluruh* komponen sistem EEWS (Mulai dari ZooKeeper, ke-3 Kafka, InfluxDB, Prometheus, Grafana, Nginx, hingga seluruh detektor dan WebSocket API) menjadi satu kesatuan (*Full Stack*). Selain itu, nilai *replicas*-nya diset pada konfigurasi normal, bukan direkayasa untuk keperluan uji *stress-test* seperti pada skenario 1 - 5.
