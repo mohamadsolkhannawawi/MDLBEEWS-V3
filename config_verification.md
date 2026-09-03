@@ -249,3 +249,15 @@ Bagian ini memuat hasil pemeriksaan (*code review*) modul-modul internal (*sourc
   1. **Inisialisasi Otomatis**: Modul ini sukses memanfaatkan fitur *Auto-Provisioning* murni bawaan Docker *image* InfluxDB (menggunakan variabel seperti DOCKER_INFLUXDB_INIT_MODE=setup). Ini memastikan basis data *bucket* eews langsung tercipta tanpa perlu eksekusi *script* atau intervensi manual setelah *container* hidup.
   2. **Keamanan Kredensial**: File .env dan .env.example sudah saya pisahkan dan sanitasi sebelumnya (pada pemeriksaan berkas akar proyek). Token yang digunakan sekarang adalah token 88-karakter yang valid, aman, dan selaras dengan konfigurasi grafana dan data_archiver.
 - **Kesimpulan**: Modul influxDB **100% Valid**. Desain *container* ini sangat *stateless* pada level konfigurasi (karena bergantung penuh pada .env) namun sangat *stateful* pada level penyimpanan (karena volumenya di-*mount* ke folder influxDB utama).
+
+### Modul: load_balancer & 
+ginx (HTTP Traffic Router - Skenario 3)
+- **Lokasi Folder**: e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\load_balancer & e:\Documents\Bahan Skripsi\Program EEWS\MDLBEEWS\nginx
+- **Tumpukan Teknologi (Tech Stack)**: Python (Kafka-to-HTTP Bridge), NGINX (Reverse Proxy).
+- **Hasil Verifikasi Fungsi**:
+  1. **Penemuan Bug Bypass NGINX (Fatal)**: Sebelumnya, rute load_balancer pada 4 file Skenario 3 (docker-compose-s3-pwave-kafka-nginx-*.yml) tertuju secara bawaan (*default*) ke nama layanan Swarm (p_wave_detector_load_balance:8004), sehingga melewati (*bypass*) NGINX sepenuhnya. Skrip ini telah saya koreksi dengan menyuntikkan environment: LB_TARGET_URL: "http://nginx_load_balancer:80/trace" agar NGINX dilibatkan dengan benar sesuai judul skenarionya.
+  2. **Validasi Konfigurasi NGINX**: File 
+ginx/nginx.conf telah diverifikasi. Blok upstream dan proxy_pass sudah terkonfigurasi dengan valid (port 80 masuk, dialihkan ke 8004).
+  3. **Observabilitas**: Modul load_balancer mengimplementasikan metrik historgram lb_forward_latency_seconds yang sangat krusial untuk membedah perbedaan latensi rute langsung versus rute melalui NGINX.
+- **Kesimpulan**: Modul load_balancer & 
+ginx **Valid (Telah Ditambal/Diperbaiki)**. Dengan perbaikan rute ini, pengujian Skenario 3 Anda (Native Kafka vs Nginx) kini sah secara arsitektural dan ilmiah.

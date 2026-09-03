@@ -186,6 +186,8 @@ services:
     build:
       context: .
       dockerfile: load_balancer/Dockerfile
+    environment:
+      LB_TARGET_URL: "http://nginx_load_balancer:80/trace"
     deploy:
       replicas: 1
     tty: true
