@@ -13,5 +13,10 @@ influxDB/**/*
 grafana/grafana.db
 grafana/plugins/
 
+# Dokumen Skripsi (Non-kode)
+DOKUMEN SKRIPSI/
+"DOKUMEN SKRIPSI/"
+DOKUMEN SKRIPSI
+
 # KECUALIKAN file .env.example agar tetap masuk ke Git
 !influxDB/.env.example
