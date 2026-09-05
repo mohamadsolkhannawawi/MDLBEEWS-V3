@@ -1,5 +1,5 @@
 param (
-    [int]$DurationSec = 120,
+    [int]$DurationSec = 300,
     [string]$ScenarioName = "All"
 )
 
