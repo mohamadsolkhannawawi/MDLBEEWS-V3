@@ -305,6 +305,7 @@ services:
   telegraf:
     image: telegraf:1.29
     container_name: telegraf
+    user: root
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
