@@ -10,8 +10,8 @@ $RootDir = Split-Path -Parent $ScriptDir
 Set-Location $RootDir
 
 $Scenarios = @(
-    @{ Name="NoMetrics"; File="docker-compose-s2-no_metrics.yml"; OutStats="tests/results/s2_overhead_no_metrics_stats.csv" },
-    @{ Name="WithMetrics"; File="docker-compose-s2-with_metrics.yml"; OutStats="tests/results/s2_overhead_with_metrics_stats.csv" }
+    @{ Name="NoMetrics"; File="docker-compose-s2-no_metrics.yml"; OutMetrics="tests/results/s2_overhead_no_metrics_metrics.csv" },
+    @{ Name="WithMetrics"; File="docker-compose-s2-with_metrics.yml"; OutMetrics="tests/results/s2_overhead_with_metrics_metrics.csv" }
 )
 
 if ($ScenarioName -ne "All") {
@@ -34,8 +34,9 @@ foreach ($s in $Scenarios) {
     Write-Host "Waiting 60s for stabilization..."
     Start-Sleep -Seconds 60
     
-    # Target "paper-eews" atau nama prefix default docker compose untuk mengukur total resource consumption
-    Write-Host "Collecting Docker Stats for all containers..."
+    Write-Host "Collecting Docker Stats and Prometheus Metrics..."
+    $proc2 = Start-Process -FilePath $PythonExecutable -ArgumentList "tests/collect_metrics.py --duration $DurationSec --output $($s.OutMetrics)" -PassThru -NoNewWindow
+    Wait-Process -InputObject $proc2
 
     Write-Host "Tearing down $($s.Name)..."
 docker compose -f $($s.File) down -v --remove-orphans

@@ -41,11 +41,12 @@ foreach ($s in $Scenarios) {
     
     Write-Host "Collecting Docker Stats and Prometheus Metrics..."
     $proc2 = Start-Process -FilePath $PythonExecutable -ArgumentList "tests/collect_metrics.py --duration $DurationSec --output $($s.OutMetrics)" -PassThru -NoNewWindow
-
-    # Load generator should finish around the same time
+    
+    Wait-Process -InputObject $procLoad
+    Wait-Process -InputObject $proc2
 
     Write-Host "Tearing down $($s.Name)..."
-docker compose -f $($s.File) down -v --remove-orphans
+    docker compose -f $($s.File) down -v --remove-orphans
 }
 
 Write-Host "S4 WebSocket testing completed!" -ForegroundColor Green
