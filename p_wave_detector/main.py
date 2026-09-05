@@ -56,12 +56,12 @@ if ENABLE_METRICS:
     PWAVE_INFERENCE_LATENCY = Histogram(
         'pwave_inference_latency_seconds',
         'Latency of P-wave model inference',
-        buckets=[0.01, 0.05, 0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0, 120.0]
+        buckets=[0.01, 0.05, 0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0, 120.0, 300.0, 600.0]
     )
     PWAVE_E2E_LATENCY = Histogram(
         'pwave_end_to_end_latency_seconds',
         'End-to-end latency from data provider to P-wave detection',
-        buckets=[0.01, 0.05, 0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0, 120.0]
+        buckets=[0.01, 0.05, 0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0, 120.0, 300.0, 600.0]
     )
 else:
     PWAVE_REQUESTS = None

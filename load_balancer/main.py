@@ -42,7 +42,7 @@ if ENABLE_METRICS:
     LB_FORWARD_LATENCY = Histogram(
         'lb_forward_latency_seconds',
         'Latency of HTTP forward to P-Wave Detector',
-        buckets=[0.01, 0.05, 0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0, 120.0]
+        buckets=[0.01, 0.05, 0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0, 120.0, 300.0, 600.0]
     )
 else:
     LB_FORWARDED = None
