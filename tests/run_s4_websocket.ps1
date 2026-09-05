@@ -40,7 +40,7 @@ foreach ($s in $Scenarios) {
     $procLoad = Start-Process -FilePath $PythonExecutable -ArgumentList "tests/ws_load_generator.py --uri $($s.TargetURI) --clients $($s.Clients) --duration $DurationSec" -PassThru -NoNewWindow
     
     Write-Host "Collecting Docker Stats and Prometheus Metrics..."
-    $proc2 = Start-Process -FilePath $PythonExecutable -ArgumentList "tests/collect_metrics.py --duration $DurationSec --output $($s.OutMetrics)" -PassThru -NoNewWindow
+    $proc2 = Start-Process -FilePath $PythonExecutable -ArgumentList "tests/collect_metrics.py --scenario s4 --duration $DurationSec --output $($s.OutMetrics)" -PassThru -NoNewWindow
     
     Wait-Process -InputObject $procLoad
     Wait-Process -InputObject $proc2

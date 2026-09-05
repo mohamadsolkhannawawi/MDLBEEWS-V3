@@ -226,14 +226,3 @@ services:
     restart: always
 
 
-  telegraf:
-    image: telegraf:1.29
-    container_name: telegraf
-    user: root
-    entrypoint: ["telegraf"]
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-    ports:
-      - "9273:9273"
-    restart: always

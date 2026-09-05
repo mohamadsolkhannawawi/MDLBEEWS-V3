@@ -34,12 +34,18 @@ foreach ($s in $Scenarios) {
     Write-Host "Waiting 60s for stabilization..."
     Start-Sleep -Seconds 60
     
-    Write-Host "Collecting Docker Stats and Prometheus Metrics..."
-    $proc2 = Start-Process -FilePath $PythonExecutable -ArgumentList "tests/collect_metrics.py --duration $DurationSec --output $($s.OutMetrics)" -PassThru -NoNewWindow
+    Write-Host "Collecting Metrics..."
+    if ($s.Name -eq "NoMetrics") {
+        # Prometheus is disabled, so we collect CPU/RAM directly from Docker API
+        $proc2 = Start-Process -FilePath $PythonExecutable -ArgumentList "tests/collect_docker_stats.py --duration $DurationSec --output $($s.OutMetrics)" -PassThru -NoNewWindow
+    } else {
+        # Prometheus is enabled, collect all metrics via PromQL
+        $proc2 = Start-Process -FilePath $PythonExecutable -ArgumentList "tests/collect_metrics.py --scenario s2 --duration $DurationSec --output $($s.OutMetrics)" -PassThru -NoNewWindow
+    }
     Wait-Process -InputObject $proc2
 
     Write-Host "Tearing down $($s.Name)..."
-docker compose -f $($s.File) down -v --remove-orphans
+    docker compose -f $($s.File) down -v --remove-orphans
 }
 
 Write-Host "Skripsi S2 testing completed!" -ForegroundColor Green

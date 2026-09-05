@@ -39,7 +39,7 @@ foreach ($s in $Scenarios) {
     $JobMetrics = Start-Job -ScriptBlock {
         param($Exe, $Dur, $Out)
         Set-Location $using:RootDir
-        & $Exe tests/collect_metrics.py --duration $Dur --output $Out
+        & $Exe tests/collect_metrics.py --scenario s1 --duration $Dur --output $Out
     } -ArgumentList $PythonExecutable, $DurationSec, $($s.OutMetrics)
 
 
