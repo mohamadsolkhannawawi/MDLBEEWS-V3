@@ -104,6 +104,8 @@ def analyze_s1():
     for prefix in scenarios:
         metrics = read_csv(os.path.join(RESULTS_DIR, f"{prefix}_metrics.csv"))
         stats = read_csv(os.path.join(RESULTS_DIR, f"{prefix}_stats.csv"))
+        if not stats and metrics:
+            stats = metrics
         mode_name = prefix.replace("s1_", "").upper()
         
         if not stats:
