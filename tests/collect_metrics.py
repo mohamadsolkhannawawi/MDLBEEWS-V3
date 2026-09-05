@@ -19,7 +19,9 @@ QUERIES = {
     "fastapi_ws_broadcast_latency_p95": 'histogram_quantile(0.95, rate(fastapi_ws_broadcast_latency_seconds_bucket[1m]))',
     "active_ws_clients_express": 'ws_active_clients',
     "active_ws_clients_fastapi": 'fastapi_ws_active_clients',
-    "dp_throughput_traces_per_sec": 'sum(rate(data_provider_traces_sent_total[1m]))'
+    "dp_throughput_traces_per_sec": 'sum(rate(data_provider_traces_sent_total[1m]))',
+    "pwave_aggregate_cpu_percent": 'sum(docker_container_cpu_usage_percent{container_name=~".*p_wave_detector.*"})',
+    "pwave_aggregate_mem_mb": 'sum(docker_container_mem_usage_bytes{container_name=~".*p_wave_detector.*"}) / 1048576'
 }
 
 def create_session():

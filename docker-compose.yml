@@ -341,6 +341,16 @@ services:
       - kafka2
     restart: always
 
+  telegraf:
+    image: telegraf:1.29
+    container_name: telegraf
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    ports:
+      - "9273:9273"
+    restart: always
+
 volumes:
   prometheus_data:
   grafana_data:

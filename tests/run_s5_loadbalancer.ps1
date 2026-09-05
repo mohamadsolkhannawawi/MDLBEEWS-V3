@@ -35,11 +35,8 @@ foreach ($s in $Scenarios) {
     Start-Sleep -Seconds 60
     
     Write-Host "Collecting Docker Stats and Prometheus Metrics..."
-    $proc1 = Start-Process -FilePath $PythonExecutable -ArgumentList "tests/collect_docker_stats.py --duration $DurationSec --output $($s.OutStats) --target-substring kafka" -PassThru -NoNewWindow
     $proc2 = Start-Process -FilePath $PythonExecutable -ArgumentList "tests/collect_metrics.py --duration $DurationSec --output $($s.OutMetrics)" -PassThru -NoNewWindow
 
-    Wait-Process -ErrorAction SilentlyContinue -Id $proc1.Id
-    Wait-Process -ErrorAction SilentlyContinue -Id $proc2.Id
 
     Write-Host "Tearing down $($s.Name)..."
 docker compose -f $($s.File) down -v --remove-orphans

@@ -223,7 +223,7 @@
       }
     },
     {
-      "title": "Resource Usage (Host)",
+      "title": "Resource Usage (Host & Containers)",
       "type": "row",
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 34 },
       "collapsed": false,
@@ -238,24 +238,20 @@
       "targets": [
         {
           "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[1m])) * 100)",
-          "legendFormat": "CPU Usage %",
+          "legendFormat": "Host CPU %",
           "refId": "A"
+        },
+        {
+          "expr": "sum by(container_name) (docker_container_cpu_usage_percent)",
+          "legendFormat": "{{container_name}}",
+          "refId": "B"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
           "min": 0,
-          "max": 100,
-          "custom": { "lineWidth": 2, "fillOpacity": 10 },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 70 },
-              { "color": "red", "value": 90 }
-            ]
-          }
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
         }
       }
     },
@@ -268,8 +264,13 @@
       "targets": [
         {
           "expr": "(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / 1024 / 1024",
-          "legendFormat": "Used Memory (MB)",
+          "legendFormat": "Host Used Mem (MB)",
           "refId": "A"
+        },
+        {
+          "expr": "sum by(container_name) (docker_container_mem_usage_bytes) / 1048576",
+          "legendFormat": "{{container_name}}",
+          "refId": "B"
         }
       ],
       "fieldConfig": {

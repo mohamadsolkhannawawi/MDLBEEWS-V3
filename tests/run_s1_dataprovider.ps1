@@ -42,7 +42,6 @@ foreach ($s in $Scenarios) {
         & $Exe tests/collect_metrics.py --duration $Dur --output $Out
     } -ArgumentList $PythonExecutable, $DurationSec, $($s.OutMetrics)
 
-    & $PythonExecutable tests/collect_docker_stats.py --duration $DurationSec --output $($s.OutStats) --target-substring "data_provider"
 
     Wait-Job $JobMetrics | Out-Null
     Receive-Job $JobMetrics

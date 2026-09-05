@@ -36,7 +36,6 @@ foreach ($s in $Scenarios) {
     
     # Target "paper-eews" atau nama prefix default docker compose untuk mengukur total resource consumption
     Write-Host "Collecting Docker Stats for all containers..."
-    & $PythonExecutable tests/collect_docker_stats.py --duration $DurationSec --output $($s.OutStats) --target-substring ""
 
     Write-Host "Tearing down $($s.Name)..."
 docker compose -f $($s.File) down -v --remove-orphans
