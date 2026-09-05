@@ -1,3 +1,0 @@
-Kondisi,CPU Mean (%),CPU P95 (%),RAM Mean (MB),RAM Max (MB)
-Tanpa Metrics,859.92,1286.62,12071.53,21250.48
-Dengan Metrics,895.54,1387.89,14176.89,24788.21
