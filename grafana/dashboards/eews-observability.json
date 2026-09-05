@@ -268,7 +268,7 @@
           "refId": "A"
         },
         {
-          "expr": "sum by(container_name) (docker_container_mem_usage_bytes) / 1048576",
+          "expr": "sum by(container_name) (docker_container_mem_usage) / 1048576",
           "legendFormat": "{{container_name}}",
           "refId": "B"
         }
